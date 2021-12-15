@@ -11,6 +11,7 @@
           @click.native="EXPAND_NAVIGATION = !EXPAND_NAVIGATION"
         />
         <ButtonSecondary
+          v-if="!IS_UTOOLS"
           v-tippy="{ theme: 'tooltip' }"
           :title="`${ZEN_MODE ? t('action.turn_off') : t('action.turn_on')} ${t(
             'layout.zen_mode'
@@ -65,6 +66,7 @@
                 @click.native="$refs.options.tippy().hide()"
               />
               <SmartItem
+                v-if="!IS_UTOOLS"
                 svg="message-circle"
                 :label="`${t('app.chat_with_us')}`"
                 @click.native="
@@ -77,7 +79,14 @@
               <hr />
               <SmartItem
                 svg="github"
-                :label="`${t('app.github')}`"
+                label="Hoppscotch-utools"
+                to="https://github.com/baiy/hoppscotch-utools"
+                blank
+                @click.native="$refs.options.tippy().hide()"
+              />
+              <SmartItem
+                svg="github"
+                label="Hoppscotch"
                 to="https://github.com/hoppscotch/hoppscotch"
                 blank
                 @click.native="$refs.options.tippy().hide()"
@@ -162,7 +171,7 @@ import { defineActionHandler } from "~/helpers/actions"
 import { showChat } from "~/helpers/support"
 import { useSetting } from "~/newstore/settings"
 import { useI18n } from "~/helpers/utils/composables"
-
+import { IS_UTOOLS } from "~/utools/utools"
 const t = useI18n()
 const showShortcuts = ref(false)
 const showShare = ref(false)

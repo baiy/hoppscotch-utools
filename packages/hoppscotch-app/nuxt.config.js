@@ -96,12 +96,13 @@ export default {
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
+    "~/utools/plugin.js",
     "~/plugins/v-tippy",
     "~/plugins/v-focus",
     "~/plugins/v-textarea",
     "~/plugins/vue-apollo",
-    "~/plugins/init-fb.ts",
-    "~/plugins/crisp",
+    // "~/plugins/init-fb.ts",
+    // "~/plugins/crisp",
     { src: "~/plugins/web-worker", ssr: false },
   ],
 
@@ -111,15 +112,15 @@ export default {
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
     // https://github.com/nuxt-community/pwa-module
-    "@nuxtjs/pwa",
+    // "@nuxtjs/pwa",
     // https://github.com/nuxt-community/stylelint-module
     "@nuxtjs/stylelint-module",
     // https://github.com/nuxt-community/eslint-module
     "@nuxtjs/eslint-module",
     // https://github.com/nuxt-community/analytics-module
-    "@nuxtjs/google-analytics",
+    // "@nuxtjs/google-analytics",
     // https://github.com/nuxt-community/gtm-module
-    "@nuxtjs/gtm",
+    // "@nuxtjs/gtm",
     // https://github.com/windicss/windicss
     "nuxt-windicss",
     // https://github.com/nuxt-community/color-mode-module
@@ -146,9 +147,9 @@ export default {
     // https://github.com/nuxt-community/i18n-module
     "@nuxtjs/i18n",
     // https://github.com/nuxt-community/robots-module
-    "@nuxtjs/robots",
+    // "@nuxtjs/robots",
     // https://github.com/nuxt-community/sitemap-module
-    "@nuxtjs/sitemap",
+    // "@nuxtjs/sitemap",
   ],
 
   // PWA module configuration (https://pwa.nuxtjs.org/setup)
@@ -212,6 +213,7 @@ export default {
 
   // Google Fonts module configuration (https://github.com/nuxt-community/google-fonts-module)
   googleFonts: {
+    download: true,
     display: "block",
     families: {
       Inter: [400, 500, 600, 700, 800],
@@ -223,15 +225,15 @@ export default {
   // i18n module configuration (https://github.com/nuxt-community/i18n-module)
   i18n: {
     locales: languages,
-    defaultLocale: "en",
+    defaultLocale: "cn",
     vueI18n: {
-      fallbackLocale: "en",
+      fallbackLocale: "cn",
     },
     lazy: true,
     langDir: "locales/",
     detectBrowserLanguage: {
       alwaysRedirect: true,
-      fallbackLocale: "en",
+      fallbackLocale: "cn",
     },
     baseUrl: process.env.BASE_URL,
   },
@@ -250,6 +252,10 @@ export default {
         config.mode = "development"
       }
 
+      if (!isDev) {
+        config.output.publicPath = "./_nuxt/"
+      }
+
       config.node = {
         fs: "empty",
       }
@@ -264,6 +270,11 @@ export default {
         config.module.rules.push({
           test: /\.md$/i,
           use: { loader: "raw-loader" },
+          exclude: /(node_modules)/,
+        })
+        config.module.rules.push({
+          test: /\.vue$/i,
+          loader: "./utools/replace-image-path-loader.js",
           exclude: /(node_modules)/,
         })
 
@@ -329,6 +340,8 @@ export default {
 
   // Router configuration (https://nuxtjs.org/api/configuration-router)
   router: {
+    mode: "hash",
+    base: process.env.NODE_ENV === "production" ? "./" : "/",
     linkActiveClass: "active-link",
     linkExactActiveClass: "exact-active-link",
   },

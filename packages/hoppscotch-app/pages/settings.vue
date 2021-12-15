@@ -90,7 +90,7 @@
                   {{ $t("settings.sidebar_on_left") }}
                 </SmartToggle>
               </div>
-              <div class="flex items-center">
+              <div v-if="!IS_UTOOLS" class="flex items-center">
                 <SmartToggle :on="ZEN_MODE" @change="toggleSetting('ZEN_MODE')">
                   {{ $t("layout.zen_mode") }}
                 </SmartToggle>
@@ -110,7 +110,7 @@
           </p>
         </div>
         <div class="space-y-8 p-8 md:col-span-2">
-          <section>
+          <section v-if="!IS_UTOOLS">
             <h4 class="font-semibold text-secondaryDark">
               {{ $t("settings.extensions") }}
             </h4>
@@ -249,6 +249,7 @@ import {
 } from "~/newstore/settings"
 import type { KeysMatching } from "~/types/ts-utils"
 import { getLocalConfig } from "~/newstore/localpersistence"
+import { IS_UTOOLS } from "~/utools/utools"
 
 type SettingsType = typeof defaultSettings
 
@@ -262,6 +263,7 @@ export default defineComponent({
       EXPAND_NAVIGATION: useSetting("EXPAND_NAVIGATION"),
       SIDEBAR_ON_LEFT: useSetting("SIDEBAR_ON_LEFT"),
       ZEN_MODE: useSetting("ZEN_MODE"),
+      IS_UTOOLS,
     }
   },
   data() {

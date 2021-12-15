@@ -20,7 +20,7 @@ const firebaseConfig = {
 let initialized = false
 
 export function initializeFirebase() {
-  if (!initialized) {
+  if (initialized) {
     try {
       initializeApp(firebaseConfig)
 
