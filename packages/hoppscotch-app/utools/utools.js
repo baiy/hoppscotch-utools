@@ -13,7 +13,9 @@ defaultSettings.SIDEBAR_ON_LEFT = true
 window.localStorage.setItem("cookiesAllowed", "yes")
 
 const openUrl = (url) => {
-  if (isReady) {
+  url = url.trim()
+  console.log(url)
+  if (url && url.indexOf("http") === 0) {
     window.utools.shellOpenExternal(url)
   }
 }
@@ -26,12 +28,16 @@ const interceptLink = () => {
       target = target.closest("a")
     }
     if (target && "tagName" in target && target.tagName.toLowerCase() === "a") {
+      const url = target.getAttribute("href") || ""
+      if (url.indexOf("http") !== 0) {
+        return
+      }
       if (event.preventDefault) {
         event.preventDefault()
       } else {
         window.event.returnValue = true
       }
-      openUrl(target.getAttribute("href"))
+      openUrl(url)
     }
   })
 }

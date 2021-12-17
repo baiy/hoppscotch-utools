@@ -96,7 +96,8 @@ export default {
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
-    "~/utools/plugin.js",
+    "~/utools/storage.js",
+    "~/utools/launch.js",
     "~/plugins/v-tippy",
     "~/plugins/v-focus",
     "~/plugins/v-textarea",
