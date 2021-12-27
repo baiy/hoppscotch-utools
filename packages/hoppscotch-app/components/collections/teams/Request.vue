@@ -1,8 +1,13 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col" :class="[{ 'bg-primaryLight': dragging }]">
     <div
       class="flex items-stretch group"
-      @contextmenu.prevent="$refs.options.tippy().show()"
+      draggable="true"
+      @dragstart="dragStart"
+      @dragover.stop
+      @dragleave="dragging = false"
+      @dragend="dragging = false"
+      @contextmenu.prevent="options.tippy().show()"
     >
       <span
         class="cursor-pointer flex px-2 w-16 items-center justify-center truncate"
@@ -33,9 +38,17 @@
             active.requestID === requestIndex
           "
           v-tippy="{ theme: 'tooltip' }"
-          class="rounded-full bg-green-500 flex-shrink-0 h-1.5 mx-3 w-1.5"
+          class="relative h-1.5 w-1.5 flex flex-shrink-0 mx-3"
           :title="`${$t('collection.request_in_use')}`"
-        ></span>
+        >
+          <span
+            class="absolute animate-ping inline-flex flex-shrink-0 h-full w-full rounded-full bg-green-500 opacity-75"
+          >
+          </span>
+          <span
+            class="relative inline-flex flex-shrink-0 rounded-full h-1.5 w-1.5 bg-green-500"
+          ></span>
+        </span>
       </span>
       <div class="flex">
         <ButtonSecondary
@@ -54,6 +67,7 @@
             trigger="click"
             theme="popover"
             arrow
+            :on-shown="() => tippyActions.focus()"
           >
             <template #trigger>
               <ButtonSecondary
@@ -62,28 +76,45 @@
                 svg="more-vertical"
               />
             </template>
-            <SmartItem
-              svg="edit"
-              :label="$t('action.edit')"
-              @click.native="
-                $emit('edit-request', {
-                  collectionIndex,
-                  folderIndex,
-                  folderName,
-                  request,
-                  requestIndex,
-                })
-                $refs.options.tippy().hide()
-              "
-            />
-            <SmartItem
-              svg="trash-2"
-              :label="$t('action.delete')"
-              @click.native="
-                confirmRemove = true
-                $refs.options.tippy().hide()
-              "
-            />
+            <div
+              ref="tippyActions"
+              class="flex flex-col focus:outline-none"
+              tabindex="0"
+              @keyup.e="edit.$el.click()"
+              @keyup.delete="deleteAction.$el.click()"
+              @keyup.escape="options.tippy().hide()"
+            >
+              <SmartItem
+                ref="edit"
+                svg="edit"
+                :label="$t('action.edit')"
+                :shortcut="['E']"
+                @click.native="
+                  () => {
+                    $emit('edit-request', {
+                      collectionIndex,
+                      folderIndex,
+                      folderName,
+                      request,
+                      requestIndex,
+                    })
+                    options.tippy().hide()
+                  }
+                "
+              />
+              <SmartItem
+                ref="deleteAction"
+                svg="trash-2"
+                :label="$t('action.delete')"
+                :shortcut="['⌫']"
+                @click.native="
+                  () => {
+                    confirmRemove = true
+                    options.tippy().hide()
+                  }
+                "
+              />
+            </div>
           </tippy>
         </span>
       </div>
@@ -98,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@nuxtjs/composition-api"
+import { defineComponent, ref } from "@nuxtjs/composition-api"
 import { translateToNewRequest } from "@hoppscotch/data"
 import { useReadonlyStream } from "~/helpers/utils/composables"
 import {
@@ -124,10 +155,15 @@ export default defineComponent({
     const active = useReadonlyStream(restSaveContext$, null)
     return {
       active,
+      tippyActions: ref<any | null>(null),
+      options: ref<any | null>(null),
+      edit: ref<any | null>(null),
+      deleteAction: ref<any | null>(null),
     }
   },
   data() {
     return {
+      dragging: false,
       requestMethodLabels: {
         get: "text-green-500",
         post: "text-yellow-500",
@@ -169,6 +205,10 @@ export default defineComponent({
           originLocation: "team-collection",
           requestID: this.requestIndex as string,
         })
+    },
+    dragStart({ dataTransfer }) {
+      this.dragging = !this.dragging
+      dataTransfer.setData("requestIndex", this.requestIndex)
     },
     removeRequest() {
       this.$emit("remove-request", {

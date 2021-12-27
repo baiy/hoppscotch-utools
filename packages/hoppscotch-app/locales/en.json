@@ -96,7 +96,8 @@
     "password": "Password",
     "token": "Token",
     "type": "Authorization Type",
-    "username": "Username"
+    "username": "Username",
+    "pass_key_by": "Pass by"
   },
   "collection": {
     "created": "Collection created",
@@ -213,7 +214,7 @@
   "helpers": {
     "authorization": "The authorization header will be automatically generated when you send the request.",
     "generate_documentation_first": "Generate documentation first",
-    "network_fail": "Unable to reach the API endpoint. Check your network connection or turn on Proxy Interceptor and try again.",
+    "network_fail": "Unable to reach the API endpoint. Check your network connection or select a different Interceptor and try again.",
     "offline": "You seem to be offline. Data in this workspace might not be up to date.",
     "offline_short": "You seem to be offline.",
     "post_request_tests": "Test scripts are written in JavaScript, and are run after the response is received.",
@@ -229,7 +230,7 @@
   "import": {
     "collections": "Import collections",
     "curl": "Import cURL",
-    "failed": "Import failed",
+    "failed": "Error while importing: format not recognized",
     "from_gist": "Import from Gist",
     "from_my_collections": "Import from My Collections",
     "gist_url": "Enter Gist URL",

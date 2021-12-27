@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center">
+  <div class="flex py-1 items-center">
     <span class="flex flex-1 mr-4">
       {{ t(shortcut.label) }}
     </span>
@@ -19,6 +19,9 @@ import { useI18n } from "~/helpers/utils/composables"
 const t = useI18n()
 
 defineProps<{
-  shortcut: Object
+  shortcut: {
+    label: string
+    keys: string[]
+  }
 }>()
 </script>

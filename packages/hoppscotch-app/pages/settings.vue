@@ -130,17 +130,6 @@
             <div class="flex flex-col space-y-2 py-4">
               <span>
                 <SmartItem
-                  to="https://addons.mozilla.org/en-US/firefox/addon/hoppscotch"
-                  blank
-                  svg="brands/firefox"
-                  label="Firefox"
-                  :info-icon="hasFirefoxExtInstalled ? 'check_circle' : ''"
-                  :active-info-icon="hasFirefoxExtInstalled"
-                  outline
-                />
-              </span>
-              <span>
-                <SmartItem
                   to="https://chrome.google.com/webstore/detail/hoppscotch-browser-extens/amknoiejhlmhancpahfcfcfhllgkpbld"
                   blank
                   svg="brands/chrome"
@@ -150,12 +139,23 @@
                   outline
                 />
               </span>
+              <span>
+                <SmartItem
+                  to="https://addons.mozilla.org/en-US/firefox/addon/hoppscotch"
+                  blank
+                  svg="brands/firefox"
+                  label="Firefox"
+                  :info-icon="hasFirefoxExtInstalled ? 'check_circle' : ''"
+                  :active-info-icon="hasFirefoxExtInstalled"
+                  outline
+                />
+              </span>
             </div>
             <div class="space-y-4 py-4">
               <div class="flex items-center">
                 <SmartToggle
                   :on="EXTENSIONS_ENABLED"
-                  @change="toggleSetting('EXTENSIONS_ENABLED')"
+                  @change="toggleInterceptor('extension')"
                 >
                   {{ t("settings.extensions_use_toggle") }}
                 </SmartToggle>
@@ -184,7 +184,7 @@
               <div class="flex items-center">
                 <SmartToggle
                   :on="PROXY_ENABLED"
-                  @change="toggleSetting('PROXY_ENABLED')"
+                  @change="toggleInterceptor('proxy')"
                 >
                   {{ t("settings.proxy_use_toggle") }}
                 </SmartToggle>
@@ -297,16 +297,22 @@ watch(
   { deep: true }
 )
 // Extensions and proxy should not be enabled at the same time
-watch(
-  [EXTENSIONS_ENABLED, PROXY_ENABLED],
-  ([extEnabled, proxEnabled], [oldExtEnabled]) => {
-    // Detect which changed over the watch
-    const changedKey = extEnabled === oldExtEnabled ? "extension" : "proxy"
-    if (changedKey === "extension") {
-      if (proxEnabled) PROXY_ENABLED.value = false
-    } else if (extEnabled) EXTENSIONS_ENABLED.value = false
+const toggleInterceptor = (interceptor: "extension" | "proxy") => {
+  if (interceptor === "extension") {
+    EXTENSIONS_ENABLED.value = !EXTENSIONS_ENABLED.value
+
+    if (EXTENSIONS_ENABLED.value) {
+      PROXY_ENABLED.value = false
+    }
+  } else {
+    PROXY_ENABLED.value = !PROXY_ENABLED.value
+
+    if (PROXY_ENABLED.value) {
+      EXTENSIONS_ENABLED.value = false
+    }
   }
-)
+}
+
 const showConfirmModal = () => {
   if (TELEMETRY_ENABLED.value) confirmRemove.value = true
   else toggleSetting("TELEMETRY_ENABLED")

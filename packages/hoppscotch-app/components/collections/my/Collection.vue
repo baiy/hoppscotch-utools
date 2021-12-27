@@ -8,7 +8,7 @@
       @drop="dragging = false"
       @dragleave="dragging = false"
       @dragend="dragging = false"
-      @contextmenu.prevent="$refs.options.tippy().show()"
+      @contextmenu.prevent="options.tippy().show()"
     >
       <span
         class="cursor-pointer flex px-4 items-center justify-center"
@@ -65,6 +65,7 @@
             trigger="click"
             theme="popover"
             arrow
+            :on-shown="() => tippyActions.focus()"
           >
             <template #trigger>
               <ButtonSecondary
@@ -73,39 +74,55 @@
                 svg="more-vertical"
               />
             </template>
-            <SmartItem
-              svg="folder-plus"
-              :label="$t('folder.new')"
-              @click.native="
-                () => {
-                  $emit('add-folder', {
-                    folder: collection,
-                    path: `${collectionIndex}`,
-                  })
-                  $refs.options.tippy().hide()
-                }
-              "
-            />
-            <SmartItem
-              svg="edit"
-              :label="$t('action.edit')"
-              @click.native="
-                () => {
-                  $emit('edit-collection')
-                  $refs.options.tippy().hide()
-                }
-              "
-            />
-            <SmartItem
-              svg="trash-2"
-              :label="$t('action.delete')"
-              @click.native="
-                () => {
-                  confirmRemove = true
-                  $refs.options.tippy().hide()
-                }
-              "
-            />
+            <div
+              ref="tippyActions"
+              class="flex flex-col focus:outline-none"
+              tabindex="0"
+              @keyup.n="folderAction.$el.click()"
+              @keyup.e="edit.$el.click()"
+              @keyup.delete="deleteAction.$el.click()"
+              @keyup.escape="options.tippy().hide()"
+            >
+              <SmartItem
+                ref="folderAction"
+                svg="folder-plus"
+                :label="$t('folder.new')"
+                :shortcut="['N']"
+                @click.native="
+                  () => {
+                    $emit('add-folder', {
+                      folder: collection,
+                      path: `${collectionIndex}`,
+                    })
+                    options.tippy().hide()
+                  }
+                "
+              />
+              <SmartItem
+                ref="edit"
+                svg="edit"
+                :label="$t('action.edit')"
+                :shortcut="['E']"
+                @click.native="
+                  () => {
+                    $emit('edit-collection')
+                    options.tippy().hide()
+                  }
+                "
+              />
+              <SmartItem
+                ref="deleteAction"
+                svg="trash-2"
+                :label="$t('action.delete')"
+                :shortcut="['⌫']"
+                @click.native="
+                  () => {
+                    confirmRemove = true
+                    options.tippy().hide()
+                  }
+                "
+              />
+            </div>
           </tippy>
         </span>
       </div>
@@ -166,7 +183,7 @@
             :src="`/images/states/${$colorMode.value}/pack.svg`"
             loading="lazy"
             class="flex-col object-contain object-center h-16 mb-4 w-16 inline-flex"
-            :alt="$t('empty.collection')"
+            :alt="`${$t('empty.collection')}`"
           />
           <span class="text-center">
             {{ $t("empty.collection") }}
@@ -183,8 +200,8 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from "@nuxtjs/composition-api"
+<script lang="ts">
+import { defineComponent, ref } from "@nuxtjs/composition-api"
 import { moveRESTRequest } from "~/newstore/collections"
 
 export default defineComponent({
@@ -198,6 +215,15 @@ export default defineComponent({
     collectionsType: { type: Object, default: () => {} },
     picked: { type: Object, default: () => {} },
   },
+  setup() {
+    return {
+      tippyActions: ref<any | null>(null),
+      options: ref<any | null>(null),
+      folderAction: ref<any | null>(null),
+      edit: ref<any | null>(null),
+      deleteAction: ref<any | null>(null),
+    }
+  },
   data() {
     return {
       showChildren: false,
@@ -210,7 +236,7 @@ export default defineComponent({
     }
   },
   computed: {
-    isSelected() {
+    isSelected(): boolean {
       return (
         this.picked &&
         this.picked.pickedType === "my-collection" &&
