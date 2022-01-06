@@ -1,7 +1,9 @@
-*,
-*::before,
-*::after {
+* {
   @apply backface-hidden;
+  @apply before:backface-hidden;
+  @apply after:backface-hidden;
+  @apply selection:bg-accentDark;
+  @apply selection:text-accentContrast;
 }
 
 :root {
@@ -35,11 +37,6 @@
 
 .hide-scrollbar::-webkit-scrollbar {
   @apply hidden;
-}
-
-::selection {
-  @apply bg-accentDark;
-  @apply text-accentContrast;
 }
 
 input::placeholder,
@@ -102,6 +99,7 @@ body {
 
 .material-icons {
   @apply flex-shrink-0;
+  @apply overflow-hidden;
 
   font-size: var(--line-height-body) !important;
   width: var(--line-height-body);
@@ -109,6 +107,7 @@ body {
 
 .svg-icons {
   @apply flex-shrink-0;
+  @apply overflow-hidden;
 
   height: var(--line-height-body);
   width: var(--line-height-body);
@@ -145,7 +144,7 @@ a {
   @apply shadow;
   @apply leading-body;
 
-  font-size: 88%;
+  font-size: 86%;
 
   kbd {
     @apply hidden;
@@ -230,7 +229,6 @@ button {
 }
 
 .floating-input ~ label {
-  @apply font-medium;
   @apply py-0.5;
   @apply px-2;
   @apply m-2;
@@ -246,7 +244,7 @@ button {
   @apply transform;
   @apply origin-top-left;
   @apply scale-75;
-  @apply -translate-y-5;
+  @apply -translate-y-4;
   @apply translate-x-1;
 }
 
@@ -449,12 +447,20 @@ pre.ace_editor {
 .shortcut-key {
   @apply inline-flex;
   @apply font-sans;
-  @apply font-medium;
   @apply text-tiny;
   @apply bg-divider;
   @apply rounded;
   @apply ml-2;
   @apply px-1;
+  @apply transition;
+}
+
+.capitalize-first {
+  @apply first-letter:capitalize;
+}
+
+details summary::-webkit-details-marker {
+  @apply hidden;
 }
 
 @media (max-width: 767px) {

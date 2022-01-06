@@ -29,9 +29,9 @@
     "send": "Küld",
     "start": "Rajt",
     "stop": "Álljon meg",
+    "to_close": "to close",
     "to_navigate": "to navigate",
     "to_select": "to select",
-    "to_close": "to close",
     "turn_off": "Kikapcsolni",
     "turn_on": "Bekapcsol",
     "undo": "Visszavonás",
@@ -93,11 +93,11 @@
     "generate_token": "Token generálása",
     "include_in_url": "Belefoglalás az URL -be",
     "learn": "Megtanulják, hogyan",
+    "pass_key_by": "Pass by",
     "password": "Jelszó",
     "token": "Jelképes",
     "type": "Engedélyezés típusa",
-    "username": "Felhasználónév",
-    "pass_key_by": "Pass by"
+    "username": "Felhasználónév"
   },
   "collection": {
     "created": "Gyűjtemény létrehozva",
@@ -426,6 +426,13 @@
       "save_to_collections": "Mentés a Gyűjtemények közé",
       "send_request": "Felkérést küld",
       "title": "Kérés"
+    },
+    "theme": {
+      "black": "Switch  theme to black mode",
+      "dark": "Switch  theme to  dark mode",
+      "light": "Switch  theme to light mode",
+      "system": "Switch  theme to system mode",
+      "title": "Theme"
     }
   },
   "show": {
@@ -447,7 +454,7 @@
   },
   "state": {
     "bulk_mode": "Tömeges szerkesztés",
-    "bulk_mode_placeholder": "A bejegyzéseket új sor választja el\nA kulcsokat és az értékeket a következők választják el egymástól:\nElőtag // bármelyik sorhoz, amelyet hozzá szeretne adni, de továbbra is letiltva",
+    "bulk_mode_placeholder": "A bejegyzéseket új sor választja el\nA kulcsokat és az értékeket a következők választják el egymástól:\nElőtag # bármelyik sorhoz, amelyet hozzá szeretne adni, de továbbra is letiltva",
     "cleared": "Törölt",
     "connected": "csatlakoztatva",
     "connected_to": "Összekapcsolva a következővel: {name}",

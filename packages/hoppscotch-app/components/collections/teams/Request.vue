@@ -81,6 +81,7 @@
               class="flex flex-col focus:outline-none"
               tabindex="0"
               @keyup.e="edit.$el.click()"
+              @keyup.d="duplicate.$el.click()"
               @keyup.delete="deleteAction.$el.click()"
               @keyup.escape="options.tippy().hide()"
             >
@@ -97,6 +98,22 @@
                       folderName,
                       request,
                       requestIndex,
+                    })
+                    options.tippy().hide()
+                  }
+                "
+              />
+              <SmartItem
+                ref="duplicate"
+                svg="copy"
+                :label="$t('action.duplicate')"
+                :shortcut="['D']"
+                @click.native="
+                  () => {
+                    $emit('duplicate-request', {
+                      request,
+                      requestIndex,
+                      collectionID,
                     })
                     options.tippy().hide()
                   }
@@ -130,9 +147,13 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "@nuxtjs/composition-api"
-import { translateToNewRequest } from "@hoppscotch/data"
+import {
+  safelyExtractRESTRequest,
+  translateToNewRequest,
+} from "@hoppscotch/data"
 import { useReadonlyStream } from "~/helpers/utils/composables"
 import {
+  getDefaultRESTRequest,
   restSaveContext$,
   setRESTRequest,
   setRESTSaveContext,
@@ -150,6 +171,7 @@ export default defineComponent({
     saveRequest: Boolean,
     collectionsType: { type: Object, default: () => {} },
     picked: { type: Object, default: () => {} },
+    collectionID: { type: String, default: null },
   },
   setup() {
     const active = useReadonlyStream(restSaveContext$, null)
@@ -159,6 +181,7 @@ export default defineComponent({
       options: ref<any | null>(null),
       edit: ref<any | null>(null),
       deleteAction: ref<any | null>(null),
+      duplicate: ref<any | null>(null),
     }
   },
   data() {
@@ -201,10 +224,16 @@ export default defineComponent({
           },
         })
       else
-        setRESTRequest(translateToNewRequest(this.request), {
-          originLocation: "team-collection",
-          requestID: this.requestIndex as string,
-        })
+        setRESTRequest(
+          safelyExtractRESTRequest(
+            translateToNewRequest(this.request),
+            getDefaultRESTRequest()
+          ),
+          {
+            originLocation: "team-collection",
+            requestID: this.requestIndex as string,
+          }
+        )
     },
     dragStart({ dataTransfer }) {
       this.dragging = !this.dragging

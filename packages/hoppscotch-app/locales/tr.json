@@ -29,9 +29,9 @@
     "send": "Gönder",
     "start": "Başla",
     "stop": "Dur",
+    "to_close": "to close",
     "to_navigate": "to navigate",
     "to_select": "to select",
-    "to_close": "to close",
     "turn_off": "Kapat",
     "turn_on": "Aç",
     "undo": "Geri al",
@@ -93,11 +93,11 @@
     "generate_token": "Jeton Oluştur",
     "include_in_url": "URL'ye dahil et",
     "learn": "Nasıl öğrenilir",
+    "pass_key_by": "Pass by",
     "password": "Parola",
     "token": "Jeton",
     "type": "Yetki Türü",
-    "username": "Kullanıcı adı",
-    "pass_key_by": "Pass by"
+    "username": "Kullanıcı adı"
   },
   "collection": {
     "created": "Koleksiyon oluşturuldu",
@@ -426,6 +426,13 @@
       "save_to_collections": "Koleksiyonlara Kaydet",
       "send_request": "İstek gönder",
       "title": "İstek"
+    },
+    "theme": {
+      "black": "Switch  theme to black mode",
+      "dark": "Switch  theme to  dark mode",
+      "light": "Switch  theme to light mode",
+      "system": "Switch  theme to system mode",
+      "title": "Theme"
     }
   },
   "show": {
@@ -447,7 +454,7 @@
   },
   "state": {
     "bulk_mode": "Toplu düzenleme",
-    "bulk_mode_placeholder": "Girişler yeni satırla ayrılır\nAnahtarlar ve değerler şu şekilde ayrılır:\nEklemek istediğiniz ancak devre dışı bırakmak istediğiniz herhangi bir satırın başına // ekleyin",
+    "bulk_mode_placeholder": "Girişler yeni satırla ayrılır\nAnahtarlar ve değerler şu şekilde ayrılır:\nEklemek istediğiniz ancak devre dışı bırakmak istediğiniz herhangi bir satırın başına # ekleyin",
     "cleared": "Temizlendi",
     "connected": "bağlı",
     "connected_to": "{name} ile bağlantılı",

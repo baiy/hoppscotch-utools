@@ -29,9 +29,9 @@
     "send": "Wyślij",
     "start": "Rozpocznij",
     "stop": "Zatrzymaj",
+    "to_close": "to close",
     "to_navigate": "to navigate",
     "to_select": "to select",
-    "to_close": "to close",
     "turn_off": "Wyłącz",
     "turn_on": "Włącz",
     "undo": "Cofnij",
@@ -93,11 +93,11 @@
     "generate_token": "Wygeneruj token",
     "include_in_url": "Uwzględnij w adresie URL",
     "learn": "Naucz się jak",
+    "pass_key_by": "Pass by",
     "password": "Hasło",
     "token": "Token",
     "type": "Typ autoryzacji",
-    "username": "Nazwa użytkownika",
-    "pass_key_by": "Pass by"
+    "username": "Nazwa użytkownika"
   },
   "collection": {
     "created": "Utworzono kolekcję",
@@ -426,6 +426,13 @@
       "save_to_collections": "Zapisz w kolekcjach",
       "send_request": "Wyślij żądanie",
       "title": "Żądania"
+    },
+    "theme": {
+      "black": "Switch  theme to black mode",
+      "dark": "Switch  theme to  dark mode",
+      "light": "Switch  theme to light mode",
+      "system": "Switch  theme to system mode",
+      "title": "Theme"
     }
   },
   "show": {
@@ -447,7 +454,7 @@
   },
   "state": {
     "bulk_mode": "Edycja zbiorcza",
-    "bulk_mode_placeholder": "Wpisy są oddzielone znakiem nowej linii\nKlucze i wartości są oddzielone:\nDołącz // do dowolnego wiersza, który chcesz dodać, ale pozostaw wyłączony",
+    "bulk_mode_placeholder": "Wpisy są oddzielone znakiem nowej linii\nKlucze i wartości są oddzielone:\nDołącz # do dowolnego wiersza, który chcesz dodać, ale pozostaw wyłączony",
     "cleared": "Wyczyszczono",
     "connected": "Połączony",
     "connected_to": "Połączony z {name}",

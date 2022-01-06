@@ -115,13 +115,16 @@ export default defineComponent({
 
   methods: {
     handlePaste(ev) {
+      this.handleChange()
       this.$emit("paste", { event: ev, previousValue: this.internalValue })
     },
     handleChange() {
       this.debouncedHandler = debounce(function () {
-        if (this.internalValue !== this.$refs.editor.textContent) {
-          this.internalValue = this.$refs.editor.textContent
-          this.processHighlights()
+        if (this.$refs.editor) {
+          if (this.internalValue !== this.$refs.editor.textContent) {
+            this.internalValue = this.$refs.editor.textContent
+            this.processHighlights()
+          }
         }
       }, 5)
       this.debouncedHandler()
@@ -483,7 +486,6 @@ export default defineComponent({
 [contenteditable] {
   @apply select-text;
   @apply text-secondaryDark;
-  @apply font-medium;
 
   &:empty {
     @apply leading-loose;

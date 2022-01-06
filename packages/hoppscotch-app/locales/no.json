@@ -29,9 +29,9 @@
     "send": "Sende",
     "start": "Start",
     "stop": "Stoppe",
+    "to_close": "to close",
     "to_navigate": "to navigate",
     "to_select": "to select",
-    "to_close": "to close",
     "turn_off": "Skru av",
     "turn_on": "Slå på",
     "undo": "Angre",
@@ -93,11 +93,11 @@
     "generate_token": "Generer nøkkel",
     "include_in_url": "Inkluder i URL",
     "learn": "Lær hvordan",
+    "pass_key_by": "Pass by",
     "password": "Passord",
     "token": "Nøkkel",
     "type": "Godkjenningstype",
-    "username": "Brukernavn",
-    "pass_key_by": "Pass by"
+    "username": "Brukernavn"
   },
   "collection": {
     "created": "Samlingen er opprettet",
@@ -426,6 +426,13 @@
       "save_to_collections": "Lagre i samlinger",
       "send_request": "Send forespørsel",
       "title": "Be om"
+    },
+    "theme": {
+      "black": "Switch  theme to black mode",
+      "dark": "Switch  theme to  dark mode",
+      "light": "Switch  theme to light mode",
+      "system": "Switch  theme to system mode",
+      "title": "Theme"
     }
   },
   "show": {
@@ -447,7 +454,7 @@
   },
   "state": {
     "bulk_mode": "Masse redigering",
-    "bulk_mode_placeholder": "Oppføringer skilles med ny linje\nNøkler og verdier er atskilt med:\nForbered // til hvilken som helst rad du vil legge til, men behold den deaktivert",
+    "bulk_mode_placeholder": "Oppføringer skilles med ny linje\nNøkler og verdier er atskilt med:\nForbered # til hvilken som helst rad du vil legge til, men behold den deaktivert",
     "cleared": "Ryddet",
     "connected": "Tilkoblet",
     "connected_to": "Koblet til {name}",

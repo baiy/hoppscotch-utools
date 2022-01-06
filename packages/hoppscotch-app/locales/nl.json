@@ -29,9 +29,9 @@
     "send": "Versturen",
     "start": "Begin",
     "stop": "Stop",
+    "to_close": "to close",
     "to_navigate": "to navigate",
     "to_select": "to select",
-    "to_close": "to close",
     "turn_off": "Uitschakelen",
     "turn_on": "Inschakelen",
     "undo": "Ongedaan maken",
@@ -93,11 +93,11 @@
     "generate_token": "Token genereren",
     "include_in_url": "Opnemen in URL",
     "learn": "Leren hoe",
+    "pass_key_by": "Pass by",
     "password": "Wachtwoord",
     "token": "token",
     "type": "Autorisatietype:",
-    "username": "Gebruikersnaam",
-    "pass_key_by": "Pass by"
+    "username": "Gebruikersnaam"
   },
   "collection": {
     "created": "Collectie gemaakt",
@@ -426,6 +426,13 @@
       "save_to_collections": "Opslaan in collecties",
       "send_request": "Verstuur verzoek",
       "title": "Verzoek"
+    },
+    "theme": {
+      "black": "Switch  theme to black mode",
+      "dark": "Switch  theme to  dark mode",
+      "light": "Switch  theme to light mode",
+      "system": "Switch  theme to system mode",
+      "title": "Theme"
     }
   },
   "show": {
@@ -447,7 +454,7 @@
   },
   "state": {
     "bulk_mode": "Bulkbewerking",
-    "bulk_mode_placeholder": "Invoer wordt gescheiden door een nieuwe regel\nSleutels en waarden worden gescheiden door:\nVoeg // toe aan elke rij die u wilt toevoegen, maar blijf uitgeschakeld",
+    "bulk_mode_placeholder": "Invoer wordt gescheiden door een nieuwe regel\nSleutels en waarden worden gescheiden door:\nVoeg # toe aan elke rij die u wilt toevoegen, maar blijf uitgeschakeld",
     "cleared": "gewist",
     "connected": "Verbonden",
     "connected_to": "Verbonden met {naam}",

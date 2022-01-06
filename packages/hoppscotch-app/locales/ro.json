@@ -29,9 +29,9 @@
     "send": "Trimite",
     "start": "start",
     "stop": "Stop",
+    "to_close": "to close",
     "to_navigate": "to navigate",
     "to_select": "to select",
-    "to_close": "to close",
     "turn_off": "Opriți",
     "turn_on": "Aprinde",
     "undo": "Anula",
@@ -93,11 +93,11 @@
     "generate_token": "Generați token",
     "include_in_url": "Includeți în URL",
     "learn": "Afla cum",
+    "pass_key_by": "Pass by",
     "password": "Parola",
     "token": "Jeton",
     "type": "Tipul de autorizare",
-    "username": "Nume de utilizator",
-    "pass_key_by": "Pass by"
+    "username": "Nume de utilizator"
   },
   "collection": {
     "created": "Colecție creată",
@@ -426,6 +426,13 @@
       "save_to_collections": "Salvați în colecții",
       "send_request": "Trimite cerere",
       "title": "Cerere"
+    },
+    "theme": {
+      "black": "Switch  theme to black mode",
+      "dark": "Switch  theme to  dark mode",
+      "light": "Switch  theme to light mode",
+      "system": "Switch  theme to system mode",
+      "title": "Theme"
     }
   },
   "show": {
@@ -447,7 +454,7 @@
   },
   "state": {
     "bulk_mode": "Editare în bloc",
-    "bulk_mode_placeholder": "Intrările sunt separate prin linie nouă\nCheile și valorile sunt separate prin:\nPrepend // la orice rând pe care doriți să îl adăugați, dar păstrați-l dezactivat",
+    "bulk_mode_placeholder": "Intrările sunt separate prin linie nouă\nCheile și valorile sunt separate prin:\nPrepend # la orice rând pe care doriți să îl adăugați, dar păstrați-l dezactivat",
     "cleared": "Eliminat",
     "connected": "Conectat",
     "connected_to": "Conectat la {name}",

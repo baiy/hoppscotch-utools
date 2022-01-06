@@ -29,9 +29,9 @@
     "send": "Enviar",
     "start": "Empezar",
     "stop": "Detener",
+    "to_close": "to close",
     "to_navigate": "to navigate",
     "to_select": "to select",
-    "to_close": "to close",
     "turn_off": "Desactivar",
     "turn_on": "Activar",
     "undo": "Deshacer",
@@ -93,11 +93,11 @@
     "generate_token": "Generar token",
     "include_in_url": "Incluir en la URL",
     "learn": "Aprender",
+    "pass_key_by": "Pass by",
     "password": "Contraseña",
     "token": "Token",
     "type": "Tipo de autorización",
-    "username": "Nombre de usuario",
-    "pass_key_by": "Pass by"
+    "username": "Nombre de usuario"
   },
   "collection": {
     "created": "Colección creada",
@@ -426,6 +426,13 @@
       "save_to_collections": "Guardar en colecciones",
       "send_request": "Enviar petición",
       "title": "Petición"
+    },
+    "theme": {
+      "black": "Switch  theme to black mode",
+      "dark": "Switch  theme to  dark mode",
+      "light": "Switch  theme to light mode",
+      "system": "Switch  theme to system mode",
+      "title": "Theme"
     }
   },
   "show": {
@@ -447,7 +454,7 @@
   },
   "state": {
     "bulk_mode": "Edición masiva",
-    "bulk_mode_placeholder": "Las entradas están separadas por una nueva línea\nLas claves y los valores están separados por:\nAnteponer // a cualquier fila que desee agregar pero mantener deshabilitada",
+    "bulk_mode_placeholder": "Las entradas están separadas por una nueva línea\nLas claves y los valores están separados por:\nAnteponer # a cualquier fila que desee agregar pero mantener deshabilitada",
     "cleared": "Despejado",
     "connected": "Conectado",
     "connected_to": "Conectado a {name}",
