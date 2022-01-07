@@ -7,7 +7,6 @@ defaultSettings.EXTENSIONS_ENABLED = false
 defaultSettings.EXPAND_NAVIGATION = false
 defaultSettings.ZEN_MODE = true
 defaultSettings.FONT_SIZE = "medium"
-defaultSettings.SIDEBAR_ON_LEFT = true
 
 // eslint-disable-next-line no-restricted-syntax
 window.localStorage.setItem("cookiesAllowed", "yes")
