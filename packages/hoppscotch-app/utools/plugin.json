@@ -4,8 +4,8 @@
   "author": "baiy",
   "homepage": "https://github.com/baiy/hoppscotch-utools",
   "main": "index.html",
-  "version": "2.1.4",
-  "logo": "icon.png",
+  "version": "2.1.5",
+  "logo": "logo.png",
   "features": [
     {
       "code": "Hoppscotch",
