@@ -33,10 +33,7 @@
     "turn_off": "Tắt",
     "turn_on": "Bật",
     "undo": "Hoàn tác",
-    "yes": "đúng",
-    "preserve_current": "Bảo tồn hiện tại",
-    "replace_current": "Thay thế hiện tại",
-    "replace_json": "Thay thế bằng JSON"
+    "yes": "đúng"
   },
   "add": {
     "new": "Thêm mới",
@@ -67,7 +64,6 @@
     "terms_and_privacy": "Điều khoản và quyền riêng tư",
     "twitter": "Twitter",
     "type_a_command_search": "Nhập lệnh hoặc tìm kiếm…",
-    "version": "v2.1.0",
     "we_use_cookies": "Chúng tôi sử dụng cookie",
     "whats_new": "Có gì mới?",
     "wiki": "Wiki"
@@ -247,10 +243,7 @@
     "from_json_description": "Import from Hoppscotch collection file",
     "gist_url": "Nhập URL Gist",
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
-    "title": "Nhập khẩu",
-    "gist": "Import from Gist",
-    "gist_description": "Import a Gist",
-    "json": "Nhập từ JSON"
+    "title": "Nhập khẩu"
   },
   "layout": {
     "column": "Vertical layout",

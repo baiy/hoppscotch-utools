@@ -33,10 +33,7 @@
     "turn_off": "Opriți",
     "turn_on": "Aprinde",
     "undo": "Anula",
-    "yes": "da",
-    "preserve_current": "Păstrați curentul",
-    "replace_current": "Înlocuiți curentul",
-    "replace_json": "Înlocuiți cu JSON"
+    "yes": "da"
   },
   "add": {
     "new": "Adăuga nou",
@@ -67,7 +64,6 @@
     "terms_and_privacy": "Termeni și confidențialitate",
     "twitter": "Stare de nervozitate",
     "type_a_command_search": "Tastați o comandă sau căutați ...",
-    "version": "v2.1.0",
     "we_use_cookies": "Folosim cookie-uri",
     "whats_new": "Ce mai e nou?",
     "wiki": "Wiki"
@@ -247,10 +243,7 @@
     "from_json_description": "Import from Hoppscotch collection file",
     "gist_url": "Introduceți adresa URL Gist",
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
-    "title": "Import",
-    "gist": "Import from Gist",
-    "gist_description": "Import a Gist",
-    "json": "Importați din JSON"
+    "title": "Import"
   },
   "layout": {
     "column": "Vertical layout",

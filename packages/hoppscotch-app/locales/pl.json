@@ -33,10 +33,7 @@
     "turn_off": "Wyłącz",
     "turn_on": "Włącz",
     "undo": "Cofnij",
-    "yes": "Tak",
-    "preserve_current": "Zachowaj bieżący",
-    "replace_current": "Zastąp bieżący",
-    "replace_json": "Zastąp JSON"
+    "yes": "Tak"
   },
   "add": {
     "new": "Dodaj nowe",
@@ -67,7 +64,6 @@
     "terms_and_privacy": "Warunki i prywatność",
     "twitter": "Twitter",
     "type_a_command_search": "Wpisz polecenie lub wyszukaj…",
-    "version": "v2.1.0",
     "we_use_cookies": "Używamy plików cookie",
     "whats_new": "Co nowego?",
     "wiki": "Wiki"
@@ -247,10 +243,7 @@
     "from_json_description": "Import from Hoppscotch collection file",
     "gist_url": "Wpisz adres URL Gist",
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
-    "title": "Import",
-    "gist": "Import from Gist",
-    "gist_description": "Import a Gist",
-    "json": "Importuj z JSON"
+    "title": "Import"
   },
   "layout": {
     "column": "Pionowy układ",

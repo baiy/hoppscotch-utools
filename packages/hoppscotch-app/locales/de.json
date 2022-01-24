@@ -33,10 +33,7 @@
     "turn_off": "Ausschalten",
     "turn_on": "Einschalten",
     "undo": "Rückgängig machen",
-    "yes": "Ja",
-    "preserve_current": "Aktuelles behalten",
-    "replace_current": "Aktuelles ersetzen",
-    "replace_json": "Durch JSON ersetzen"
+    "yes": "Ja"
   },
   "add": {
     "new": "Neue hinzufügen",
@@ -67,7 +64,6 @@
     "terms_and_privacy": "Allgemeine Geschäftsbedingungen und Datenschutzerklärung",
     "twitter": "Twitter",
     "type_a_command_search": "Geben Sie einen Befehl ein oder suchen Sie…",
-    "version": "v2.1.0",
     "we_use_cookies": "Wir verwenden Cookies",
     "whats_new": "Was gibt's Neues?",
     "wiki": "Wiki"
@@ -247,10 +243,7 @@
     "from_json_description": "Import from Hoppscotch collection file",
     "gist_url": "Gist-URL eingeben",
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
-    "title": "Importieren",
-    "gist": "Import from Gist",
-    "gist_description": "Import a Gist",
-    "json": "Aus JSON importieren"
+    "title": "Importieren"
   },
   "layout": {
     "column": "Vertical layout",

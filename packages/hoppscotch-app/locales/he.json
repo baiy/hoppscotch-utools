@@ -33,10 +33,7 @@
     "turn_off": "לכבות",
     "turn_on": "להדליק",
     "undo": "לבטל",
-    "yes": "כן",
-    "preserve_current": "שמור על זרם",
-    "replace_current": "החלף זרם",
-    "replace_json": "החלף ב- JSON"
+    "yes": "כן"
   },
   "add": {
     "new": "הוסף חדש",
@@ -67,7 +64,6 @@
     "terms_and_privacy": "תנאים ופרטיות",
     "twitter": "טוויטר",
     "type_a_command_search": "הקלד פקודה או חפש ...",
-    "version": "v2.1.0",
     "we_use_cookies": "אנו משתמשים בעוגיות",
     "whats_new": "מה חדש?",
     "wiki": "ויקי"
@@ -247,10 +243,7 @@
     "from_json_description": "Import from Hoppscotch collection file",
     "gist_url": "הזן Gist URL",
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
-    "title": "יְבוּא",
-    "gist": "Import from Gist",
-    "gist_description": "Import a Gist",
-    "json": "ייבוא מ- JSON"
+    "title": "יְבוּא"
   },
   "layout": {
     "column": "Vertical layout",

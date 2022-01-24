@@ -33,10 +33,7 @@
     "turn_off": "Uitschakelen",
     "turn_on": "Inschakelen",
     "undo": "Ongedaan maken",
-    "yes": "Ja",
-    "preserve_current": "Huidige behouden",
-    "replace_current": "Vervang huidige",
-    "replace_json": "Vervang door JSON"
+    "yes": "Ja"
   },
   "add": {
     "new": "Nieuwe toevoegen",
@@ -67,7 +64,6 @@
     "terms_and_privacy": "Voorwaarden en privacy",
     "twitter": "Twitter",
     "type_a_command_search": "Typ een opdracht of zoek...",
-    "version": "v2.1.0",
     "we_use_cookies": "Wij gebruiken cookies",
     "whats_new": "Wat is er nieuw?",
     "wiki": "Wiki"
@@ -247,10 +243,7 @@
     "from_json_description": "Import from Hoppscotch collection file",
     "gist_url": "Vul de hoofd-URL in",
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
-    "title": "Importeren",
-    "gist": "Import from Gist",
-    "gist_description": "Import a Gist",
-    "json": "Importeren uit JSON"
+    "title": "Importeren"
   },
   "layout": {
     "column": "Vertical layout",

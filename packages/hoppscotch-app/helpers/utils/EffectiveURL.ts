@@ -1,3 +1,6 @@
+import * as A from "fp-ts/Array"
+import qs from "qs"
+import { pipe } from "fp-ts/function"
 import { combineLatest, Observable } from "rxjs"
 import { map } from "rxjs/operators"
 import {
@@ -6,6 +9,10 @@ import {
   HoppRESTRequest,
 } from "@hoppscotch/data"
 import { parseTemplateString, parseBodyEnvVariables } from "../templating"
+import { arrayFlatMap, arraySort } from "../functional/array"
+import { toFormData } from "../functional/formData"
+import { tupleToRecord } from "../functional/record"
+import { parseRawKeyValueEntries } from "../rawKeyValue"
 import { Environment, getGlobalVariables } from "~/newstore/environments"
 
 export interface EffectiveHoppRESTRequest extends HoppRESTRequest {
@@ -58,28 +65,51 @@ function getFinalBodyFromRequest(
     return null
   }
 
+  if (request.body.contentType === "application/x-www-form-urlencoded") {
+    return pipe(
+      request.body.body,
+      parseRawKeyValueEntries,
+
+      // Filter out active
+      A.filter((x) => x.active),
+      // Convert to tuple
+      A.map(({ key, value }) => [key, value] as [string, string]),
+      // Tuple to Record object
+      tupleToRecord,
+      // Stringify
+      qs.stringify
+    )
+  }
+
   if (request.body.contentType === "multipart/form-data") {
-    const formData = new FormData()
+    return pipe(
+      request.body.body,
+      A.filter((x) => x.key !== "" && x.active), // Remove empty keys
 
-    request.body.body
-      .filter((x) => x.key !== "" && x.active) // Remove empty keys
-      .map(
-        (x) =>
-          <FormDataKeyValue>{
-            active: x.active,
-            isFile: x.isFile,
-            key: parseTemplateString(x.key, env.variables),
-            value: x.isFile
-              ? x.value
-              : parseTemplateString(x.value, env.variables),
-          }
-      )
-      .forEach((entry) => {
-        if (!entry.isFile) formData.append(entry.key, entry.value)
-        else entry.value.forEach((blob) => formData.append(entry.key, blob))
-      })
+      // Sort files down
+      arraySort((a, b) => {
+        if (a.isFile) return 1
+        if (b.isFile) return -1
+        return 0
+      }),
 
-    return formData
+      // FormData allows only a single blob in an entry,
+      // we split array blobs into separate entries (FormData will then join them together during exec)
+      arrayFlatMap((x) =>
+        x.isFile
+          ? x.value.map((v) => ({
+              key: parseTemplateString(x.key, env.variables),
+              value: v as string | Blob,
+            }))
+          : [
+              {
+                key: parseTemplateString(x.key, env.variables),
+                value: parseTemplateString(x.value, env.variables),
+              },
+            ]
+      ),
+      toFormData
+    )
   } else return parseBodyEnvVariables(request.body.body, env.variables)
 }
 
