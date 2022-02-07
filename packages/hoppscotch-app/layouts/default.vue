@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen w-screen">
+  <div class="flex w-screen h-screen">
     <Splitpanes class="no-splitter" :dbl-click-splitter="false" horizontal>
       <Pane v-if="!ZEN_MODE" style="height: auto">
         <AppHeader />
@@ -8,11 +8,11 @@
         <Splitpanes
           class="no-splitter"
           :dbl-click-splitter="false"
-          :horizontal="!(windowInnerWidth.x.value >= 768)"
+          :horizontal="!mdAndLarger"
         >
           <Pane
             style="width: auto; height: auto"
-            class="hide-scrollbar !overflow-auto"
+            class="hide-scrollbar !overflow-auto flex flex-col"
           >
             <AppSidenav />
           </Pane>
@@ -48,6 +48,7 @@ import {
 } from "@nuxtjs/composition-api"
 import { Splitpanes, Pane } from "splitpanes"
 import "splitpanes/dist/splitpanes.css"
+import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
 import { setupLocalPersistence } from "~/newstore/localpersistence"
 import { performMigrations } from "~/helpers/migrations"
 import { initUserInfo } from "~/helpers/teams/BackendUserInfo"
@@ -56,26 +57,27 @@ import { applySetting, useSetting } from "~/newstore/settings"
 import { logPageView } from "~/helpers/fb/analytics"
 import { hookKeybindingsListener } from "~/helpers/keybindings"
 import { defineActionHandler } from "~/helpers/actions"
-import useWindowSize from "~/helpers/utils/useWindowSize"
 import { useSentry } from "~/helpers/sentry"
 import { useColorMode } from "~/helpers/utils/composables"
 
 function appLayout() {
   const rightSidebar = useSetting("SIDEBAR")
   const columnLayout = useSetting("COLUMN_LAYOUT")
-  const windowInnerWidth = useWindowSize()
+
+  const breakpoints = useBreakpoints(breakpointsTailwind)
+  const mdAndLarger = breakpoints.greater("md")
 
   // Initially apply
   onBeforeMount(() => {
-    if (windowInnerWidth.x.value < 768) {
+    if (mdAndLarger.value) {
       rightSidebar.value = false
       columnLayout.value = true
     }
   })
 
   // Listen for updates
-  watch(windowInnerWidth.x, () => {
-    if (windowInnerWidth.x.value < 768) {
+  watch(mdAndLarger, () => {
+    if (!mdAndLarger.value) {
       rightSidebar.value = false
       columnLayout.value = true
     }
@@ -172,8 +174,12 @@ export default defineComponent({
     updateThemes()
 
     setupSentry()
+
+    const breakpoints = useBreakpoints(breakpointsTailwind)
+    const mdAndLarger = breakpoints.greater("md")
+
     return {
-      windowInnerWidth: useWindowSize(),
+      mdAndLarger,
       ZEN_MODE: useSetting("ZEN_MODE"),
     }
   },

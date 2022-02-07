@@ -36,7 +36,7 @@
         open
       >
         <summary
-          class="flex items-center justify-between flex-1 min-w-0 transition cursor-pointer focus:outline-none text-secondaryLight text-tiny group"
+          class="flex items-center justify-between flex-1 min-w-0 cursor-pointer transition focus:outline-none text-secondaryLight text-tiny group"
         >
           <span
             class="px-4 py-2 truncate transition group-hover:text-secondary capitalize-first"
@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "@nuxtjs/composition-api"
-import * as timeago from "timeago.js"
+import { useTimeAgo } from "@vueuse/core"
 import { safelyExtractRESTRequest } from "@hoppscotch/data"
 import {
   useI18n,
@@ -135,7 +135,7 @@ const t = useI18n()
 
 const groupByDate = (array: any[], key: string) => {
   return array.reduce((rv: any, x: any) => {
-    ;(rv[timeago.format(x[key])] = rv[timeago.format(x[key])] || []).push(x)
+    ;(rv[useTimeAgo(x[key]).value] = rv[useTimeAgo(x[key]).value] || []).push(x)
     return rv
   }, {})
 }

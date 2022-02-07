@@ -1,19 +1,25 @@
 <template>
   <Splitpanes
     class="smart-splitter"
-    :rtl="SIDEBAR_ON_LEFT && windowInnerWidth.x.value >= 768"
+    :rtl="SIDEBAR_ON_LEFT && mdAndLarger"
     :class="{
-      '!flex-row-reverse': SIDEBAR_ON_LEFT && windowInnerWidth.x.value >= 768,
+      '!flex-row-reverse': SIDEBAR_ON_LEFT && mdAndLarger,
     }"
-    :horizontal="!(windowInnerWidth.x.value >= 768)"
+    :horizontal="!mdAndLarger"
   >
-    <Pane size="75" min-size="65" class="hide-scrollbar !overflow-auto">
+    <Pane
+      size="75"
+      min-size="65"
+      class="hide-scrollbar !overflow-auto flex flex-col"
+    >
       <Splitpanes class="smart-splitter" :horizontal="COLUMN_LAYOUT">
         <Pane
           :size="COLUMN_LAYOUT ? 45 : 50"
-          class="hide-scrollbar !overflow-auto"
+          class="hide-scrollbar !overflow-auto flex flex-col"
         >
-          <div class="sticky top-0 z-10 flex p-4 bg-primary">
+          <div
+            class="sticky top-0 z-10 flex flex-shrink-0 p-4 overflow-x-auto space-x-2 bg-primary hide-scrollbar"
+          >
             <div class="inline-flex flex-1 space-x-2">
               <input
                 id="websocket-url"
@@ -43,7 +49,7 @@
             </div>
           </div>
           <div
-            class="sticky z-10 flex items-center justify-between flex-1 pl-4 border-b bg-primary border-dividerLight top-upperPrimaryStickyFold"
+            class="sticky z-10 flex items-center justify-between pl-4 border-b bg-primary border-dividerLight top-upperPrimaryStickyFold"
           >
             <label class="font-semibold text-secondaryLight">
               {{ $t("websocket.protocols") }}
@@ -135,7 +141,7 @@
         </Pane>
         <Pane
           :size="COLUMN_LAYOUT ? 65 : 50"
-          class="hide-scrollbar !overflow-auto"
+          class="hide-scrollbar !overflow-auto flex flex-col"
         >
           <RealtimeLog :title="$t('websocket.log')" :log="log" />
         </Pane>
@@ -145,9 +151,9 @@
       v-if="SIDEBAR"
       size="25"
       min-size="20"
-      class="hide-scrollbar !overflow-auto"
+      class="hide-scrollbar !overflow-auto flex flex-col"
     >
-      <div class="flex flex-col flex-1 p-4">
+      <div class="flex items-center justify-between p-4">
         <label
           for="websocket-message"
           class="font-semibold text-secondaryLight"
@@ -186,8 +192,8 @@ import { defineComponent } from "@nuxtjs/composition-api"
 import { Splitpanes, Pane } from "splitpanes"
 import "splitpanes/dist/splitpanes.css"
 import debounce from "lodash/debounce"
+import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
 import { logHoppRequestRunToAnalytics } from "~/helpers/fb/analytics"
-import useWindowSize from "~/helpers/utils/useWindowSize"
 import { useSetting } from "~/newstore/settings"
 import {
   setWSEndpoint,
@@ -213,8 +219,11 @@ import { useStream } from "~/helpers/utils/composables"
 export default defineComponent({
   components: { Splitpanes, Pane },
   setup() {
+    const breakpoints = useBreakpoints(breakpointsTailwind)
+    const mdAndLarger = breakpoints.greater("md")
+
     return {
-      windowInnerWidth: useWindowSize(),
+      mdAndLarger,
       SIDEBAR: useSetting("SIDEBAR"),
       COLUMN_LAYOUT: useSetting("COLUMN_LAYOUT"),
       SIDEBAR_ON_LEFT: useSetting("SIDEBAR_ON_LEFT"),

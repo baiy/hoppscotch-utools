@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="sticky z-10 flex items-center justify-between flex-1 pl-4 border-b bg-primary border-dividerLight top-upperTertiaryStickyFold"
+      class="sticky z-10 flex items-center justify-between pl-4 border-b bg-primary border-dividerLight top-upperTertiaryStickyFold"
     >
       <label class="font-semibold text-secondaryLight">
         {{ $t("request.body") }}
@@ -91,7 +91,7 @@
             :name="`attachment${index}`"
             type="file"
             multiple
-            class="p-1 transition cursor-pointer file:transition file:cursor-pointer text-secondaryLight hover:text-secondaryDark file:mr-2 file:py-1 file:px-4 file:rounded file:border-0 file:text-tiny text-tiny file:text-secondary hover:file:text-secondaryDark file:bg-primaryLight hover:file:bg-primaryDark"
+            class="p-1 cursor-pointer transition file:transition file:cursor-pointer text-secondaryLight hover:text-secondaryDark file:mr-2 file:py-1 file:px-4 file:rounded file:border-0 file:text-tiny text-tiny file:text-secondary hover:file:text-secondaryDark file:bg-primaryLight hover:file:bg-primaryDark"
             @change="setRequestAttachment(index, param, $event)"
           />
         </label>
@@ -135,7 +135,7 @@
       </span>
     </div>
     <div
-      v-if="bodyParams.length === 0"
+      v-if="workingParams.length === 0"
       class="flex flex-col items-center justify-center p-4 text-secondaryLight"
     >
       <img

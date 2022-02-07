@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sticky top-0 z-10 flex p-4 space-x-2 overflow-x-auto bg-primary hide-scrollbar"
+    class="sticky top-0 z-10 flex flex-shrink-0 p-4 overflow-x-auto space-x-2 bg-primary hide-scrollbar"
   >
     <div class="flex flex-1">
       <div class="relative flex">
@@ -125,11 +125,7 @@
       </span>
       <ButtonSecondary
         class="ml-2 rounded rounded-r-none"
-        :label="
-          windowInnerWidth.x.value >= 768 && COLUMN_LAYOUT
-            ? `${t('request.save')}`
-            : ''
-        "
+        :label="mdAndLarger && COLUMN_LAYOUT ? `${t('request.save')}` : ''"
         filled
         svg="save"
         @click.native="saveRequest()"
@@ -217,6 +213,7 @@
 import { computed, ref, watch } from "@nuxtjs/composition-api"
 import { isLeft, isRight } from "fp-ts/lib/Either"
 import * as E from "fp-ts/Either"
+import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
 import {
   updateRESTResponse,
   restEndpoint$,
@@ -245,7 +242,6 @@ import { copyToClipboard } from "~/helpers/utils/clipboard"
 import { useSetting } from "~/newstore/settings"
 import { overwriteRequestTeams } from "~/helpers/teams/utils"
 import { apolloClient } from "~/helpers/apollo"
-import useWindowSize from "~/helpers/utils/useWindowSize"
 import { createShortcode } from "~/helpers/backend/mutations/Shortcode"
 
 const t = useI18n()
@@ -307,6 +303,8 @@ const newSendRequest = async () => {
     return
   }
 
+  ensureMethodInEndpoint()
+
   loading.value = true
 
   // Double calling is because the function returns a TaskEither than should be executed
@@ -342,6 +340,20 @@ const newSendRequest = async () => {
       type: "script_fail",
       error,
     })
+  }
+}
+
+const ensureMethodInEndpoint = () => {
+  if (
+    !/^http[s]?:\/\//.test(newEndpoint.value) &&
+    !newEndpoint.value.startsWith("<<")
+  ) {
+    const domain = newEndpoint.value.split(/[/:#?]+/)[0]
+    if (domain === "localhost" || /([0-9]+\.)*[0-9]/.test(domain)) {
+      setRESTEndpoint("http://" + newEndpoint.value)
+    } else {
+      setRESTEndpoint("https://" + newEndpoint.value)
+    }
   }
 }
 
@@ -539,6 +551,8 @@ const isCustomMethod = computed(() => {
 
 const requestName = useRESTRequestName()
 
-const windowInnerWidth = useWindowSize()
 const COLUMN_LAYOUT = useSetting("COLUMN_LAYOUT")
+
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndLarger = breakpoints.greater("md")
 </script>

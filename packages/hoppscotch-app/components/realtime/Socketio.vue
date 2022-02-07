@@ -1,19 +1,25 @@
 <template>
   <Splitpanes
     class="smart-splitter"
-    :rtl="SIDEBAR_ON_LEFT && windowInnerWidth.x.value >= 768"
+    :rtl="SIDEBAR_ON_LEFT && mdAndLarger"
     :class="{
-      '!flex-row-reverse': SIDEBAR_ON_LEFT && windowInnerWidth.x.value >= 768,
+      '!flex-row-reverse': SIDEBAR_ON_LEFT && mdAndLarger,
     }"
-    :horizontal="!(windowInnerWidth.x.value >= 768)"
+    :horizontal="!mdAndLarger"
   >
-    <Pane size="75" min-size="65" class="hide-scrollbar !overflow-auto">
+    <Pane
+      size="75"
+      min-size="65"
+      class="hide-scrollbar !overflow-auto flex flex-col"
+    >
       <Splitpanes class="smart-splitter" :horizontal="COLUMN_LAYOUT">
         <Pane
           :size="COLUMN_LAYOUT ? 45 : 50"
-          class="hide-scrollbar !overflow-auto"
+          class="hide-scrollbar !overflow-auto flex flex-col"
         >
-          <div class="sticky top-0 z-10 flex p-4 bg-primary">
+          <div
+            class="sticky top-0 z-10 flex flex-shrink-0 p-4 overflow-x-auto space-x-2 bg-primary hide-scrollbar"
+          >
             <div class="inline-flex flex-1 space-x-2">
               <div class="flex flex-1">
                 <label for="client-version">
@@ -82,7 +88,7 @@
             </div>
           </div>
           <div
-            class="sticky z-10 flex items-center justify-between flex-1 pl-4 border-b bg-primary border-dividerLight top-upperPrimaryStickyFold"
+            class="sticky z-10 flex items-center justify-between pl-4 border-b bg-primary border-dividerLight top-upperPrimaryStickyFold"
           >
             <span class="flex items-center">
               <label class="font-semibold text-secondaryLight">
@@ -183,10 +189,10 @@
           </div>
           <div
             v-if="authType === 'Bearer'"
-            class="flex border-b border-dividerLight"
+            class="flex flex-1 border-b border-dividerLight"
           >
             <div class="w-2/3 border-r border-dividerLight">
-              <div class="flex border-b border-dividerLight">
+              <div class="flex flex-1 border-b border-dividerLight">
                 <SmartEnvInput
                   v-model="bearerToken"
                   placeholder="Token"
@@ -213,7 +219,7 @@
         </Pane>
         <Pane
           :size="COLUMN_LAYOUT ? 65 : 50"
-          class="hide-scrollbar !overflow-auto"
+          class="hide-scrollbar !overflow-auto flex flex-col"
         >
           <RealtimeLog :title="$t('socketio.log')" :log="log" />
         </Pane>
@@ -223,9 +229,9 @@
       v-if="SIDEBAR"
       size="25"
       min-size="20"
-      class="hide-scrollbar !overflow-auto"
+      class="hide-scrollbar !overflow-auto flex flex-col"
     >
-      <div class="flex flex-col flex-1 p-4">
+      <div class="flex items-center justify-between p-4">
         <label for="events" class="font-semibold text-secondaryLight">
           {{ $t("socketio.events") }}
         </label>
@@ -242,7 +248,7 @@
           :disabled="!connectionState"
         />
       </div>
-      <div class="flex items-center justify-between flex-1 p-4">
+      <div class="flex items-center justify-between p-4">
         <label class="font-semibold text-secondaryLight">
           {{ $t("socketio.communication") }}
         </label>
@@ -306,9 +312,9 @@ import { io as ClientV4 } from "socket.io-client-v4"
 
 import wildcard from "socketio-wildcard"
 import debounce from "lodash/debounce"
+import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
 import { logHoppRequestRunToAnalytics } from "~/helpers/fb/analytics"
 import { useSetting } from "~/newstore/settings"
-import useWindowSize from "~/helpers/utils/useWindowSize"
 import {
   SIOEndpoint$,
   setSIOEndpoint,
@@ -337,8 +343,11 @@ const socketIoClients = {
 export default defineComponent({
   components: { Splitpanes, Pane },
   setup() {
+    const breakpoints = useBreakpoints(breakpointsTailwind)
+    const mdAndLarger = breakpoints.greater("md")
+
     return {
-      windowInnerWidth: useWindowSize(),
+      mdAndLarger,
       SIDEBAR: useSetting("SIDEBAR"),
       COLUMN_LAYOUT: useSetting("COLUMN_LAYOUT"),
       SIDEBAR_ON_LEFT: useSetting("SIDEBAR_ON_LEFT"),

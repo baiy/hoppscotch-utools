@@ -1,17 +1,21 @@
 <template>
   <Splitpanes
     class="smart-splitter"
-    :rtl="SIDEBAR_ON_LEFT && windowInnerWidth.x.value >= 768"
+    :rtl="SIDEBAR_ON_LEFT && mdAndLarger"
     :class="{
-      '!flex-row-reverse': SIDEBAR_ON_LEFT && windowInnerWidth.x.value >= 768,
+      '!flex-row-reverse': SIDEBAR_ON_LEFT && mdAndLarger,
     }"
-    :horizontal="!(windowInnerWidth.x.value >= 768)"
+    :horizontal="!mdAndLarger"
   >
-    <Pane size="75" min-size="65" class="hide-scrollbar !overflow-auto">
+    <Pane
+      size="75"
+      min-size="65"
+      class="hide-scrollbar !overflow-auto flex flex-col"
+    >
       <Splitpanes class="smart-splitter" :horizontal="COLUMN_LAYOUT">
         <Pane
           :size="COLUMN_LAYOUT ? 45 : 50"
-          class="hide-scrollbar !overflow-auto"
+          class="hide-scrollbar !overflow-auto flex flex-col"
         >
           <HttpRequest />
           <SmartTabs styles="sticky bg-primary top-upperPrimaryStickyFold z-10">
@@ -64,7 +68,7 @@
         </Pane>
         <Pane
           :size="COLUMN_LAYOUT ? 65 : 50"
-          class="flex flex-col hide-scrollbar !overflow-auto"
+          class="flex flex-col hide-scrollbar !overflow-auto flex flex-col"
         >
           <HttpResponse ref="response" />
         </Pane>
@@ -74,7 +78,7 @@
       v-if="SIDEBAR"
       size="25"
       min-size="20"
-      class="hide-scrollbar !overflow-auto"
+      class="hide-scrollbar !overflow-auto flex flex-col"
     >
       <SmartTabs styles="sticky bg-primary z-10 top-0" vertical>
         <SmartTab
@@ -103,12 +107,6 @@
         </SmartTab>
       </SmartTabs>
     </Pane>
-    <SmartConfirmModal
-      :show="confirmSync"
-      :title="`${$t('confirm.sync')}`"
-      @hide-modal="confirmSync = false"
-      @resolve="syncRequest"
-    />
   </Splitpanes>
 </template>
 
@@ -121,6 +119,7 @@ import {
   Ref,
   ref,
   useContext,
+  watch,
 } from "@nuxtjs/composition-api"
 import { Splitpanes, Pane } from "splitpanes"
 import "splitpanes/dist/splitpanes.css"
@@ -132,6 +131,7 @@ import {
   HoppRESTAuthOAuth2,
   safelyExtractRESTRequest,
 } from "@hoppscotch/data"
+import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
 import { useSetting } from "~/newstore/settings"
 import {
   restActiveParamsCount$,
@@ -147,13 +147,14 @@ import {
 import { translateExtURLParams } from "~/helpers/RESTExtURLParams"
 import {
   pluckRef,
+  useI18n,
   useReadonlyStream,
   useStream,
+  useToast,
 } from "~/helpers/utils/composables"
 import { loadRequestFromSync, startRequestSync } from "~/helpers/fb/request"
 import { onLoggedIn } from "~/helpers/fb/auth"
 import { oauthRedirect } from "~/helpers/oauth"
-import useWindowSize from "~/helpers/utils/useWindowSize"
 
 function bindRequestToURLParams() {
   const { route } = useContext()
@@ -235,6 +236,32 @@ export default defineComponent({
 
     const confirmSync = ref(false)
 
+    const toast = useToast()
+    const t = useI18n()
+
+    watch(confirmSync, (newValue) => {
+      if (newValue) {
+        toast.show(`${t("confirm.sync")}`, {
+          duration: 0,
+          action: [
+            {
+              text: `${t("action.yes")}`,
+              onClick: (_, toastObject) => {
+                syncRequest()
+                toastObject.goAway(0)
+              },
+            },
+            {
+              text: `${t("action.no")}`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0)
+              },
+            },
+          ],
+        })
+      }
+    })
+
     const syncRequest = () => {
       setRESTRequest(
         safelyExtractRESTRequest(requestForSync.value!, getDefaultRESTRequest())
@@ -244,8 +271,11 @@ export default defineComponent({
     setupRequestSync(confirmSync, requestForSync)
     bindRequestToURLParams()
 
+    const breakpoints = useBreakpoints(breakpointsTailwind)
+    const mdAndLarger = breakpoints.greater("md")
+
     return {
-      windowInnerWidth: useWindowSize(),
+      mdAndLarger,
       newActiveParamsCount$: useReadonlyStream(
         restActiveParamsCount$.pipe(
           map((e) => {

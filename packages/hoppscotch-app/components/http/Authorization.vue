@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="flex flex-col flex-1">
     <div
-      class="sticky z-10 flex items-center justify-between flex-1 pl-4 border-b bg-primary border-dividerLight top-upperSecondaryStickyFold"
+      class="sticky z-10 flex items-center justify-between pl-4 border-b bg-primary border-dividerLight top-upperSecondaryStickyFold"
     >
       <span class="flex items-center">
         <label class="font-semibold text-secondaryLight">
@@ -151,17 +151,17 @@
         class="mb-4"
       />
     </div>
-    <div v-else class="flex border-b border-dividerLight">
+    <div v-else class="flex flex-1 border-b border-dividerLight">
       <div class="w-2/3 border-r border-dividerLight">
         <div v-if="authType === 'basic'">
-          <div class="flex border-b border-dividerLight">
+          <div class="flex flex-1 border-b border-dividerLight">
             <SmartEnvInput
               v-model="basicUsername"
               :placeholder="$t('authorization.username')"
               styles="bg-transparent flex flex-1 py-1 px-4"
             />
           </div>
-          <div class="flex border-b border-dividerLight">
+          <div class="flex flex-1 border-b border-dividerLight">
             <SmartEnvInput
               v-model="basicPassword"
               :placeholder="$t('authorization.password')"
@@ -170,7 +170,7 @@
           </div>
         </div>
         <div v-if="authType === 'bearer'">
-          <div class="flex border-b border-dividerLight">
+          <div class="flex flex-1 border-b border-dividerLight">
             <SmartEnvInput
               v-model="bearerToken"
               placeholder="Token"
@@ -179,7 +179,7 @@
           </div>
         </div>
         <div v-if="authType === 'oauth-2'">
-          <div class="flex border-b border-dividerLight">
+          <div class="flex flex-1 border-b border-dividerLight">
             <SmartEnvInput
               v-model="oauth2Token"
               placeholder="Token"
@@ -189,14 +189,14 @@
           <HttpOAuth2Authorization />
         </div>
         <div v-if="authType === 'api-key'">
-          <div class="flex border-b border-dividerLight">
+          <div class="flex flex-1 border-b border-dividerLight">
             <SmartEnvInput
               v-model="apiKey"
               placeholder="Key"
               styles="bg-transparent flex flex-1 py-1 px-4"
             />
           </div>
-          <div class="flex border-b border-dividerLight">
+          <div class="flex flex-1 border-b border-dividerLight">
             <SmartEnvInput
               v-model="apiValue"
               placeholder="Value"
