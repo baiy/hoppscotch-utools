@@ -4,7 +4,10 @@
       <Pane v-if="!ZEN_MODE" style="height: auto">
         <AppHeader />
       </Pane>
-      <Pane class="flex flex-1 hide-scrollbar !overflow-auto">
+      <Pane
+        :class="spacerClass"
+        class="flex flex-1 hide-scrollbar !overflow-auto md:mb-0"
+      >
         <Splitpanes
           class="no-splitter"
           :dbl-click-splitter="false"
@@ -12,7 +15,7 @@
         >
           <Pane
             style="width: auto; height: auto"
-            class="hide-scrollbar !overflow-auto flex flex-col"
+            class="hide-scrollbar !overflow-auto hidden md:flex md:flex-col"
           >
             <AppSidenav />
           </Pane>
@@ -23,7 +26,7 @@
               horizontal
             >
               <Pane class="flex flex-1 hide-scrollbar !overflow-auto">
-                <main class="flex flex-1 w-full">
+                <main class="flex flex-1 w-full" role="main">
                   <nuxt class="flex flex-1" />
                 </main>
               </Pane>
@@ -31,20 +34,36 @@
           </Pane>
         </Splitpanes>
       </Pane>
-      <Pane style="height: auto">
+      <Pane v-if="mdAndLarger" style="height: auto">
         <AppFooter />
       </Pane>
+      <Pane
+        v-else
+        style="height: auto"
+        class="hide-scrollbar !overflow-auto flex flex-col fixed inset-x-0 bottom-0 z-10"
+      >
+        <AppSidenav />
+      </Pane>
     </Splitpanes>
+    <AppPowerSearch :show="showSearch" @hide-modal="showSearch = false" />
+    <AppSupport
+      v-if="mdAndLarger"
+      :show="showSupport"
+      @hide-modal="showSupport = false"
+    />
+    <AppOptions v-else :show="showSupport" @hide-modal="showSupport = false" />
   </div>
 </template>
 
 <script lang="ts">
 import {
   defineComponent,
+  computed,
   onBeforeMount,
   useContext,
   useRouter,
   watch,
+  ref,
 } from "@nuxtjs/composition-api"
 import { Splitpanes, Pane } from "splitpanes"
 import "splitpanes/dist/splitpanes.css"
@@ -52,7 +71,6 @@ import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
 import { setupLocalPersistence } from "~/newstore/localpersistence"
 import { performMigrations } from "~/helpers/migrations"
 import { initUserInfo } from "~/helpers/teams/BackendUserInfo"
-import { registerApolloAuthUpdate } from "~/helpers/apollo"
 import { applySetting, useSetting } from "~/newstore/settings"
 import { logPageView } from "~/helpers/fb/analytics"
 import { hookKeybindingsListener } from "~/helpers/keybindings"
@@ -69,7 +87,7 @@ function appLayout() {
 
   // Initially apply
   onBeforeMount(() => {
-    if (mdAndLarger.value) {
+    if (!mdAndLarger.value) {
       rightSidebar.value = false
       columnLayout.value = true
     }
@@ -77,7 +95,8 @@ function appLayout() {
 
   // Listen for updates
   watch(mdAndLarger, () => {
-    if (!mdAndLarger.value) {
+    if (mdAndLarger.value) rightSidebar.value = true
+    else {
       rightSidebar.value = false
       columnLayout.value = true
     }
@@ -108,6 +127,23 @@ function updateThemes() {
   const themeColor = useSetting("THEME_COLOR")
   const bgColor = useSetting("BG_COLOR")
   const fontSize = useSetting("FONT_SIZE")
+  const EXPAND_NAVIGATION = useSetting("EXPAND_NAVIGATION")
+
+  const spacerClass = computed(() => {
+    if (fontSize.value === "small" && EXPAND_NAVIGATION.value)
+      return "spacer-small"
+    if (fontSize.value === "medium" && EXPAND_NAVIGATION.value)
+      return "spacer-medium"
+    if (fontSize.value === "large" && EXPAND_NAVIGATION.value)
+      return "spacer-large"
+    if (
+      (fontSize.value === "small" ||
+        fontSize.value === "medium" ||
+        fontSize.value === "large") &&
+      !EXPAND_NAVIGATION.value
+    )
+      return "spacer-expand"
+  })
 
   // Initially apply
   onBeforeMount(() => {
@@ -124,6 +160,10 @@ function updateThemes() {
   watch(fontSize, () =>
     document.documentElement.setAttribute("data-font-size", fontSize.value)
   )
+
+  return {
+    spacerClass,
+  }
 }
 
 function defineJumpActions() {
@@ -171,16 +211,30 @@ export default defineComponent({
 
     defineJumpActions()
 
-    updateThemes()
+    const { spacerClass } = updateThemes()
 
     setupSentry()
 
     const breakpoints = useBreakpoints(breakpointsTailwind)
     const mdAndLarger = breakpoints.greater("md")
 
+    const showSearch = ref(false)
+    const showSupport = ref(false)
+
+    defineActionHandler("modals.search.toggle", () => {
+      showSearch.value = !showSearch.value
+    })
+
+    defineActionHandler("modals.support.toggle", () => {
+      showSupport.value = !showSupport.value
+    })
+
     return {
       mdAndLarger,
+      spacerClass,
       ZEN_MODE: useSetting("ZEN_MODE"),
+      showSearch,
+      showSupport,
     }
   },
   head() {
@@ -193,8 +247,6 @@ export default defineComponent({
   },
   beforeMount() {
     setupLocalPersistence()
-
-    registerApolloAuthUpdate()
   },
   async mounted() {
     performMigrations()
@@ -239,3 +291,39 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.spacer-small {
+  margin-bottom: 4.2rem;
+}
+
+.spacer-medium {
+  margin-bottom: 4.8rem;
+}
+
+.spacer-large {
+  margin-bottom: 5.5rem;
+}
+
+.spacer-expand {
+  margin-bottom: 2.9rem;
+}
+
+@media screen and (min-width: 768px) {
+  .spacer-small {
+    margin-bottom: 0;
+  }
+
+  .spacer-medium {
+    margin-bottom: 0;
+  }
+
+  .spacer-large {
+    margin-bottom: 0;
+  }
+
+  .spacer-expand {
+    margin-bottom: 0;
+  }
+}
+</style>

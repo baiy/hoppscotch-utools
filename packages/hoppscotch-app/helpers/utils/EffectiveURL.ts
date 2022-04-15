@@ -7,13 +7,15 @@ import {
   FormDataKeyValue,
   HoppRESTReqBody,
   HoppRESTRequest,
+  parseTemplateString,
+  parseBodyEnvVariables,
+  parseRawKeyValueEntries,
+  Environment,
 } from "@hoppscotch/data"
-import { parseTemplateString, parseBodyEnvVariables } from "../templating"
 import { arrayFlatMap, arraySort } from "../functional/array"
 import { toFormData } from "../functional/formData"
 import { tupleToRecord } from "../functional/record"
-import { parseRawKeyValueEntries } from "../rawKeyValue"
-import { Environment, getGlobalVariables } from "~/newstore/environments"
+import { getGlobalVariables } from "~/newstore/environments"
 
 export interface EffectiveHoppRESTRequest extends HoppRESTRequest {
   /**
@@ -201,7 +203,10 @@ export function getEffectiveRESTRequest(
   }
 
   const effectiveFinalBody = getFinalBodyFromRequest(request, envVariables)
-  if (request.body.contentType)
+  const contentTypeInHeader = effectiveFinalHeaders.find(
+    (x) => x.key.toLowerCase() === "content-type"
+  )
+  if (request.body.contentType && !contentTypeInHeader?.value)
     effectiveFinalHeaders.push({
       active: true,
       key: "content-type",

@@ -1,5 +1,5 @@
 <template>
-  <SmartModal v-if="show" :title="t('team.invite')" @close="hideModal">
+  <SmartModal v-if="show" dialog :title="t('team.invite')" @close="hideModal">
     <template #body>
       <div v-if="sendInvitesResult.length" class="flex flex-col px-4">
         <div class="flex flex-col items-center justify-center max-w-md">
@@ -89,7 +89,8 @@
                     :title="t('action.remove')"
                     svg="trash"
                     color="red"
-                    @click.native="removeInvitee(invitee.id)"
+                    :loading="isLoadingIndex === index"
+                    @click.native="removeInvitee(invitee.id, index)"
                   />
                 </div>
               </div>
@@ -159,51 +160,53 @@
                     />
                   </span>
                 </template>
-                <SmartItem
-                  label="OWNER"
-                  :icon="
-                    invitee.value === 'OWNER'
-                      ? 'radio_button_checked'
-                      : 'radio_button_unchecked'
-                  "
-                  :active="invitee.value === 'OWNER'"
-                  @click.native="
-                    () => {
-                      updateNewInviteeRole(index, 'OWNER')
-                      newInviteeOptions[index].tippy().hide()
-                    }
-                  "
-                />
-                <SmartItem
-                  label="EDITOR"
-                  :icon="
-                    invitee.value === 'EDITOR'
-                      ? 'radio_button_checked'
-                      : 'radio_button_unchecked'
-                  "
-                  :active="invitee.value === 'EDITOR'"
-                  @click.native="
-                    () => {
-                      updateNewInviteeRole(index, 'EDITOR')
-                      newInviteeOptions[index].tippy().hide()
-                    }
-                  "
-                />
-                <SmartItem
-                  label="VIEWER"
-                  :icon="
-                    invitee.value === 'VIEWER'
-                      ? 'radio_button_checked'
-                      : 'radio_button_unchecked'
-                  "
-                  :active="invitee.value === 'VIEWER'"
-                  @click.native="
-                    () => {
-                      updateNewInviteeRole(index, 'VIEWER')
-                      newInviteeOptions[index].tippy().hide()
-                    }
-                  "
-                />
+                <div class="flex flex-col" role="menu">
+                  <SmartItem
+                    label="OWNER"
+                    :icon="
+                      invitee.value === 'OWNER'
+                        ? 'radio_button_checked'
+                        : 'radio_button_unchecked'
+                    "
+                    :active="invitee.value === 'OWNER'"
+                    @click.native="
+                      () => {
+                        updateNewInviteeRole(index, 'OWNER')
+                        newInviteeOptions[index].tippy().hide()
+                      }
+                    "
+                  />
+                  <SmartItem
+                    label="EDITOR"
+                    :icon="
+                      invitee.value === 'EDITOR'
+                        ? 'radio_button_checked'
+                        : 'radio_button_unchecked'
+                    "
+                    :active="invitee.value === 'EDITOR'"
+                    @click.native="
+                      () => {
+                        updateNewInviteeRole(index, 'EDITOR')
+                        newInviteeOptions[index].tippy().hide()
+                      }
+                    "
+                  />
+                  <SmartItem
+                    label="VIEWER"
+                    :icon="
+                      invitee.value === 'VIEWER'
+                        ? 'radio_button_checked'
+                        : 'radio_button_unchecked'
+                    "
+                    :active="invitee.value === 'VIEWER'"
+                    @click.native="
+                      () => {
+                        updateNewInviteeRole(index, 'VIEWER')
+                        newInviteeOptions[index].tippy().hide()
+                      }
+                    "
+                  />
+                </div>
               </tippy>
             </span>
             <div class="flex">
@@ -301,7 +304,7 @@
               newInvites = [
                 {
                   key: '',
-                  value: 'VIEWRER',
+                  value: TeamMemberRole.Viewer,
                 },
               ]
             }
@@ -372,6 +375,7 @@ const pendingInvites = useGQLQuery<
   variables: reactive({
     teamID: props.editingTeamID,
   }),
+  pollDuration: 10000,
   updateSubs: computed(() =>
     !props.editingTeamID
       ? []
@@ -396,6 +400,17 @@ const pendingInvites = useGQLQuery<
 })
 
 watch(
+  () => props.show,
+  (show) => {
+    if (!show) {
+      pendingInvites.pause()
+    } else {
+      pendingInvites.unpause()
+    }
+  }
+)
+
+watch(
   () => props.editingTeamID,
   () => {
     if (props.editingTeamID) {
@@ -406,13 +421,17 @@ watch(
   }
 )
 
-const removeInvitee = async (id: string) => {
+const isLoadingIndex = ref<null | number>(null)
+
+const removeInvitee = async (id: string, index: number) => {
+  isLoadingIndex.value = index
   const result = await revokeTeamInvitation(id)()
   if (E.isLeft(result)) {
     toast.error(`${t("error.something_went_wrong")}`)
   } else {
     toast.success(`${t("team.member_removed")}`)
   }
+  isLoadingIndex.value = null
 }
 
 const newInvites = ref<Array<{ key: string; value: TeamMemberRole }>>([

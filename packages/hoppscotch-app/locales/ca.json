@@ -75,6 +75,7 @@
     "continue_with_email": "Continueu amb el correu electrònic",
     "continue_with_github": "Continueu amb GitHub",
     "continue_with_google": "Continueu amb Google",
+    "continue_with_microsoft": "Continue with Microsoft",
     "email": "Correu electrònic",
     "logged_out": "Desconnectat",
     "login": "iniciar Sessió",
@@ -103,6 +104,7 @@
     "invalid_name": "Proporcioneu un nom vàlid per a la col·lecció",
     "my_collections": "Les meves col·leccions",
     "name": "La meva nova col·lecció",
+    "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "Nova col · lecció",
     "renamed": "S'ha canviat el nom de la col·lecció",
     "request_in_use": "Request in use",
@@ -159,13 +161,19 @@
     "tests": "No hi ha proves per a aquesta sol·licitud"
   },
   "environment": {
+    "add_to_global": "Add to Global",
+    "added": "Environment addition",
     "create_new": "Crea un entorn nou",
+    "deleted": "Environment deletion",
     "edit": "Edita l'entorn",
     "invalid_name": "Proporcioneu un nom vàlid per a l'entorn",
+    "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "Nou entorn",
     "no_environment": "Sense entorn",
+    "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
     "select": "Seleccioneu un entorn",
     "title": "Entorns",
+    "updated": "Environment updation",
     "variable_list": "Llista de variables"
   },
   "error": {
@@ -175,6 +183,7 @@
     "empty_req_name": "Nom de la sol·licitud buida",
     "f12_details": "(F12 per obtenir més informació)",
     "gql_prettify_invalid_query": "No s'ha pogut definir una consulta no vàlida, resoldre els errors de sintaxi de la consulta i tornar-ho a provar",
+    "incomplete_config_urls": "Incomplete configuration URLs",
     "incorrect_email": "Incorrect email",
     "invalid_link": "Invalid link",
     "invalid_link_description": "The link you clicked is invalid or expired.",
@@ -190,12 +199,14 @@
     "as_json": "Exporta com a JSON",
     "create_secret_gist": "Crea un resum secret",
     "gist_created": "Gist creat",
-    "require_github": "Inicieu la sessió amb GitHub per crear un resum secret"
+    "require_github": "Inicieu la sessió amb GitHub per crear un resum secret",
+    "title": "Export"
   },
   "folder": {
     "created": "S'ha creat la carpeta",
     "edit": "Edita la carpeta",
     "invalid_name": "Proporcioneu un nom per a la carpeta",
+    "name_length_insufficient": "Folder name should be at least 3 characters long",
     "new": "Carpeta nova",
     "renamed": "S'ha canviat el nom de la carpeta"
   },
@@ -205,7 +216,6 @@
     "subscriptions": "Subscripcions"
   },
   "header": {
-    "account": "Compte",
     "install_pwa": "Instal·la l'aplicació",
     "login": "iniciar Sessió",
     "save_workspace": "Desa el meu espai de treball"
@@ -317,6 +327,7 @@
     "invalid_name": "Proporcioneu un nom per a la sol·licitud",
     "method": "Mètode",
     "name": "Sol·licita el nom",
+    "path": "Camí",
     "parameter_list": "Paràmetres de consulta",
     "parameters": "Paràmetres",
     "payload": "Càrrega útil",
@@ -339,6 +350,7 @@
     "html": "HTML",
     "image": "Imatge",
     "json": "JSON",
+    "pdf": "PDF",
     "preview_html": "Previsualitza HTML",
     "raw": "Raw",
     "size": "Mida",
@@ -429,7 +441,6 @@
       "head_method": "Seleccioneu el mètode HEAD",
       "method": "Mètode",
       "next_method": "Seleccioneu Mètode següent",
-      "path": "Camí",
       "post_method": "Seleccioneu el mètode POST",
       "previous_method": "Seleccioneu el mètode anterior",
       "put_method": "Seleccioneu el mètode PUT",
@@ -558,6 +569,7 @@
     "new_name": "El meu nou equip",
     "no_access": "No teniu accés d'edició a aquestes col·leccions",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
     "pending_invites": "Pending invites",
     "permissions": "Permisos",

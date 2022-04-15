@@ -5,7 +5,7 @@
         v-model="filterText"
         type="search"
         autocomplete="off"
-        class="flex w-full p-4 py-2 bg-transparent"
+        class="flex flex-1 p-4 py-2 bg-transparent"
         :placeholder="`${t('action.search')}`"
       />
       <div class="flex">
@@ -49,7 +49,7 @@
             color="red"
             :title="$t('action.remove')"
             class="hidden group-hover:inline-flex"
-            @click.native="deleteBattleHistoryEntry(filteredHistoryGroup)"
+            @click.native="deleteBatchHistoryEntry(filteredHistoryGroup)"
           />
         </summary>
         <div
@@ -59,11 +59,11 @@
           <component
             :is="page == 'rest' ? 'HistoryRestCard' : 'HistoryGraphqlCard'"
             :id="index"
-            :entry="entry"
+            :entry="entry.entry"
             :show-more="showMore"
-            @toggle-star="toggleStar(entry)"
-            @delete-entry="deleteHistory(entry)"
-            @use-entry="useHistory(entry)"
+            @toggle-star="toggleStar(entry.entry)"
+            @delete-entry="deleteHistory(entry.entry)"
+            @use-entry="useHistory(entry.entry)"
           />
         </div>
       </details>
@@ -97,13 +97,32 @@
       @hide-modal="confirmRemove = false"
       @resolve="clearHistory"
     />
+    <HttpReqChangeConfirmModal
+      :show="confirmChange"
+      @hide-modal="confirmChange = false"
+      @save-change="saveRequestChange"
+      @discard-change="discardRequestChange"
+    />
+    <CollectionsSaveRequest
+      mode="rest"
+      :show="showSaveRequestModal"
+      @hide-modal="showSaveRequestModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "@nuxtjs/composition-api"
+import { computed, ref, Ref } from "@nuxtjs/composition-api"
+import {
+  HoppRESTRequest,
+  isEqualHoppRESTRequest,
+  safelyExtractRESTRequest,
+} from "@hoppscotch/data"
+import groupBy from "lodash/groupBy"
 import { useTimeAgo } from "@vueuse/core"
-import { safelyExtractRESTRequest } from "@hoppscotch/data"
+import { pipe } from "fp-ts/function"
+import * as A from "fp-ts/Array"
+import * as E from "fp-ts/Either"
 import {
   useI18n,
   useReadonlyStream,
@@ -121,51 +140,88 @@ import {
   RESTHistoryEntry,
   GQLHistoryEntry,
 } from "~/newstore/history"
-import { getDefaultRESTRequest, setRESTRequest } from "~/newstore/RESTSession"
+import {
+  getDefaultRESTRequest,
+  getRESTRequest,
+  getRESTSaveContext,
+  setRESTRequest,
+  setRESTSaveContext,
+} from "~/newstore/RESTSession"
+import { editRESTRequest } from "~/newstore/collections"
+import { runMutation } from "~/helpers/backend/GQLClient"
+import { UpdateRequestDocument } from "~/helpers/backend/graphql"
+import { HoppRequestSaveContext } from "~/helpers/types/HoppRequestSaveContext"
+
+type HistoryEntry = GQLHistoryEntry | RESTHistoryEntry
+
+type TimedHistoryEntry = {
+  entry: HistoryEntry
+  timeAgo: Ref<string>
+}
 
 const props = defineProps<{
   page: "rest" | "graphql"
 }>()
 
-const filterText = ref("")
-const showMore = ref(false)
-const confirmRemove = ref(false)
 const toast = useToast()
 const t = useI18n()
 
-const groupByDate = (array: any[], key: string) => {
-  return array.reduce((rv: any, x: any) => {
-    ;(rv[useTimeAgo(x[key]).value] = rv[useTimeAgo(x[key]).value] || []).push(x)
-    return rv
-  }, {})
-}
+const filterText = ref("")
+const showMore = ref(false)
+const confirmRemove = ref(false)
+
+const clickedHistory = ref<HistoryEntry | null>(null)
+const confirmChange = ref(false)
+const showSaveRequestModal = ref(false)
 
 const history = useReadonlyStream<RESTHistoryEntry[] | GQLHistoryEntry[]>(
   props.page === "rest" ? restHistory$ : graphqlHistory$,
   []
 )
 
-const filteredHistory = computed(() => {
-  const regExp = new RegExp(filterText.value, "gi")
-  const check = (obj: any) => {
-    if (obj !== null && typeof obj === "object") {
-      return Object.values(obj).some(check)
-    }
-    if (Array.isArray(obj)) {
-      return obj.some(check)
-    }
-    return (
-      (typeof obj === "string" || typeof obj === "number") &&
-      regExp.test(obj as string)
+const deepCheckForRegex = (value: unknown, regExp: RegExp): boolean => {
+  if (value === null || value === undefined) return false
+
+  if (typeof value === "string") return regExp.test(value)
+  if (typeof value === "number") return regExp.test(value.toString())
+
+  if (typeof value === "object")
+    return Object.values(value).some((input) =>
+      deepCheckForRegex(input, regExp)
     )
-  }
-  return (history.value as Array<RESTHistoryEntry | GQLHistoryEntry>).filter(
-    check
+  if (Array.isArray(value))
+    return value.some((input) => deepCheckForRegex(input, regExp))
+
+  return false
+}
+
+const filteredHistory = computed(() =>
+  pipe(
+    history.value as HistoryEntry[],
+    A.filter(
+      (
+        input
+      ): input is HistoryEntry & {
+        updatedOn: NonNullable<HistoryEntry["updatedOn"]>
+      } => {
+        return (
+          !!input.updatedOn &&
+          (filterText.value.length === 0 ||
+            deepCheckForRegex(input, new RegExp(filterText.value, "gi")))
+        )
+      }
+    ),
+    A.map(
+      (entry): TimedHistoryEntry => ({
+        entry,
+        timeAgo: useTimeAgo(entry.updatedOn),
+      })
+    )
   )
-})
+)
 
 const filteredHistoryGroups = computed(() =>
-  groupByDate(filteredHistory.value, "updatedOn")
+  groupBy(filteredHistory.value, (entry) => entry.timeAgo.value)
 )
 
 const clearHistory = () => {
@@ -174,34 +230,131 @@ const clearHistory = () => {
   toast.success(`${t("state.history_deleted")}`)
 }
 
-const useHistory = (entry: any) => {
-  if (props.page === "rest")
-    setRESTRequest(
-      safelyExtractRESTRequest(entry.request, getDefaultRESTRequest())
-    )
+const setRestReq = (request: HoppRESTRequest | null | undefined) => {
+  setRESTRequest(safelyExtractRESTRequest(request, getDefaultRESTRequest()))
 }
 
-const deleteBattleHistoryEntry = (entries: number[]) => {
-  if (props.page === "rest") {
-    entries.forEach((entry: any) => {
-      deleteRESTHistoryEntry(entry)
+// NOTE: For GQL, the HistoryGraphqlCard component already implements useEntry
+// (That is not a really good behaviour tho ¯\_(ツ)_/¯)
+const useHistory = (entry: RESTHistoryEntry) => {
+  const currentFullReq = getRESTRequest()
+  // Initial state trigers a popup
+  if (!clickedHistory.value) {
+    clickedHistory.value = entry
+    confirmChange.value = true
+    return
+  }
+  // Checks if there are any change done in current request and the history request
+  if (
+    !isEqualHoppRESTRequest(
+      currentFullReq,
+      clickedHistory.value.request as HoppRESTRequest
+    )
+  ) {
+    clickedHistory.value = entry
+    confirmChange.value = true
+  } else {
+    props.page === "rest" && setRestReq(entry.request as HoppRESTRequest)
+    clickedHistory.value = entry
+  }
+}
+
+/** Save current request to the collection */
+const saveRequestChange = () => {
+  const saveCtx = getRESTSaveContext()
+  saveCurrentRequest(saveCtx)
+  confirmChange.value = false
+}
+
+/** Discard changes and change the current request and remove the collection context */
+const discardRequestChange = () => {
+  const saveCtx = getRESTSaveContext()
+  if (saveCtx) {
+    setRESTSaveContext(null)
+  }
+  clickedHistory.value &&
+    setRestReq(clickedHistory.value.request as HoppRESTRequest)
+  confirmChange.value = false
+}
+
+const saveCurrentRequest = (saveCtx: HoppRequestSaveContext | null) => {
+  if (!saveCtx) {
+    showSaveRequestModal.value = true
+    return
+  }
+  if (saveCtx.originLocation === "user-collection") {
+    try {
+      editRESTRequest(
+        saveCtx.folderPath,
+        saveCtx.requestIndex,
+        getRESTRequest()
+      )
+      clickedHistory.value &&
+        setRestReq(clickedHistory.value.request as HoppRESTRequest)
+      setRESTSaveContext(null)
+      toast.success(`${t("request.saved")}`)
+    } catch (e) {
+      console.error(e)
+      setRESTSaveContext(null)
+      saveCurrentRequest(null)
+    }
+  } else if (saveCtx.originLocation === "team-collection") {
+    const req = getRESTRequest()
+    try {
+      runMutation(UpdateRequestDocument, {
+        requestID: saveCtx.requestID,
+        data: {
+          title: req.name,
+          request: JSON.stringify(req),
+        },
+      })().then((result) => {
+        if (E.isLeft(result)) {
+          toast.error(`${t("profile.no_permission")}`)
+        } else {
+          toast.success(`${t("request.saved")}`)
+        }
+      })
+      clickedHistory.value &&
+        setRestReq(clickedHistory.value.request as HoppRESTRequest)
+      setRESTSaveContext(null)
+    } catch (error) {
+      showSaveRequestModal.value = true
+      toast.error(`${t("error.something_went_wrong")}`)
+      console.error(error)
+      setRESTSaveContext(null)
+    }
+  }
+}
+
+const isRESTHistoryEntry = (
+  entries: TimedHistoryEntry[]
+): entries is Array<TimedHistoryEntry & { entry: RESTHistoryEntry }> =>
+  // If the page is rest, then we can guarantee what we have is a RESTHistoryEnry
+  props.page === "rest"
+
+const deleteBatchHistoryEntry = (entries: TimedHistoryEntry[]) => {
+  if (isRESTHistoryEntry(entries)) {
+    entries.forEach((entry) => {
+      deleteRESTHistoryEntry(entry.entry)
     })
   } else {
-    entries.forEach((entry: any) => {
-      deleteGraphqlHistoryEntry(entry)
+    entries.forEach((entry) => {
+      deleteGraphqlHistoryEntry(entry.entry as GQLHistoryEntry)
     })
   }
   toast.success(`${t("state.deleted")}`)
 }
 
-const deleteHistory = (entry: any) => {
-  if (props.page === "rest") deleteRESTHistoryEntry(entry)
-  else deleteGraphqlHistoryEntry(entry)
+const deleteHistory = (entry: HistoryEntry) => {
+  if (props.page === "rest") deleteRESTHistoryEntry(entry as RESTHistoryEntry)
+  else deleteGraphqlHistoryEntry(entry as GQLHistoryEntry)
   toast.success(`${t("state.deleted")}`)
 }
 
-const toggleStar = (entry: any) => {
-  if (props.page === "rest") toggleRESTHistoryEntryStar(entry)
-  else toggleGraphqlHistoryEntryStar(entry)
+const toggleStar = (entry: HistoryEntry) => {
+  // History entry type specified because function does not know the type
+  if (props.page === "rest")
+    toggleRESTHistoryEntryStar(entry as RESTHistoryEntry)
+  else toggleGraphqlHistoryEntryStar(entry as GQLHistoryEntry)
 }
 </script>

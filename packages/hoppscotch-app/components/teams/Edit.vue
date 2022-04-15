@@ -1,5 +1,5 @@
 <template>
-  <SmartModal v-if="show" :title="t('team.edit')" @close="hideModal">
+  <SmartModal v-if="show" dialog :title="t('team.edit')" @close="hideModal">
     <template #body>
       <div class="flex flex-col px-2">
         <div class="relative flex">
@@ -104,51 +104,53 @@
                       />
                     </span>
                   </template>
-                  <SmartItem
-                    label="OWNER"
-                    :icon="
-                      member.role === 'OWNER'
-                        ? 'radio_button_checked'
-                        : 'radio_button_unchecked'
-                    "
-                    :active="member.role === 'OWNER'"
-                    @click.native="
-                      () => {
-                        updateMemberRole(member.userID, 'OWNER')
-                        memberOptions[index].tippy().hide()
-                      }
-                    "
-                  />
-                  <SmartItem
-                    label="EDITOR"
-                    :icon="
-                      member.role === 'EDITOR'
-                        ? 'radio_button_checked'
-                        : 'radio_button_unchecked'
-                    "
-                    :active="member.role === 'EDITOR'"
-                    @click.native="
-                      () => {
-                        updateMemberRole(member.userID, 'EDITOR')
-                        memberOptions[index].tippy().hide()
-                      }
-                    "
-                  />
-                  <SmartItem
-                    label="VIEWER"
-                    :icon="
-                      member.role === 'VIEWER'
-                        ? 'radio_button_checked'
-                        : 'radio_button_unchecked'
-                    "
-                    :active="member.role === 'VIEWER'"
-                    @click.native="
-                      () => {
-                        updateMemberRole(member.userID, 'VIEWER')
-                        memberOptions[index].tippy().hide()
-                      }
-                    "
-                  />
+                  <div class="flex flex-col" role="menu">
+                    <SmartItem
+                      label="OWNER"
+                      :icon="
+                        member.role === 'OWNER'
+                          ? 'radio_button_checked'
+                          : 'radio_button_unchecked'
+                      "
+                      :active="member.role === 'OWNER'"
+                      @click.native="
+                        () => {
+                          updateMemberRole(member.userID, 'OWNER')
+                          memberOptions[index].tippy().hide()
+                        }
+                      "
+                    />
+                    <SmartItem
+                      label="EDITOR"
+                      :icon="
+                        member.role === 'EDITOR'
+                          ? 'radio_button_checked'
+                          : 'radio_button_unchecked'
+                      "
+                      :active="member.role === 'EDITOR'"
+                      @click.native="
+                        () => {
+                          updateMemberRole(member.userID, 'EDITOR')
+                          memberOptions[index].tippy().hide()
+                        }
+                      "
+                    />
+                    <SmartItem
+                      label="VIEWER"
+                      :icon="
+                        member.role === 'VIEWER'
+                          ? 'radio_button_checked'
+                          : 'radio_button_unchecked'
+                      "
+                      :active="member.role === 'VIEWER'"
+                      @click.native="
+                        () => {
+                          updateMemberRole(member.userID, 'VIEWER')
+                          memberOptions[index].tippy().hide()
+                        }
+                      "
+                    />
+                  </div>
                 </tippy>
               </span>
               <div class="flex">
@@ -158,7 +160,8 @@
                   :title="t('action.remove')"
                   svg="user-minus"
                   color="red"
-                  @click.native="removeExistingTeamMember(member.userID)"
+                  :loading="isLoadingIndex === index"
+                  @click.native="removeExistingTeamMember(member.userID, index)"
                 />
               </div>
             </div>
@@ -175,7 +178,11 @@
     </template>
     <template #footer>
       <span>
-        <ButtonPrimary :label="t('action.save')" @click.native="saveTeam" />
+        <ButtonPrimary
+          :label="t('action.save')"
+          :loading="isLoading"
+          @click.native="saveTeam"
+        />
         <ButtonSecondary
           :label="t('action.cancel')"
           @click.native="hideModal"
@@ -210,6 +217,7 @@ const t = useI18n()
 
 const emit = defineEmits<{
   (e: "hide-modal"): void
+  (e: "refetch-teams"): void
 }>()
 
 const memberOptions = ref<any | null>(null)
@@ -245,6 +253,7 @@ const teamDetails = useGQLQuery<GetTeamQuery, GetTeamQueryVariables, "">({
   variables: {
     teamID: props.editingTeamID,
   },
+  pollDuration: 10000,
   defer: true,
   updateSubs: computed(() => {
     if (props.editingTeamID) {
@@ -274,6 +283,17 @@ const teamDetails = useGQLQuery<GetTeamQuery, GetTeamQueryVariables, "">({
     } else return []
   }),
 })
+
+watch(
+  () => props.show,
+  (show) => {
+    if (!show) {
+      teamDetails.pause()
+    } else {
+      teamDetails.unpause()
+    }
+  }
+)
 
 const roleUpdates = ref<
   {
@@ -343,7 +363,10 @@ const membersList = computed(() => {
   return []
 })
 
-const removeExistingTeamMember = async (userID: string) => {
+const isLoadingIndex = ref<null | number>(null)
+
+const removeExistingTeamMember = async (userID: string, index: number) => {
+  isLoadingIndex.value = index
   const removeTeamMemberResult = await removeTeamMember(
     userID,
     props.editingTeamID
@@ -352,10 +375,16 @@ const removeExistingTeamMember = async (userID: string) => {
     toast.error(`${t("error.something_went_wrong")}`)
   } else {
     toast.success(`${t("team.member_removed")}`)
+    emit("refetch-teams")
+    teamDetails.execute({ teamID: props.editingTeamID })
   }
+  isLoadingIndex.value = null
 }
 
+const isLoading = ref(false)
+
 const saveTeam = async () => {
+  isLoading.value = true
   if (name.value !== "") {
     if (TeamNameCodec.is(name.value)) {
       const updateTeamNameResult = await renameTeam(
@@ -380,11 +409,12 @@ const saveTeam = async () => {
       hideModal()
       toast.success(`${t("team.saved")}`)
     } else {
-      return toast.error(`${t("team.name_length_insufficient")}`)
+      toast.error(`${t("team.name_length_insufficient")}`)
     }
   } else {
-    return toast.error(`${t("empty.team_name")}`)
+    toast.error(`${t("empty.team_name")}`)
   }
+  isLoading.value = false
 }
 
 const hideModal = () => {

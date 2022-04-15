@@ -1,6 +1,7 @@
 <template>
   <SmartModal
     v-if="show"
+    dialog
     :title="$t('folder.new')"
     @close="$emit('hide-modal')"
   >
@@ -49,12 +50,16 @@ export default defineComponent({
   },
   methods: {
     addFolder() {
-      // TODO: Blocking when name is null ?
+      if (!this.name) {
+        this.$toast.error(`${this.$t("folder.name_length_insufficient")}`)
+        return
+      }
 
       this.$emit("add-folder", {
         name: this.name,
         path: this.folderPath || `${this.collectionIndex}`,
       })
+
       this.hideModal()
     },
     hideModal() {

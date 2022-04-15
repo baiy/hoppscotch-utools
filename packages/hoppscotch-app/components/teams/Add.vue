@@ -1,5 +1,5 @@
 <template>
-  <SmartModal v-if="show" :title="t('team.new')" @close="hideModal">
+  <SmartModal v-if="show" dialog :title="t('team.new')" @close="hideModal">
     <template #body>
       <div class="flex flex-col px-2">
         <input
@@ -19,7 +19,11 @@
     </template>
     <template #footer>
       <span>
-        <ButtonPrimary :label="t('action.save')" @click.native="addNewTeam" />
+        <ButtonPrimary
+          :label="t('action.save')"
+          :loading="isLoading"
+          @click.native="addNewTeam"
+        />
         <ButtonSecondary
           :label="t('action.cancel')"
           @click.native="hideModal"
@@ -51,12 +55,15 @@ const emit = defineEmits<{
 
 const name = ref<string | null>(null)
 
-const addNewTeam = () =>
-  pipe(
-    TeamNameCodec.decode(name.value), // Perform decode (returns either)
-    TE.fromEither, // Convert either to a task either
-    TE.mapLeft(() => "invalid_name" as const), // Failure above is an invalid_name, give it an identifiable value
-    TE.chainW(createTeam), // Create the team
+const isLoading = ref(false)
+
+const addNewTeam = async () => {
+  isLoading.value = true
+  await pipe(
+    TeamNameCodec.decode(name.value),
+    TE.fromEither,
+    TE.mapLeft(() => "invalid_name" as const),
+    TE.chainW(createTeam),
     TE.match(
       (err) => {
         // err is of type "invalid_name" | GQLError<Err>
@@ -67,11 +74,13 @@ const addNewTeam = () =>
         }
       },
       () => {
-        // Success logic ?
+        toast.success(`${t("team.new_created")}`)
         hideModal()
       }
     )
   )()
+  isLoading.value = false
+}
 
 const hideModal = () => {
   name.value = null

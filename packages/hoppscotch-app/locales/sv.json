@@ -75,6 +75,7 @@
     "continue_with_email": "Fortsätt med e -post",
     "continue_with_github": "Fortsätt med GitHub",
     "continue_with_google": "Fortsätt med Google",
+    "continue_with_microsoft": "Continue with Microsoft",
     "email": "E-post",
     "logged_out": "Utloggad",
     "login": "Logga in",
@@ -103,6 +104,7 @@
     "invalid_name": "Ange ett giltigt namn för samlingen",
     "my_collections": "Mina samlingar",
     "name": "Min nya samling",
+    "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "Ny kollektion",
     "renamed": "Samling bytt namn",
     "request_in_use": "Request in use",
@@ -159,13 +161,19 @@
     "tests": "Det finns inga tester för denna begäran"
   },
   "environment": {
+    "add_to_global": "Add to Global",
+    "added": "Environment addition",
     "create_new": "Skapa ny miljö",
+    "deleted": "Environment deletion",
     "edit": "Redigera miljö",
     "invalid_name": "Ange ett giltigt namn på miljön",
+    "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "Ny miljö",
     "no_environment": "Ingen miljö",
+    "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
     "select": "Välj miljö",
     "title": "Miljöer",
+    "updated": "Environment updation",
     "variable_list": "Variabel lista"
   },
   "error": {
@@ -175,6 +183,7 @@
     "empty_req_name": "Tom förfrågningsnamn",
     "f12_details": "(F12 för detaljer)",
     "gql_prettify_invalid_query": "Det gick inte att pryda en ogiltig fråga, lösa frågesyntaxfel och försök igen",
+    "incomplete_config_urls": "Incomplete configuration URLs",
     "incorrect_email": "Incorrect email",
     "invalid_link": "Invalid link",
     "invalid_link_description": "The link you clicked is invalid or expired.",
@@ -190,12 +199,14 @@
     "as_json": "Exportera som JSON",
     "create_secret_gist": "Skapa hemlig Gist",
     "gist_created": "Gist skapad",
-    "require_github": "Logga in med GitHub för att skapa hemlig information"
+    "require_github": "Logga in med GitHub för att skapa hemlig information",
+    "title": "Export"
   },
   "folder": {
     "created": "Mapp skapad",
     "edit": "Redigera mapp",
     "invalid_name": "Ange ett namn på mappen",
+    "name_length_insufficient": "Folder name should be at least 3 characters long",
     "new": "Ny mapp",
     "renamed": "Mappen har bytt namn"
   },
@@ -205,7 +216,6 @@
     "subscriptions": "Prenumerationer"
   },
   "header": {
-    "account": "konto",
     "install_pwa": "Installera app",
     "login": "Logga in",
     "save_workspace": "Spara min arbetsyta"
@@ -319,6 +329,7 @@
     "name": "Begär namn",
     "parameter_list": "Frågeparametrar",
     "parameters": "Parametrar",
+    "path": "Väg",
     "payload": "Nyttolast",
     "query": "Fråga",
     "raw_body": "Raw Request Body",
@@ -339,6 +350,7 @@
     "html": "HTML",
     "image": "Bild",
     "json": "JSON",
+    "pdf": "PDF",
     "preview_html": "Förhandsgranska HTML",
     "raw": "Rå",
     "size": "Storlek",
@@ -429,7 +441,6 @@
       "head_method": "Välj HEAD -metod",
       "method": "Metod",
       "next_method": "Välj Nästa metod",
-      "path": "Väg",
       "post_method": "Välj POST -metod",
       "previous_method": "Välj föregående metod",
       "put_method": "Välj PUT -metod",
@@ -558,6 +569,7 @@
     "new_name": "Mitt nya team",
     "no_access": "Du har inte redigeringsåtkomst till dessa samlingar",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
     "pending_invites": "Pending invites",
     "permissions": "Behörigheter",

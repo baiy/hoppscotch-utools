@@ -75,6 +75,7 @@
     "continue_with_email": "המשך עם מייל",
     "continue_with_github": "המשך עם GitHub",
     "continue_with_google": "המשך עם גוגל",
+    "continue_with_microsoft": "Continue with Microsoft",
     "email": "אימייל",
     "logged_out": "התנתק",
     "login": "התחברות",
@@ -103,6 +104,7 @@
     "invalid_name": "אנא ספק שם תקף לאוסף",
     "my_collections": "האוספים שלי",
     "name": "האוסף החדש שלי",
+    "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "קולקציה חדשה",
     "renamed": "שם האוסף שונה",
     "request_in_use": "Request in use",
@@ -159,13 +161,19 @@
     "tests": "אין בדיקות לבקשה זו"
   },
   "environment": {
+    "add_to_global": "Add to Global",
+    "added": "Environment addition",
     "create_new": "צור סביבה חדשה",
+    "deleted": "Environment deletion",
     "edit": "ערוך את הסביבה",
     "invalid_name": "אנא ספק שם חוקי לסביבה",
+    "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "סביבה חדשה",
     "no_environment": "אין סביבה",
+    "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
     "select": "בחר סביבה",
     "title": "סביבות",
+    "updated": "Environment updation",
     "variable_list": "רשימת משתנים"
   },
   "error": {
@@ -175,6 +183,7 @@
     "empty_req_name": "שם הבקשה ריק",
     "f12_details": "(F12 לפרטים)",
     "gql_prettify_invalid_query": "לא ניתן היה לייפות שאילתה לא חוקית, לפתור שגיאות תחביר שאילתות ולנסות שוב",
+    "incomplete_config_urls": "Incomplete configuration URLs",
     "incorrect_email": "Incorrect email",
     "invalid_link": "Invalid link",
     "invalid_link_description": "The link you clicked is invalid or expired.",
@@ -190,12 +199,14 @@
     "as_json": "ייצא כ- JSON",
     "create_secret_gist": "צור גיסט סודי",
     "gist_created": "גיסט נוצר",
-    "require_github": "התחבר עם GitHub כדי ליצור תמצית סודית"
+    "require_github": "התחבר עם GitHub כדי ליצור תמצית סודית",
+    "title": "Export"
   },
   "folder": {
     "created": "תיקייה נוצרה",
     "edit": "ערוך תיקייה",
     "invalid_name": "אנא ספק שם לתיקייה",
+    "name_length_insufficient": "Folder name should be at least 3 characters long",
     "new": "תיקייה חדשה",
     "renamed": "שם התיקייה שונה"
   },
@@ -205,7 +216,6 @@
     "subscriptions": "מנויים"
   },
   "header": {
-    "account": "חֶשְׁבּוֹן",
     "install_pwa": "התקן אפליקציה",
     "login": "התחברות",
     "save_workspace": "שמור את סביבת העבודה שלי"
@@ -319,6 +329,7 @@
     "name": "שם הבקשה",
     "parameter_list": "פרמטרי שאילתה",
     "parameters": "פרמטרים",
+    "path": "נָתִיב",
     "payload": "מטען",
     "query": "שאילתא",
     "raw_body": "גוף בקשה גולמית",
@@ -339,6 +350,7 @@
     "html": "HTML",
     "image": "תמונה",
     "json": "JSON",
+    "pdf": "PDF",
     "preview_html": "תצוגה מקדימה של HTML",
     "raw": "גלם",
     "size": "גודל",
@@ -429,7 +441,6 @@
       "head_method": "בחר שיטת HEAD",
       "method": "שיטה",
       "next_method": "בחר בשיטה הבאה",
-      "path": "נָתִיב",
       "post_method": "בחר שיטת POST",
       "previous_method": "בחר שיטה קודמת",
       "put_method": "בחר שיטת PUT",
@@ -558,6 +569,7 @@
     "new_name": "הצוות החדש שלי",
     "no_access": "אין לך גישת עריכה לאוספים אלה",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
     "pending_invites": "Pending invites",
     "permissions": "הרשאות",

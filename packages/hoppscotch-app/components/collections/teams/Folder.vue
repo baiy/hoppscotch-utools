@@ -32,6 +32,14 @@
         <ButtonSecondary
           v-if="collectionsType.selectedTeam.myRole !== 'VIEWER'"
           v-tippy="{ theme: 'tooltip' }"
+          svg="file-plus"
+          :title="$t('request.new')"
+          class="hidden group-hover:inline-flex"
+          @click.native="$emit('add-request', { folder, path: folderPath })"
+        />
+        <ButtonSecondary
+          v-if="collectionsType.selectedTeam.myRole !== 'VIEWER'"
+          v-tippy="{ theme: 'tooltip' }"
           svg="folder-plus"
           :title="$t('folder.new')"
           class="hidden group-hover:inline-flex"
@@ -58,11 +66,26 @@
               ref="tippyActions"
               class="flex flex-col focus:outline-none"
               tabindex="0"
+              role="menu"
+              @keyup.r="requestAction.$el.click()"
               @keyup.n="folderAction.$el.click()"
               @keyup.e="edit.$el.click()"
               @keyup.delete="deleteAction.$el.click()"
+              @keyup.x="exportAction.$el.click()"
               @keyup.escape="options.tippy().hide()"
             >
+              <SmartItem
+                ref="requestAction"
+                svg="file-plus"
+                :label="$t('request.new')"
+                :shortcut="['R']"
+                @click.native="
+                  () => {
+                    $emit('add-request', { folder, path: folderPath })
+                    options.tippy().hide()
+                  }
+                "
+              />
               <SmartItem
                 ref="folderAction"
                 svg="folder-plus"
@@ -91,6 +114,14 @@
                     options.tippy().hide()
                   }
                 "
+              />
+              <SmartItem
+                ref="exportAction"
+                svg="download"
+                :label="$t('export.title')"
+                :shortcut="['X']"
+                :loading="exportLoading"
+                @click.native="exportFolder"
               />
               <SmartItem
                 ref="deleteAction"
@@ -126,6 +157,8 @@
           :collections-type="collectionsType"
           :folder-path="`${folderPath}/${subFolderIndex}`"
           :picked="picked"
+          :loading-collection-i-ds="loadingCollectionIDs"
+          @add-request="$emit('add-request', $event)"
           @add-folder="$emit('add-folder', $event)"
           @edit-folder="$emit('edit-folder', $event)"
           @edit-request="$emit('edit-request', $event)"
@@ -154,7 +187,14 @@
           @duplicate-request="$emit('duplicate-request', $event)"
         />
         <div
-          v-if="
+          v-if="loadingCollectionIDs.includes(folder.id)"
+          class="flex flex-col items-center justify-center p-4"
+        >
+          <SmartSpinner class="my-4" />
+          <span class="text-secondaryLight">{{ $t("state.loading") }}</span>
+        </div>
+        <div
+          v-else-if="
             (folder.children == undefined || folder.children.length === 0) &&
             (folder.requests == undefined || folder.requests.length === 0)
           "
@@ -184,8 +224,13 @@
 <script lang="ts">
 import { defineComponent, ref } from "@nuxtjs/composition-api"
 import * as E from "fp-ts/Either"
+import { runMutation } from "~/helpers/backend/GQLClient"
+import { DeleteCollectionDocument } from "~/helpers/backend/graphql"
+import {
+  getCompleteCollectionTree,
+  teamCollToHoppRESTColl,
+} from "~/helpers/backend/helpers"
 import { moveRESTTeamRequest } from "~/helpers/backend/mutations/TeamRequest"
-import * as teamUtils from "~/helpers/teams/utils"
 
 export default defineComponent({
   name: "Folder",
@@ -199,14 +244,18 @@ export default defineComponent({
     isFiltered: Boolean,
     collectionsType: { type: Object, default: () => {} },
     picked: { type: Object, default: () => {} },
+    loadingCollectionIDs: { type: Array, default: () => [] },
   },
   setup() {
     return {
       tippyActions: ref<any | null>(null),
       options: ref<any | null>(null),
+      requestAction: ref<any | null>(null),
       folderAction: ref<any | null>(null),
       edit: ref<any | null>(null),
       deleteAction: ref<any | null>(null),
+      exportAction: ref<any | null>(null),
+      exportLoading: ref<boolean>(false),
     }
   },
   data() {
@@ -234,6 +283,43 @@ export default defineComponent({
     },
   },
   methods: {
+    async exportFolder() {
+      this.exportLoading = true
+
+      const result = await getCompleteCollectionTree(this.folder.id)()
+
+      if (E.isLeft(result)) {
+        this.$toast.error(this.$t("error.something_went_wrong").toString())
+        console.log(result.left)
+        this.exportLoading = false
+        this.options.tippy().hide()
+
+        return
+      }
+
+      const hoppColl = teamCollToHoppRESTColl(result.right)
+
+      const collectionJSON = JSON.stringify(hoppColl)
+
+      const file = new Blob([collectionJSON], { type: "application/json" })
+      const a = document.createElement("a")
+      const url = URL.createObjectURL(file)
+      a.href = url
+
+      a.download = `${hoppColl.name}.json`
+      document.body.appendChild(a)
+      a.click()
+      this.$toast.success(this.$t("state.download_started").toString())
+
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 1000)
+
+      this.exportLoading = false
+
+      this.options.tippy().hide()
+    },
     toggleShowChildren() {
       if (this.$props.saveRequest)
         this.$emit("select", {
@@ -257,23 +343,25 @@ export default defineComponent({
           this.$emit("select", { picked: null })
         }
 
-        teamUtils
-          .deleteCollection(this.$apollo, this.folder.id)
-          .then(() => {
+        runMutation(DeleteCollectionDocument, {
+          collectionID: this.folder.id,
+        })().then((result) => {
+          if (E.isLeft(result)) {
+            this.$toast.error(`${this.$t("error.something_went_wrong")}`)
+            console.error(result.left)
+          } else {
             this.$toast.success(`${this.$t("state.deleted")}`)
             this.$emit("update-team-collections")
-          })
-          .catch((e) => {
-            this.$toast.error(`${this.$t("error.something_went_wrong")}`)
-            console.error(e)
-          })
+          }
+        })
+
         this.$emit("update-team-collections")
       }
     },
-    expandCollection(collectionID) {
+    expandCollection(collectionID: number) {
       this.$emit("expand-collection", collectionID)
     },
-    async dropEvent({ dataTransfer }) {
+    async dropEvent({ dataTransfer }: any) {
       this.dragging = !this.dragging
       const requestIndex = dataTransfer.getData("requestIndex")
       const moveRequestResult = await moveRESTTeamRequest(
@@ -283,7 +371,7 @@ export default defineComponent({
       if (E.isLeft(moveRequestResult))
         this.$toast.error(`${this.$t("error.something_went_wrong")}`)
     },
-    removeRequest({ collectionIndex, folderName, requestIndex }) {
+    removeRequest({ collectionIndex, folderName, requestIndex }: any) {
       this.$emit("remove-request", {
         collectionIndex,
         folderName,

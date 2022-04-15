@@ -75,6 +75,7 @@
     "continue_with_email": "Gaan voort met e -pos",
     "continue_with_github": "Gaan voort met GitHub",
     "continue_with_google": "Gaan voort met Google",
+    "continue_with_microsoft": "Continue with Microsoft",
     "email": "E -pos",
     "logged_out": "Uitgeteken",
     "login": "Teken aan",
@@ -103,6 +104,7 @@
     "invalid_name": "Gee 'n geldige naam vir die versameling",
     "my_collections": "My versamelings",
     "name": "My nuwe versameling",
+    "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "Nuwe versameling",
     "renamed": "Versameling hernoem",
     "request_in_use": "Request in use",
@@ -159,13 +161,19 @@
     "tests": "Daar is geen toetse vir hierdie versoek nie"
   },
   "environment": {
+    "add_to_global": "Add to Global",
+    "added": "Environment addition",
     "create_new": "Skep nuwe omgewing",
+    "deleted": "Environment deletion",
     "edit": "Bewerk omgewing",
     "invalid_name": "Gee 'n geldige naam vir die omgewing",
+    "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "Nuwe omgewing",
     "no_environment": "Geen omgewing nie",
+    "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
     "select": "Kies omgewing",
     "title": "Omgewings",
+    "updated": "Environment updation",
     "variable_list": "Veranderlike lys"
   },
   "error": {
@@ -175,6 +183,7 @@
     "empty_req_name": "Leë versoeknaam",
     "f12_details": "(F12 vir meer inligting)",
     "gql_prettify_invalid_query": "Kon nie 'n ongeldige navraag mooi maak nie, los sintaksisfoute op en probeer weer",
+    "incomplete_config_urls": "Incomplete configuration URLs",
     "incorrect_email": "Incorrect email",
     "invalid_link": "Invalid link",
     "invalid_link_description": "The link you clicked is invalid or expired.",
@@ -190,12 +199,14 @@
     "as_json": "Uitvoer as JSON",
     "create_secret_gist": "Skep geheime Gist",
     "gist_created": "Gis geskep",
-    "require_github": "Teken in met GitHub om 'n geheime idee te skep"
+    "require_github": "Teken in met GitHub om 'n geheime idee te skep",
+    "title": "Export"
   },
   "folder": {
     "created": "Vouer geskep",
     "edit": "Wysig gids",
     "invalid_name": "Gee 'n naam vir die gids",
+    "name_length_insufficient": "Folder name should be at least 3 characters long",
     "new": "Nuwe leêr",
     "renamed": "Vouer hernoem"
   },
@@ -205,7 +216,6 @@
     "subscriptions": "Inskrywings"
   },
   "header": {
-    "account": "Rekening",
     "install_pwa": "Installeer toep",
     "login": "Teken aan",
     "save_workspace": "Stoor my werkspasie"
@@ -319,6 +329,7 @@
     "name": "Versoek naam",
     "parameter_list": "Navraagparameters",
     "parameters": "Grense",
+    "path": "Pad",
     "payload": "Nuttingslading",
     "query": "Navraag",
     "raw_body": "Rou versoeksliggaam",
@@ -339,6 +350,7 @@
     "html": "HTML",
     "image": "Beeld",
     "json": "JSON",
+    "pdf": "PDF",
     "preview_html": "Voorbeskou HTML",
     "raw": "Rou",
     "size": "Grootte",
@@ -429,7 +441,6 @@
       "head_method": "Kies HOOF metode",
       "method": "Metode",
       "next_method": "Kies Volgende metode",
-      "path": "Pad",
       "post_method": "Kies POST -metode",
       "previous_method": "Kies Vorige metode",
       "put_method": "Kies PUT -metode",
@@ -558,6 +569,7 @@
     "new_name": "My nuwe span",
     "no_access": "U het nie redigeertoegang tot hierdie versamelings nie",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
     "pending_invites": "Pending invites",
     "permissions": "Toestemmings",

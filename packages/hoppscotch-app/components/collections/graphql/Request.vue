@@ -56,6 +56,7 @@
               ref="tippyActions"
               class="flex flex-col focus:outline-none"
               tabindex="0"
+              role="menu"
               @keyup.e="edit.$el.click()"
               @keyup.d="duplicate.$el.click()"
               @keyup.delete="deleteAction.$el.click()"
@@ -122,6 +123,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from "@nuxtjs/composition-api"
 import { HoppGQLRequest, makeGQLRequest } from "@hoppscotch/data"
+import { cloneDeep } from "lodash"
 import { removeGraphqlRequest } from "~/newstore/collections"
 import { setGQLSession } from "~/newstore/GQLSession"
 
@@ -176,13 +178,16 @@ export default defineComponent({
         this.pick()
       } else {
         setGQLSession({
-          request: makeGQLRequest({
-            name: this.$props.request.name,
-            url: this.$props.request.url,
-            query: this.$props.request.query,
-            headers: this.$props.request.headers,
-            variables: this.$props.request.variables,
-          }),
+          request: cloneDeep(
+            makeGQLRequest({
+              name: this.$props.request.name,
+              url: this.$props.request.url,
+              query: this.$props.request.query,
+              headers: this.$props.request.headers,
+              variables: this.$props.request.variables,
+              auth: this.$props.request.auth,
+            })
+          ),
           schema: "",
           response: "",
         })

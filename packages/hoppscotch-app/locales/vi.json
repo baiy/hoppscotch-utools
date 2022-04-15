@@ -75,6 +75,7 @@
     "continue_with_email": "Tiếp tục với Email",
     "continue_with_github": "Tiếp tục với GitHub",
     "continue_with_google": "Tiếp tục với Google",
+    "continue_with_microsoft": "Continue with Microsoft",
     "email": "E-mail",
     "logged_out": "Đã đăng xuất",
     "login": "Đăng nhập",
@@ -103,6 +104,7 @@
     "invalid_name": "Vui lòng cung cấp tên hợp lệ cho bộ sưu tập",
     "my_collections": "Bộ sưu tập của tôi",
     "name": "Bộ sưu tập mới của tôi",
+    "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "Bộ sưu tập mới",
     "renamed": "Bộ sưu tập đã được đổi tên",
     "request_in_use": "Request in use",
@@ -159,13 +161,19 @@
     "tests": "Không có bài kiểm tra nào cho yêu cầu này"
   },
   "environment": {
+    "add_to_global": "Add to Global",
+    "added": "Environment addition",
     "create_new": "Tạo môi trường mới",
+    "deleted": "Environment deletion",
     "edit": "Chỉnh sửa môi trường",
     "invalid_name": "Vui lòng cung cấp tên hợp lệ cho môi trường",
+    "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "Môi trường mới",
     "no_environment": "Không có môi trường",
+    "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
     "select": "Chọn môi trường",
     "title": "Môi trường",
+    "updated": "Environment updation",
     "variable_list": "Danh sách biến"
   },
   "error": {
@@ -175,6 +183,7 @@
     "empty_req_name": "Tên yêu cầu trống",
     "f12_details": "(F12 để biết chi tiết)",
     "gql_prettify_invalid_query": "Không thể xác minh trước một truy vấn không hợp lệ, hãy giải quyết các lỗi cú pháp truy vấn và thử lại",
+    "incomplete_config_urls": "Incomplete configuration URLs",
     "incorrect_email": "Incorrect email",
     "invalid_link": "Invalid link",
     "invalid_link_description": "The link you clicked is invalid or expired.",
@@ -190,12 +199,14 @@
     "as_json": "Xuất dưới dạng JSON",
     "create_secret_gist": "Tạo Gist bí mật",
     "gist_created": "Gist đã tạo",
-    "require_github": "Đăng nhập bằng GitHub để tạo ý chính bí mật"
+    "require_github": "Đăng nhập bằng GitHub để tạo ý chính bí mật",
+    "title": "Export"
   },
   "folder": {
     "created": "Thư mục đã được tạo",
     "edit": "Chỉnh sửa thư mục",
     "invalid_name": "Vui lòng cung cấp tên cho thư mục",
+    "name_length_insufficient": "Folder name should be at least 3 characters long",
     "new": "Thư mục mới",
     "renamed": "Thư mục đã được đổi tên"
   },
@@ -205,7 +216,6 @@
     "subscriptions": "Đăng ký"
   },
   "header": {
-    "account": "Tài khoản",
     "install_pwa": "Cài đặt ứng dụng",
     "login": "Đăng nhập",
     "save_workspace": "Lưu không gian làm việc của tôi"
@@ -319,6 +329,7 @@
     "name": "Yêu cầu tên",
     "parameter_list": "Tham số truy vấn",
     "parameters": "Thông số",
+    "path": "Đường dẫn",
     "payload": "Khối hàng",
     "query": "Truy vấn",
     "raw_body": "Nội dung yêu cầu thô",
@@ -339,6 +350,7 @@
     "html": "HTML",
     "image": "Hình ảnh",
     "json": "JSON",
+    "pdf": "PDF",
     "preview_html": "Xem trước HTML",
     "raw": "Nguyên",
     "size": "Kích thước",
@@ -429,7 +441,6 @@
       "head_method": "Chọn phương pháp HEAD",
       "method": "Phương pháp",
       "next_method": "Chọn phương pháp tiếp theo",
-      "path": "Đường dẫn",
       "post_method": "Chọn phương pháp ĐĂNG",
       "previous_method": "Chọn phương pháp trước đó",
       "put_method": "Chọn phương pháp PUT",
@@ -480,7 +491,7 @@
     "download_started": "Đã bắt đầu tải xuống",
     "enabled": "Đã bật",
     "file_imported": "Đã nhập tệp",
-    "finished_in": "Hoàn thành sau {thời lượng} mili giây",
+    "finished_in": "Hoàn thành sau {duration} mili giây",
     "history_deleted": "Lịch sử đã bị xóa",
     "linewrap": "Quấn dòng",
     "loading": "Đang tải...",
@@ -558,6 +569,7 @@
     "new_name": "Nhóm mới của tôi",
     "no_access": "Bạn không có quyền truy cập chỉnh sửa vào các bộ sưu tập này",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
     "pending_invites": "Pending invites",
     "permissions": "Quyền",

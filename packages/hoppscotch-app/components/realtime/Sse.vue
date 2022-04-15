@@ -1,9 +1,6 @@
 <template>
-  <Splitpanes class="smart-splitter" :horizontal="COLUMN_LAYOUT">
-    <Pane
-      :size="COLUMN_LAYOUT ? 45 : 50"
-      class="hide-scrollbar !overflow-auto flex flex-col"
-    >
+  <AppPaneLayout>
+    <template #primary>
       <div
         class="sticky top-0 z-10 flex flex-shrink-0 p-4 overflow-x-auto space-x-2 bg-primary hide-scrollbar"
       >
@@ -15,7 +12,7 @@
               type="url"
               autocomplete="off"
               :class="{ error: !serverValid }"
-              class="flex flex-1 w-full px-4 py-2 border rounded-l bg-primaryLight border-divider text-secondaryDark hover:border-dividerDark focus-visible:bg-transparent focus-visible:border-dividerDark"
+              class="flex flex-1 w-full px-4 py-2 border rounded-l bg-primaryLight border-divider text-secondaryDark"
               :placeholder="$t('sse.url')"
               :disabled="connectionSSEState"
               @keyup.enter="serverValid ? toggleSSEConnection() : null"
@@ -29,7 +26,7 @@
             <input
               id="event-type"
               v-model="eventType"
-              class="flex flex-1 w-full px-4 py-2 border rounded-r bg-primaryLight border-divider text-secondaryDark hover:border-dividerDark focus-visible:bg-transparent focus-visible:border-dividerDark"
+              class="flex flex-1 w-full px-4 py-2 border rounded-r bg-primaryLight border-divider text-secondaryDark"
               spellcheck="false"
               :disabled="connectionSSEState"
               @keyup.enter="serverValid ? toggleSSEConnection() : null"
@@ -48,23 +45,18 @@
           />
         </div>
       </div>
-    </Pane>
-    <Pane
-      :size="COLUMN_LAYOUT ? 65 : 50"
-      class="hide-scrollbar !overflow-auto flex flex-col"
-    >
+    </template>
+    <template #secondary>
       <RealtimeLog :title="$t('sse.log')" :log="log" />
-    </Pane>
-  </Splitpanes>
+    </template>
+  </AppPaneLayout>
 </template>
 
 <script>
 import { defineComponent } from "@nuxtjs/composition-api"
-import { Splitpanes, Pane } from "splitpanes"
 import "splitpanes/dist/splitpanes.css"
 import debounce from "lodash/debounce"
 import { logHoppRequestRunToAnalytics } from "~/helpers/fb/analytics"
-import { useSetting } from "~/newstore/settings"
 import {
   SSEEndpoint$,
   setSSEEndpoint,
@@ -83,10 +75,8 @@ import {
 import { useStream } from "~/helpers/utils/composables"
 
 export default defineComponent({
-  components: { Splitpanes, Pane },
   setup() {
     return {
-      COLUMN_LAYOUT: useSetting("COLUMN_LAYOUT"),
       connectionSSEState: useStream(
         SSEConnectionState$,
         false,

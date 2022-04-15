@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col flex-1">
     <div
-      class="sticky z-10 flex items-center justify-between pl-4 border-b bg-primary border-dividerLight top-upperSecondaryStickyFold"
+      class="sticky z-10 flex items-center justify-between pl-4 border-b bg-primary border-dividerLight top-upperMobileSecondaryStickyFold sm:top-upperSecondaryStickyFold"
     >
       <span class="flex items-center">
         <label class="font-semibold text-secondaryLight">
@@ -22,81 +22,83 @@
               />
             </span>
           </template>
-          <SmartItem
-            label="None"
-            :icon="
-              authName === 'None'
-                ? 'radio_button_checked'
-                : 'radio_button_unchecked'
-            "
-            :active="authName === 'None'"
-            @click.native="
-              () => {
-                authType = 'none'
-                authTypeOptions.tippy().hide()
-              }
-            "
-          />
-          <SmartItem
-            label="Basic Auth"
-            :icon="
-              authName === 'Basic Auth'
-                ? 'radio_button_checked'
-                : 'radio_button_unchecked'
-            "
-            :active="authName === 'Basic Auth'"
-            @click.native="
-              () => {
-                authType = 'basic'
-                authTypeOptions.tippy().hide()
-              }
-            "
-          />
-          <SmartItem
-            label="Bearer Token"
-            :icon="
-              authName === 'Bearer'
-                ? 'radio_button_checked'
-                : 'radio_button_unchecked'
-            "
-            :active="authName === 'Bearer'"
-            @click.native="
-              () => {
-                authType = 'bearer'
-                authTypeOptions.tippy().hide()
-              }
-            "
-          />
-          <SmartItem
-            label="OAuth 2.0"
-            :icon="
-              authName === 'OAuth 2.0'
-                ? 'radio_button_checked'
-                : 'radio_button_unchecked'
-            "
-            :active="authName === 'OAuth 2.0'"
-            @click.native="
-              () => {
-                authType = 'oauth-2'
-                authTypeOptions.tippy().hide()
-              }
-            "
-          />
-          <SmartItem
-            label="API key"
-            :icon="
-              authName === 'API key'
-                ? 'radio_button_checked'
-                : 'radio_button_unchecked'
-            "
-            :active="authName === 'API key'"
-            @click.native="
-              () => {
-                authType = 'api-key'
-                authTypeOptions.tippy().hide()
-              }
-            "
-          />
+          <div class="flex flex-col" role="menu">
+            <SmartItem
+              label="None"
+              :icon="
+                authName === 'None'
+                  ? 'radio_button_checked'
+                  : 'radio_button_unchecked'
+              "
+              :active="authName === 'None'"
+              @click.native="
+                () => {
+                  authType = 'none'
+                  authTypeOptions.tippy().hide()
+                }
+              "
+            />
+            <SmartItem
+              label="Basic Auth"
+              :icon="
+                authName === 'Basic Auth'
+                  ? 'radio_button_checked'
+                  : 'radio_button_unchecked'
+              "
+              :active="authName === 'Basic Auth'"
+              @click.native="
+                () => {
+                  authType = 'basic'
+                  authTypeOptions.tippy().hide()
+                }
+              "
+            />
+            <SmartItem
+              label="Bearer Token"
+              :icon="
+                authName === 'Bearer'
+                  ? 'radio_button_checked'
+                  : 'radio_button_unchecked'
+              "
+              :active="authName === 'Bearer'"
+              @click.native="
+                () => {
+                  authType = 'bearer'
+                  authTypeOptions.tippy().hide()
+                }
+              "
+            />
+            <SmartItem
+              label="OAuth 2.0"
+              :icon="
+                authName === 'OAuth 2.0'
+                  ? 'radio_button_checked'
+                  : 'radio_button_unchecked'
+              "
+              :active="authName === 'OAuth 2.0'"
+              @click.native="
+                () => {
+                  authType = 'oauth-2'
+                  authTypeOptions.tippy().hide()
+                }
+              "
+            />
+            <SmartItem
+              label="API key"
+              :icon="
+                authName === 'API key'
+                  ? 'radio_button_checked'
+                  : 'radio_button_unchecked'
+              "
+              :active="authName === 'API key'"
+              @click.native="
+                () => {
+                  authType = 'api-key'
+                  authTypeOptions.tippy().hide()
+                }
+              "
+            />
+          </div>
         </tippy>
       </span>
       <div class="flex">
@@ -105,14 +107,13 @@
           @change="setExclude('auth', !$event)"
         >
           {{ $t("authorization.include_in_url") }}
-        </SmartCheckbox> -->
+        </SmartCheckbox>-->
         <SmartCheckbox
           :on="authActive"
           class="px-2"
           @change="authActive = !authActive"
+          >{{ $t("state.enabled") }}</SmartCheckbox
         >
-          {{ $t("state.enabled") }}
-        </SmartCheckbox>
         <ButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           to="https://docs.hoppscotch.io/features/authorization"
@@ -138,9 +139,7 @@
         class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
         :alt="`${$t('empty.authorization')}`"
       />
-      <span class="pb-4 text-center">
-        {{ $t("empty.authorization") }}
-      </span>
+      <span class="pb-4 text-center">{{ $t("empty.authorization") }}</span>
       <ButtonSecondary
         outline
         :label="$t('app.documentation')"
@@ -158,50 +157,32 @@
             <SmartEnvInput
               v-model="basicUsername"
               :placeholder="$t('authorization.username')"
-              styles="bg-transparent flex flex-1 py-1 px-4"
             />
           </div>
           <div class="flex flex-1 border-b border-dividerLight">
             <SmartEnvInput
               v-model="basicPassword"
               :placeholder="$t('authorization.password')"
-              styles="bg-transparent flex flex-1 py-1 px-4"
             />
           </div>
         </div>
         <div v-if="authType === 'bearer'">
           <div class="flex flex-1 border-b border-dividerLight">
-            <SmartEnvInput
-              v-model="bearerToken"
-              placeholder="Token"
-              styles="bg-transparent flex flex-1 py-1 px-4"
-            />
+            <SmartEnvInput v-model="bearerToken" placeholder="Token" />
           </div>
         </div>
         <div v-if="authType === 'oauth-2'">
           <div class="flex flex-1 border-b border-dividerLight">
-            <SmartEnvInput
-              v-model="oauth2Token"
-              placeholder="Token"
-              styles="bg-transparent flex flex-1 py-1 px-4"
-            />
+            <SmartEnvInput v-model="oauth2Token" placeholder="Token" />
           </div>
           <HttpOAuth2Authorization />
         </div>
         <div v-if="authType === 'api-key'">
           <div class="flex flex-1 border-b border-dividerLight">
-            <SmartEnvInput
-              v-model="apiKey"
-              placeholder="Key"
-              styles="bg-transparent flex flex-1 py-1 px-4"
-            />
+            <SmartEnvInput v-model="apiKey" placeholder="Key" />
           </div>
           <div class="flex flex-1 border-b border-dividerLight">
-            <SmartEnvInput
-              v-model="apiValue"
-              placeholder="Value"
-              styles="bg-transparent flex flex-1 py-1 px-4"
-            />
+            <SmartEnvInput v-model="apiValue" placeholder="Value" />
           </div>
           <div class="flex items-center border-b border-dividerLight">
             <label class="ml-4 text-secondaryLight">
@@ -222,36 +203,38 @@
                   />
                 </span>
               </template>
-              <SmartItem
-                :icon="
-                  addTo === 'Headers'
-                    ? 'radio_button_checked'
-                    : 'radio_button_unchecked'
-                "
-                :active="addTo === 'Headers'"
-                :label="'Headers'"
-                @click.native="
-                  () => {
-                    addTo = 'Headers'
-                    addToOptions.tippy().hide()
-                  }
-                "
-              />
-              <SmartItem
-                :icon="
-                  addTo === 'Query params'
-                    ? 'radio_button_checked'
-                    : 'radio_button_unchecked'
-                "
-                :active="addTo === 'Query params'"
-                :label="'Query params'"
-                @click.native="
-                  () => {
-                    addTo = 'Query params'
-                    addToOptions.tippy().hide()
-                  }
-                "
-              />
+              <div class="flex flex-col" role="menu">
+                <SmartItem
+                  :icon="
+                    addTo === 'Headers'
+                      ? 'radio_button_checked'
+                      : 'radio_button_unchecked'
+                  "
+                  :active="addTo === 'Headers'"
+                  :label="'Headers'"
+                  @click.native="
+                    () => {
+                      addTo = 'Headers'
+                      addToOptions.tippy().hide()
+                    }
+                  "
+                />
+                <SmartItem
+                  :icon="
+                    addTo === 'Query params'
+                      ? 'radio_button_checked'
+                      : 'radio_button_unchecked'
+                  "
+                  :active="addTo === 'Query params'"
+                  :label="'Query params'"
+                  @click.native="
+                    () => {
+                      addTo = 'Query params'
+                      addToOptions.tippy().hide()
+                    }
+                  "
+                />
+              </div>
             </tippy>
           </div>
         </div>

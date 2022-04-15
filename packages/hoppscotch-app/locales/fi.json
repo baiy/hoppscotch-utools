@@ -75,6 +75,7 @@
     "continue_with_email": "Jatka sähköpostilla",
     "continue_with_github": "Jatka GitHubilla",
     "continue_with_google": "Jatka Googlella",
+    "continue_with_microsoft": "Continue with Microsoft",
     "email": "Sähköposti",
     "logged_out": "Kirjautunut ulos",
     "login": "Kirjaudu sisään",
@@ -103,6 +104,7 @@
     "invalid_name": "Anna kokoelmalle kelvollinen nimi",
     "my_collections": "Omat kokoelmat",
     "name": "Uusi kokoelmani",
+    "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "Uusi kokoelma",
     "renamed": "Kokoelma nimetty uudelleen",
     "request_in_use": "Request in use",
@@ -159,13 +161,19 @@
     "tests": "Tätä pyyntöä ei ole testattu"
   },
   "environment": {
+    "add_to_global": "Add to Global",
+    "added": "Environment addition",
     "create_new": "Luo uusi ympäristö",
+    "deleted": "Environment deletion",
     "edit": "Muokkaa ympäristöä",
     "invalid_name": "Anna ympäristölle kelvollinen nimi",
+    "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "Uusi ympäristö",
     "no_environment": "Ei ympäristöä",
+    "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
     "select": "Valitse ympäristö",
     "title": "Ympäristöt",
+    "updated": "Environment updation",
     "variable_list": "Muuttujien luettelo"
   },
   "error": {
@@ -175,6 +183,7 @@
     "empty_req_name": "Tyhjä pyynnön nimi",
     "f12_details": "(F12 lisätietoja)",
     "gql_prettify_invalid_query": "Virheellistä kyselyä ei voitu määrittää, ratkaista kyselyn syntaksivirheet ja yrittää uudelleen",
+    "incomplete_config_urls": "Incomplete configuration URLs",
     "incorrect_email": "Incorrect email",
     "invalid_link": "Invalid link",
     "invalid_link_description": "The link you clicked is invalid or expired.",
@@ -190,12 +199,14 @@
     "as_json": "Vie JSON -muodossa",
     "create_secret_gist": "Luo salainen ydin",
     "gist_created": "Gist luotu",
-    "require_github": "Kirjaudu sisään GitHubilla luodaksesi salaisen sisällön"
+    "require_github": "Kirjaudu sisään GitHubilla luodaksesi salaisen sisällön",
+    "title": "Export"
   },
   "folder": {
     "created": "Kansio luotu",
     "edit": "Muokkaa kansiota",
     "invalid_name": "Anna kansion nimi",
+    "name_length_insufficient": "Folder name should be at least 3 characters long",
     "new": "Uusi kansio",
     "renamed": "Kansio nimettiin uudelleen"
   },
@@ -205,7 +216,6 @@
     "subscriptions": "Tilaukset"
   },
   "header": {
-    "account": "Tili",
     "install_pwa": "Asenna sovellus",
     "login": "Kirjaudu sisään",
     "save_workspace": "Tallenna työtila"
@@ -319,6 +329,7 @@
     "name": "Pyynnön nimi",
     "parameter_list": "Kyselyparametrit",
     "parameters": "Parametrit",
+    "path": "Polku",
     "payload": "Hyötykuorma",
     "query": "Kysely",
     "raw_body": "Raaka pyynnön runko",
@@ -339,6 +350,7 @@
     "html": "HTML",
     "image": "Kuva",
     "json": "JSON",
+    "pdf": "PDF",
     "preview_html": "Esikatsele HTML -koodia",
     "raw": "Raaka",
     "size": "Koko",
@@ -429,7 +441,6 @@
       "head_method": "Valitse HEAD -menetelmä",
       "method": "Menetelmä",
       "next_method": "Valitse Seuraava menetelmä",
-      "path": "Polku",
       "post_method": "Valitse POST -menetelmä",
       "previous_method": "Valitse Edellinen menetelmä",
       "put_method": "Valitse PUT -menetelmä",
@@ -558,6 +569,7 @@
     "new_name": "Uusi tiimini",
     "no_access": "Sinulla ei ole muokkausoikeuksia näihin kokoelmiin",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
     "pending_invites": "Pending invites",
     "permissions": "Käyttöoikeudet",

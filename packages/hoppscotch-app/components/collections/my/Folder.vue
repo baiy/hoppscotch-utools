@@ -31,6 +31,13 @@
       <div class="flex">
         <ButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
+          svg="file-plus"
+          :title="t('request.new')"
+          class="hidden group-hover:inline-flex"
+          @click.native="$emit('add-request', { path: folderPath })"
+        />
+        <ButtonSecondary
+          v-tippy="{ theme: 'tooltip' }"
           svg="folder-plus"
           :title="t('folder.new')"
           class="hidden group-hover:inline-flex"
@@ -56,11 +63,26 @@
               ref="tippyActions"
               class="flex flex-col focus:outline-none"
               tabindex="0"
+              role="menu"
+              @keyup.r="requestAction.$el.click()"
               @keyup.n="folderAction.$el.click()"
               @keyup.e="edit.$el.click()"
               @keyup.delete="deleteAction.$el.click()"
+              @keyup.x="exportAction.$el.click()"
               @keyup.escape="options.tippy().hide()"
             >
+              <SmartItem
+                ref="requestAction"
+                svg="file-plus"
+                :label="$t('request.new')"
+                :shortcut="['R']"
+                @click.native="
+                  () => {
+                    $emit('add-request', { path: folderPath })
+                    options.tippy().hide()
+                  }
+                "
+              />
               <SmartItem
                 ref="folderAction"
                 svg="folder-plus"
@@ -86,6 +108,18 @@
                       collectionIndex,
                       folderPath,
                     })
+                    options.tippy().hide()
+                  }
+                "
+              />
+              <SmartItem
+                ref="exportAction"
+                svg="download"
+                :label="$t('export.title')"
+                :shortcut="['X']"
+                @click.native="
+                  () => {
+                    exportFolder()
                     options.tippy().hide()
                   }
                 "
@@ -124,6 +158,7 @@
           :collections-type="collectionsType"
           :folder-path="`${folderPath}/${subFolderIndex}`"
           :picked="picked"
+          @add-request="$emit('add-request', $event)"
           @add-folder="$emit('add-folder', $event)"
           @edit-folder="$emit('edit-folder', $event)"
           @edit-request="$emit('edit-request', $event)"
@@ -208,9 +243,11 @@ export default defineComponent({
     return {
       tippyActions: ref<any | null>(null),
       options: ref<any | null>(null),
+      requestAction: ref<any | null>(null),
       folderAction: ref<any | null>(null),
       edit: ref<any | null>(null),
       deleteAction: ref<any | null>(null),
+      exportAction: ref<any | null>(null),
       t,
     }
   },
@@ -239,6 +276,23 @@ export default defineComponent({
     },
   },
   methods: {
+    exportFolder() {
+      const folderJSON = JSON.stringify(this.folder)
+
+      const file = new Blob([folderJSON], { type: "application/json" })
+      const a = document.createElement("a")
+      const url = URL.createObjectURL(file)
+      a.href = url
+
+      a.download = `${this.folder.name}.json`
+      document.body.appendChild(a)
+      a.click()
+      this.$toast.success(this.$t("state.download_started").toString())
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 1000)
+    },
     toggleShowChildren() {
       if (this.$props.saveRequest)
         this.$emit("select", {
