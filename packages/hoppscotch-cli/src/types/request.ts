@@ -7,15 +7,11 @@ export type FormDataEntry = {
   value: string | Blob;
 };
 
+export type HoppEnvPair = { key: string; value: string };
+
 export type HoppEnvs = {
-  global: {
-    key: string;
-    value: string;
-  }[];
-  selected: {
-    key: string;
-    value: string;
-  }[];
+  global: HoppEnvPair[];
+  selected: HoppEnvPair[];
 };
 
 export type CollectionStack = {
@@ -28,4 +24,12 @@ export type RequestReport = {
   tests: TestReport[];
   errors: HoppCLIError[];
   result: boolean;
+  duration: { test: number; request: number; preRequest: number };
+};
+
+export type ProcessRequestParams = {
+  request: HoppRESTRequest;
+  envs: HoppEnvs;
+  path: string;
+  delay: number;
 };

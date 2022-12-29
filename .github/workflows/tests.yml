@@ -2,12 +2,13 @@ name: Node.js CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
   pull_request:
-    branches: [main]
+    branches: [main, staging]
 
 jobs:
-  build:
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
     strategy:
@@ -15,14 +16,23 @@ jobs:
         node-version: ["lts/*"]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-      - name: Install pnpm
-        run: curl -f https://get.pnpm.io/v6.14.js | node - add --global pnpm@6
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup environment
+        run: mv .env.example .env
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
         with:
-          node-version: ${{ matrix.node-version }}
+          version: 7
+          run_install: true
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
           cache: pnpm
+
       - name: Run tests
-        run: pnpm i && pnpm -r test
+        run: pnpm test

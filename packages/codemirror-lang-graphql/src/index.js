@@ -7,7 +7,7 @@ import {
   foldInside,
   delimitedIndent,
 } from "@codemirror/language"
-import { styleTags, tags as t } from "@codemirror/highlight"
+import { styleTags, tags as t } from "@lezer/highlight"
 
 export const GQLLanguage = LRLanguage.define({
   parser: parser.configure({
@@ -27,16 +27,22 @@ export const GQLLanguage = LRLanguage.define({
           },
       }),
       styleTags({
-        Name: t.definition(t.variableName),
-        "OperationDefinition/Name": t.definition(t.function(t.variableName)),
-        OperationType: t.keyword,
-        BooleanValue: t.bool,
-        StringValue: t.string,
-        IntValue: t.number,
-        FloatValue: t.number,
-        NullValue: t.null,
-        ObjectValue: t.brace,
         Comment: t.lineComment,
+        Name: t.propertyName,
+        StringValue: t.string,
+        IntValue: t.integer,
+        FloatValue: t.float,
+        NullValue: t.null,
+        BooleanValue: t.bool,
+        Comma: t.separator,
+        "OperationDefinition/Name": t.definition(t.function(t.variableName)),
+        "OperationType TypeKeyword SchemaKeyword FragmentKeyword OnKeyword DirectiveKeyword RepeatableKeyword SchemaKeyword ExtendKeyword ScalarKeyword InterfaceKeyword UnionKeyword EnumKeyword InputKeyword ImplementsKeyword": t.keyword,
+        "ExecutableDirectiveLocation TypeSystemDirectiveLocation": t.atom,
+        "DirectiveName!": t.annotation,
+        "\"{\" \"}\"": t.brace,
+        "\"(\" \")\"": t.paren,
+        "\"[\" \"]\"": t.squareBracket,
+        "Type! NamedType": t.typeName,
       }),
     ],
   }),

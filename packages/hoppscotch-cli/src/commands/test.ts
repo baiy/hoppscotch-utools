@@ -6,14 +6,17 @@ import {
   collectionsRunnerResult,
 } from "../utils/collections";
 import { handleError } from "../handlers/error";
-import { checkFilePath } from "../utils/checks";
 import { parseCollectionData } from "../utils/mutators";
+import { parseEnvsData } from "../options/test/env";
+import { TestCmdOptions } from "../types/commands";
+import { parseDelayOption } from "../options/test/delay";
 
-export const test = (path: string) => async () => {
+export const test = (path: string, options: TestCmdOptions) => async () => {
   await pipe(
-    path,
-    checkFilePath,
-    TE.chain(parseCollectionData),
+    TE.Do,
+    TE.bind("envs", () => parseEnvsData(options.env)),
+    TE.bind("collections", () => parseCollectionData(path)),
+    TE.bind("delay", () => parseDelayOption(options.delay)),
     TE.chainTaskK(collectionsRunner),
     TE.chainW(flow(collectionsRunnerResult, collectionsRunnerExit, TE.of)),
     TE.mapLeft((e) => {
