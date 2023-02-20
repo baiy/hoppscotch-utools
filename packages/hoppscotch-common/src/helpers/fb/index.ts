@@ -5,6 +5,7 @@ import { initCollections } from "./collections"
 import { initEnvironments } from "./environments"
 import { initHistory } from "./history"
 import { initSettings } from "./settings"
+import { IS_UTOOLS } from "~/utools"
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -20,6 +21,7 @@ const firebaseConfig = {
 let initialized = false
 
 export function initializeFirebase() {
+  if(IS_UTOOLS) return
   if (!initialized) {
     try {
       initializeApp(firebaseConfig)

@@ -17,3 +17,7 @@
 ### 禁用`cookie`提示
 `window.localStorage.setItem("cookiesAllowed", "yes")`
 > packages/hoppscotch-common/src/utools.ts
+
+### `Firebase` 禁用
+`if(IS_UTOOLS) return`
+> packages/hoppscotch-common/src/helpers/fb/index.ts
