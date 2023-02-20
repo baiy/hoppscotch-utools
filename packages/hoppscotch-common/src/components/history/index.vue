@@ -284,7 +284,7 @@ const filters = computed(() => [
   { value: "STARRED" as const, label: t("filter.starred") },
 ])
 
-type FilterMode = typeof filters["value"][number]["value"]
+type FilterMode = (typeof filters)["value"][number]["value"]
 
 const filterSelection = ref<FilterMode>("ALL")
 
@@ -293,7 +293,7 @@ const groups = computed(() => [
   { value: "URL" as const, label: t("group.url") },
 ])
 
-type GroupMode = typeof groups["value"][number]["value"]
+type GroupMode = (typeof groups)["value"][number]["value"]
 
 const groupSelection = ref<GroupMode>("TIME")
 
@@ -331,14 +331,25 @@ const setRestReq = (request: HoppRESTRequest | null | undefined) => {
 // (That is not a really good behaviour tho ¯\_(ツ)_/¯)
 const useHistory = (entry: RESTHistoryEntry) => {
   const currentFullReq = getRESTRequest()
+
+  const currentReqWithNoChange = getRESTSaveContext()?.req
+
+  // checks if the current request is the same as the save context request if present
+  if (
+    currentReqWithNoChange &&
+    isEqualHoppRESTRequest(currentReqWithNoChange, currentFullReq)
+  ) {
+    props.page === "rest" && setRestReq(entry.request)
+    clickedHistory.value = entry
+  }
   // Initial state trigers a popup
-  if (!clickedHistory.value) {
+  else if (!clickedHistory.value) {
     clickedHistory.value = entry
     confirmChange.value = true
     return
   }
   // Checks if there are any change done in current request and the history request
-  if (
+  else if (
     !isEqualHoppRESTRequest(
       currentFullReq,
       clickedHistory.value.request as HoppRESTRequest
@@ -347,7 +358,7 @@ const useHistory = (entry: RESTHistoryEntry) => {
     clickedHistory.value = entry
     confirmChange.value = true
   } else {
-    props.page === "rest" && setRestReq(entry.request as HoppRESTRequest)
+    props.page === "rest" && setRestReq(entry.request)
     clickedHistory.value = entry
   }
 }
