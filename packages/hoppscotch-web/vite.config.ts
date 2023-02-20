@@ -15,8 +15,8 @@ import Layouts from "vite-plugin-vue-layouts"
 import IconResolver from "unplugin-icons/resolver"
 import { FileSystemIconLoader } from "unplugin-icons/loaders"
 import * as path from "path"
-import { VitePluginFonts } from "vite-plugin-fonts"
 import legacy from "@vitejs/plugin-legacy"
+import webfontDownload from 'vite-plugin-webfont-dl'
 
 const ENV = loadEnv("development", path.resolve(__dirname, "../../"))
 
@@ -176,15 +176,9 @@ export default defineConfig({
         ],
       },
     }),
-    VitePluginFonts({
-      google: {
-        families: [
-          "Inter:wght@400;500;600;700;800",
-          "Roboto+Mono:wght@400;500",
-          "Material+Icons",
-        ],
-      },
-    }),
+    webfontDownload([
+      'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&family=Material+Icons&display=swap',
+    ]),
     legacy({
       modernPolyfills: ["es.string.replace-all"],
       renderLegacyChunks: false,
