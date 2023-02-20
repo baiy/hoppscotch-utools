@@ -35,7 +35,7 @@ export default defineConfig({
   },
   publicDir: path.resolve(__dirname, "../hoppscotch-common/public"),
   build: {
-    sourcemap: true,
+    sourcemap: false,
     emptyOutDir: true,
   },
   resolve: {
