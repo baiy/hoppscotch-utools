@@ -1,0 +1,23 @@
+{
+  "pluginName": "Hoppscotch",
+  "description": "Http/WebSocket/GraphQL/Api 请求调试工具，帮助你更快地创建请求，节省宝贵的开发时间",
+  "author": "baiy",
+  "homepage": "https://github.com/baiy/hoppscotch-utools",
+  "main": "index.html",
+  "version": "3.0.1",
+  "logo": "logo.png",
+  "features": [
+    {
+      "code": "Hoppscotch",
+      "explain": "[Http/WebSocket/GraphQL/Api] 调试工具",
+      "cmds": [
+        "http",
+        "get",
+        "post",
+        "api",
+        "websocket",
+        "graphql"
+      ]
+    }
+  ]
+}
