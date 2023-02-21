@@ -22,6 +22,10 @@
 `if(IS_UTOOLS) return`
 > packages/hoppscotch-common/src/helpers/fb/index.ts
 
+### `crisp` 禁用
+`if(IS_UTOOLS) return`
+> packages/hoppscotch-common/src/modules/crisp.ts
+
 ### `处理a标签跳转`
 > packages/hoppscotch-common/src/utools.ts
 

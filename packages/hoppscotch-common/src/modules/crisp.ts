@@ -1,6 +1,8 @@
 import { HoppModule } from "."
+import { IS_UTOOLS } from "~/utools"
 
 export const showChat = () => {
+  if (IS_UTOOLS) return
   ;(window as any).$crisp.push([
     "do",
     "chat:show",
@@ -10,6 +12,7 @@ export const showChat = () => {
 
 export default <HoppModule>{
   onVueAppInit() {
+    if (IS_UTOOLS) return
     // TODO: Env variable this ?
     ;(window as any).$crisp = []
     ;(window as any).CRISP_WEBSITE_ID = "3ad30257-c192-4773-955d-fb05a4b41af3"
