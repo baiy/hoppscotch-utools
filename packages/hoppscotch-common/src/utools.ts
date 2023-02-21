@@ -9,7 +9,6 @@ window.localStorage.setItem("locale", "cn")
 defaultSettings.EXTENSIONS_ENABLED = false
 defaultSettings.EXPAND_NAVIGATION = false
 defaultSettings.ZEN_MODE = true
-defaultSettings.FONT_SIZE = "medium"
 
 declare global {
   interface Window {
@@ -25,27 +24,41 @@ const openUrl = (url: string) => {
 }
 
 // 拦截a标签跳转
-(() => {
-  document.body.addEventListener("click", function (event) {
-    let target: any = event.target || event.srcElement
-    if ("tagName" in target && target.tagName.toLowerCase() !== "a") {
-      target = target.closest("a")
+document.body.addEventListener("click", function (event) {
+  let target: any = event.target || event.srcElement
+  if ("tagName" in target && target.tagName.toLowerCase() !== "a") {
+    target = target.closest("a")
+  }
+  if (target && "tagName" in target && target.tagName.toLowerCase() === "a") {
+    const url = target.getAttribute("href") || ""
+    if (url.indexOf("http") !== 0) {
+      return
     }
-    if (target && "tagName" in target && target.tagName.toLowerCase() === "a") {
-      const url = target.getAttribute("href") || ""
-      if (url.indexOf("http") !== 0) {
-        return
+    if (event.preventDefault) {
+      event.preventDefault()
+    } else {
+      if (window.event) {
+        window.event.returnValue = true
       }
-      if (event.preventDefault) {
-        event.preventDefault()
-      } else {
-        if (window.event) {
-          window.event.returnValue = true
-        }
-      }
-      openUrl(url)
     }
-  })
-})()
+    openUrl(url)
+  }
+})
 
+// 页面图片路径调整
+window.addEventListener(
+  "error",
+  (event: any) => {
+    if (event.target instanceof HTMLImageElement) {
+      const target = event.target as HTMLImageElement
+      if (target.getAttribute("src")?.indexOf("/images1/") === 0) {
+        target.setAttribute(
+          "src",
+          target.getAttribute("src")?.replace('/images1/', 'images/') || ""
+        )
+      }
+    }
+  },
+  true
+)
 export const IS_UTOOLS = true

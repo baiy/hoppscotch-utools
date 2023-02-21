@@ -46,9 +46,13 @@
 `base: "./",`
 > packages/hoppscotch-web/vite.config.ts
 
+### 页面图片路径调整
+
+> packages/hoppscotch-common/src/utools.ts
+
 ### 调整页面路由模式
 
 > packages/hoppscotch-common/src/modules/router.ts
 
-### 页面布局调整
+### 页面布局调整微调
 
