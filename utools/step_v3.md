@@ -21,3 +21,9 @@
 ### `Firebase` 禁用
 `if(IS_UTOOLS) return`
 > packages/hoppscotch-common/src/helpers/fb/index.ts
+
+### `处理a标签跳转`
+> packages/hoppscotch-common/src/utools.ts
+
+### 修改默认配置
+> packages/hoppscotch-common/src/utools.ts
