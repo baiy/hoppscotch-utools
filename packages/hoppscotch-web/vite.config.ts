@@ -21,6 +21,7 @@ import webfontDownload from 'vite-plugin-webfont-dl'
 const ENV = loadEnv("development", path.resolve(__dirname, "../../"))
 
 export default defineConfig({
+  base: "./",
   envDir: path.resolve(__dirname, "../../"),
   // TODO: Migrate @hoppscotch/data to full ESM
   define: {

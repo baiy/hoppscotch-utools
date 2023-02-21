@@ -1,7 +1,7 @@
 import { HoppModule, HOPP_MODULES } from "."
 import {
   createRouter,
-  createWebHistory,
+  createWebHashHistory,
   RouteLocationNormalized,
 } from "vue-router"
 import { setupLayouts } from "virtual:generated-layouts"
@@ -43,7 +43,8 @@ export const isLoadingInitialRoute = readonly(_isLoadingInitialRoute)
 export default <HoppModule>{
   onVueAppInit(app) {
     const router = createRouter({
-      history: createWebHistory(),
+      // history: createWebHistory(),
+      history: createWebHashHistory(),
       routes,
     })
 
