@@ -54,5 +54,9 @@
 
 > packages/hoppscotch-common/src/modules/router.ts
 
+### 适配utools存储
+
+> packages/hoppscotch-common/src/utools.ts
+
 ### 页面布局调整微调
 

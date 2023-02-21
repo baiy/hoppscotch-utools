@@ -1,9 +1,9 @@
+import "./utools"
 import { createApp } from "vue"
 import { PlatformDef, setPlatformDef } from "./platform"
 import { setupLocalPersistence } from "./newstore/localpersistence"
 import { performMigrations } from "./helpers/migrations"
 import { initializeFirebase } from "./helpers/fb"
-import "./utools"
 import { initBackendGQLClient } from "./helpers/backend/GQLClient"
 import { HOPP_MODULES } from "@modules/."
 
