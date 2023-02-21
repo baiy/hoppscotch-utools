@@ -10,6 +10,7 @@
         :label="`${t('environment.my_environments')}`"
       />
       <SmartTab
+        v-if="!IS_UTOOLS"
         :id="'team-environments'"
         :label="`${t('environment.team_environments')}`"
       >
@@ -86,6 +87,7 @@ import { useI18n } from "@composables/i18n"
 import IconDone from "~icons/lucide/check"
 import IconUsers from "~icons/lucide/users"
 import { invokeAction } from "~/helpers/actions"
+import { IS_UTOOLS } from "~/utools"
 
 const t = useI18n()
 

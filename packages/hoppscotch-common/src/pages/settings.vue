@@ -87,7 +87,7 @@
                   {{ t("settings.sidebar_on_left") }}
                 </SmartToggle>
               </div>
-              <div class="flex items-center">
+              <div class="flex items-center" v-if="!IS_UTOOLS">
                 <SmartToggle :on="ZEN_MODE" @change="toggleSetting('ZEN_MODE')">
                   {{ t("layout.zen_mode") }}
                 </SmartToggle>
@@ -97,7 +97,7 @@
         </div>
       </div>
 
-      <div class="md:grid md:gap-4 md:grid-cols-3">
+      <div class="md:grid md:gap-4 md:grid-cols-3" v-if="!IS_UTOOLS">
         <div class="p-8 md:col-span-1">
           <h3 class="heading">
             {{ t("settings.interceptor") }}
@@ -248,6 +248,7 @@ import { useReadonlyStream } from "@composables/stream"
 import { browserIsChrome, browserIsFirefox } from "~/helpers/utils/userAgent"
 import { extensionStatus$ } from "~/newstore/HoppExtension"
 import { usePageHead } from "@composables/head"
+import { IS_UTOOLS } from "~/utools"
 
 const t = useI18n()
 const toast = useToast()

@@ -55,6 +55,7 @@
         />
       </SmartTab>
       <SmartTab
+        v-if="!IS_UTOOLS"
         :id="'team-collections'"
         :label="`${t('collection.team_collections')}`"
       >
@@ -188,6 +189,7 @@ import { useLocalState } from "~/newstore/localstate"
 import { onLoggedIn } from "~/composables/auth"
 import { GetMyTeamsQuery } from "~/helpers/backend/graphql"
 import { pipe } from "fp-ts/function"
+import { IS_UTOOLS } from "~/utools"
 import * as TE from "fp-ts/TaskEither"
 import {
   addRESTCollection,

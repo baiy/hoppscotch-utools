@@ -11,6 +11,7 @@
           @click="EXPAND_NAVIGATION = !EXPAND_NAVIGATION"
         />
         <ButtonSecondary
+          v-if="!IS_UTOOLS"
           v-tippy="{ theme: 'tooltip' }"
           :title="`${ZEN_MODE ? t('action.turn_off') : t('action.turn_on')} ${t(
             'layout.zen_mode'
@@ -22,7 +23,7 @@
           }"
           @click="ZEN_MODE = !ZEN_MODE"
         />
-        <tippy interactive trigger="click" theme="popover">
+        <tippy interactive trigger="click" theme="popover" v-if="!IS_UTOOLS">
           <ButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('settings.interceptor')"
@@ -77,6 +78,7 @@
                 "
               />
               <SmartItem
+                v-if="!IS_UTOOLS"
                 ref="chat"
                 :icon="IconMessageCircle"
                 :label="`${t('app.chat_with_us')}`"
@@ -105,7 +107,14 @@
               <hr />
               <SmartItem
                 :icon="IconGithub"
-                :label="`${t('app.github')}`"
+                label="Hoppscotch-utools"
+                to="https://github.com/baiy/hoppscotch-utools"
+                blank
+                @click="hide()"
+              />
+              <SmartItem
+                :icon="IconGithub"
+                label="Hoppscotch"
                 to="https://github.com/hoppscotch/hoppscotch"
                 blank
                 @click="hide()"
@@ -157,7 +166,7 @@
           @click="invokeAction('flyouts.keybinds.toggle')"
         />
         <ButtonSecondary
-          v-if="navigatorShare"
+          v-if="!IS_UTOOLS && navigatorShare"
           v-tippy="{ theme: 'tooltip' }"
           :icon="IconShare2"
           :title="t('request.share')"
@@ -216,6 +225,7 @@ import IconTwitter from "~icons/lucide/twitter"
 import IconUserPlus from "~icons/lucide/user-plus"
 import IconLock from "~icons/lucide/lock"
 import { showChat } from "@modules/crisp"
+import { IS_UTOOLS } from "~/utools"
 import { useSetting } from "@composables/settings"
 import { useI18n } from "@composables/i18n"
 import { useReadonlyStream } from "@composables/stream"

@@ -188,11 +188,12 @@
                   "
                 />
                 <SmartItem
+                  v-if="!IS_UTOOLS"
                   :icon="IconLink2"
                   :label="`${t('request.view_my_links')}`"
                   to="/profile"
                 />
-                <hr />
+                <hr v-if="!IS_UTOOLS" />
                 <SmartItem
                   ref="saveRequestAction"
                   :label="`${t('request.save_as')}`"
@@ -243,6 +244,7 @@ import { computed, ref, watch } from "vue"
 import { isLeft, isRight } from "fp-ts/lib/Either"
 import * as E from "fp-ts/Either"
 import { cloneDeep } from "lodash-es"
+import { IS_UTOOLS } from "~/utools"
 import { refAutoReset } from "@vueuse/core"
 import {
   updateRESTResponse,

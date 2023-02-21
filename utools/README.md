@@ -31,3 +31,5 @@
 
 ### 修改默认配置
 > packages/hoppscotch-common/src/utools.ts
+
+### 页面布局调整
