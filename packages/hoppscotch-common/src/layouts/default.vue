@@ -1,9 +1,6 @@
 <template>
   <div class="flex w-screen h-screen">
     <Splitpanes class="no-splitter" :dbl-click-splitter="false" horizontal>
-      <Pane style="height: auto">
-        <AppHeader />
-      </Pane>
       <Pane :class="spacerClass" class="flex flex-1 !overflow-auto md:mb-0">
         <Splitpanes
           class="no-splitter"

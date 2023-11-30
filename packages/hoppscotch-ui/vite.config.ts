@@ -40,7 +40,7 @@ export default defineConfig({
     }),
   ], // to process SFC
   build: {
-    sourcemap: true,
+    sourcemap: false,
     minify: false,
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),

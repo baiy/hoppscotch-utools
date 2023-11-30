@@ -191,6 +191,7 @@ export const runGQLQuery = <
 >(
   args: RunQueryOptions<DocType, DocVarType>
 ): Promise<E.Either<GQLError<DocErrorType>, DocType>> => {
+  throw new Error("ignore graphql disable")
   const request = createRequest<DocType, DocVarType>(args.query, args.variables)
   const source = client.value!.executeQuery(request, {
     requestPolicy: "network-only",
@@ -255,6 +256,7 @@ export const runGQLSubscription = <
 >(
   args: RunQueryOptions<DocType, DocVarType>
 ) => {
+  throw new Error("ignore graphql disable")
   const result$ = new Subject<E.Either<GQLError<DocErrorType>, DocType>>()
 
   const source = client.value!.executeSubscription(
@@ -316,6 +318,7 @@ export const runGQLSubscription = <
 export const runAuthOnlyGQLSubscription = flow(
   runGQLSubscription,
   ([result$, sub]) => {
+    throw new Error("ignore graphql disable")
     const updatedResult$ = result$.pipe(
       map((res) => {
         if (
@@ -345,8 +348,9 @@ export const runMutation = <
   mutation: TypedDocumentNode<DocType, DocVariables>,
   variables: DocVariables,
   additionalConfig?: Partial<OperationContext>
-): TE.TaskEither<GQLError<DocErrors>, DocType> =>
-  pipe(
+): TE.TaskEither<GQLError<DocErrors>, DocType> =>{
+  throw new Error("ignore graphql disable")
+  return pipe(
     TE.tryCatch(
       () =>
         client
@@ -393,3 +397,4 @@ export const runMutation = <
       )
     )
   )
+}

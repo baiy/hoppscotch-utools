@@ -37,44 +37,7 @@ async function signInUserWithMicrosoftFB() {
 }
 
 async function getInitialUserDetails() {
-  const res = await axios.post<{
-    data?: {
-      me?: {
-        uid: string
-        displayName: string
-        email: string
-        photoURL: string
-        isAdmin: boolean
-        createdOn: string
-        // emailVerified: boolean
-      }
-    }
-    errors?: Array<{
-      message: string
-    }>
-  }>(
-    `${import.meta.env.VITE_BACKEND_GQL_URL}`,
-    {
-      query: `query Me {
-      me {
-        uid
-        displayName
-        email
-        photoURL
-        isAdmin
-        createdOn
-      }
-    }`,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    }
-  )
-
-  return res.data
+  return {}
 }
 
 const isGettingInitialUser: Ref<null | boolean> = ref(null)

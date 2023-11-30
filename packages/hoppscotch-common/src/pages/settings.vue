@@ -87,25 +87,6 @@
           </section>
         </div>
       </div>
-
-      <div class="md:grid md:gap-4 md:grid-cols-3">
-        <div class="p-8 md:col-span-1">
-          <h3 class="heading">
-            {{ t("settings.interceptor") }}
-          </h3>
-          <p class="my-1 text-secondaryLight">
-            {{ t("settings.interceptor_description") }}
-          </p>
-        </div>
-        <div class="p-8 space-y-8 md:col-span-2">
-          <section v-for="[id, settings] in interceptorsWithSettings" :key="id">
-            <h4 class="font-semibold text-secondaryDark">
-              {{ settings.entryTitle(t) }}
-            </h4>
-            <component :is="settings.component" />
-          </section>
-        </div>
-      </div>
     </div>
     <HoppSmartConfirmModal
       :show="confirmRemove"

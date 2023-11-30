@@ -53,7 +53,6 @@
           v-model="tab.document.request.endpoint"
           :placeholder="`${t('request.url')}`"
           :auto-complete-source="userHistories"
-          :inspection-results="tabResults"
           @paste="onPasteUrl($event)"
           @enter="newSendRequest"
         />
@@ -177,23 +176,6 @@
                   class="mb-2 input !bg-primaryContrast"
                   @keyup.enter="hide()"
                 />
-                <HoppSmartItem
-                  ref="copyRequestAction"
-                  :label="shareButtonText"
-                  :icon="copyLinkIcon"
-                  :loading="fetchingShareLink"
-                  @click="
-                    () => {
-                      copyRequest()
-                    }
-                  "
-                />
-                <HoppSmartItem
-                  :icon="IconLink2"
-                  :label="`${t('request.view_my_links')}`"
-                  to="/profile"
-                />
-                <hr />
                 <HoppSmartItem
                   ref="saveRequestAction"
                   :label="`${t('request.save_as')}`"

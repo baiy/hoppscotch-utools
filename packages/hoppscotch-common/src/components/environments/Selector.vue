@@ -65,6 +65,7 @@
             "
           />
           <HoppSmartTabs
+            class="selected-environment-index"
             v-model="selectedEnvTab"
             :styles="`sticky overflow-x-auto my-2 border border-divider rounded flex-shrink-0 z-10 top-0 bg-primary ${
               !isTeamSelected || workspace.type === 'personal'
@@ -107,61 +108,6 @@
                 <span class="pb-2 text-center">
                   {{ t("empty.environments") }}
                 </span>
-              </div>
-            </HoppSmartTab>
-            <HoppSmartTab
-              :id="'team-environments'"
-              :label="`${t('environment.team_environments')}`"
-              :disabled="!isTeamSelected || workspace.type === 'personal'"
-            >
-              <div
-                v-if="teamListLoading"
-                class="flex flex-col items-center justify-center p-4"
-              >
-                <HoppSmartSpinner class="my-4" />
-                <span class="text-secondaryLight">
-                  {{ t("state.loading") }}
-                </span>
-              </div>
-              <div v-if="isTeamSelected" class="flex flex-col">
-                <HoppSmartItem
-                  v-for="(gen, index) in teamEnvironmentList"
-                  :key="`gen-team-${index}`"
-                  :icon="IconLayers"
-                  :label="gen.environment.name"
-                  :info-icon="isEnvActive(gen.id) ? IconCheck : undefined"
-                  :active-info-icon="isEnvActive(gen.id)"
-                  @click="
-                    () => {
-                      handleEnvironmentChange(index, {
-                        type: 'team-environment',
-                        environment: gen,
-                      })
-                      hide()
-                    }
-                  "
-                />
-                <div
-                  v-if="teamEnvironmentList.length === 0"
-                  class="flex flex-col items-center justify-center text-secondaryLight"
-                >
-                  <img
-                    :src="`/images/states/${colorMode.value}/blockchain.svg`"
-                    loading="lazy"
-                    class="inline-flex flex-col object-contain object-center w-16 h-16 mb-2"
-                    :alt="`${t('empty.environments')}`"
-                  />
-                  <span class="pb-2 text-center">
-                    {{ t("empty.environments") }}
-                  </span>
-                </div>
-              </div>
-              <div
-                v-if="!teamListLoading && teamAdapterError"
-                class="flex flex-col items-center py-4"
-              >
-                <icon-lucide-help-circle class="mb-4 svg-icons" />
-                {{ getErrorMessage(teamAdapterError) }}
               </div>
             </HoppSmartTab>
           </HoppSmartTabs>
@@ -615,3 +561,8 @@ const editEnv = () => {
   }
 }
 </script>
+<style>
+.selected-environment-index .tabs{
+  display: none;
+}
+</style>

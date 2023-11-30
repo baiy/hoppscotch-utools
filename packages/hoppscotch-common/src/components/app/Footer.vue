@@ -10,16 +10,6 @@
           :class="{ '-rotate-180': !EXPAND_NAVIGATION }"
           @click="EXPAND_NAVIGATION = !EXPAND_NAVIGATION"
         />
-        <tippy interactive trigger="click" theme="popover">
-          <HoppButtonSecondary
-            v-tippy="{ theme: 'tooltip' }"
-            :title="t('settings.interceptor')"
-            :icon="IconShieldCheck"
-          />
-          <template #content>
-            <AppInterceptor />
-          </template>
-        </tippy>
         <HoppButtonSecondary
           v-if="platform.platformFeatureFlags.cookiesEnabled ?? false"
           :label="t('app.cookies')"
@@ -84,57 +74,21 @@
                 "
               />
               -->
-              <template
-                v-for="footerItem in platform.ui?.additionalFooterMenuItems"
-                :key="footerItem.id"
-              >
-                <template v-if="footerItem.action.type === 'link'">
-                  <HoppSmartItem
-                    :icon="footerItem.icon"
-                    :label="footerItem.text(t)"
-                    :to="footerItem.action.href"
-                    blank
-                    @click="hide()"
-                  />
-                </template>
-                <HoppSmartItem
-                  v-else
-                  :icon="footerItem.icon"
-                  :label="footerItem.text(t)"
-                  blank
-                  @click="
-                    () => {
-                      // @ts-expect-error TypeScript not understanding the type
-                      footerItem.action.do()
-                      hide()
-                    }
-                  "
-                />
-              </template>
+
               <hr />
               <HoppSmartItem
                 :icon="IconGithub"
-                :label="`${t('app.github')}`"
+                label="Hoppscotch"
                 to="https://github.com/hoppscotch/hoppscotch"
                 blank
                 @click="hide()"
               />
               <HoppSmartItem
-                :icon="IconTwitter"
-                :label="`${t('app.twitter')}`"
-                to="https://hoppscotch.io/twitter"
+                :icon="IconGithub"
+                label="Hoppscotch-utools"
+                to="https://github.com/baiy/hoppscotch-utools"
                 blank
                 @click="hide()"
-              />
-              <HoppSmartItem
-                :icon="IconUserPlus"
-                :label="`${t('app.invite')}`"
-                @click="
-                  () => {
-                    invokeAction('modals.share.toggle')
-                    hide()
-                  }
-                "
               />
               <HoppSmartItem
                 :icon="IconLock"
@@ -152,7 +106,7 @@
                   }
                 "
               >
-                {{ `${t("app.name")} v${version}` }}
+                {{ `${t("app.name")} v23.11.30` }}
               </div>
             </div>
           </template>
@@ -164,13 +118,6 @@
           )} <kbd>${getSpecialKey()}</kbd><kbd>/</kbd>`"
           :icon="IconZap"
           @click="invokeAction('flyouts.keybinds.toggle')"
-        />
-        <HoppButtonSecondary
-          v-if="navigatorShare"
-          v-tippy="{ theme: 'tooltip' }"
-          :icon="IconShare2"
-          :title="t('request.share')"
-          @click="nativeShare()"
         />
         <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"

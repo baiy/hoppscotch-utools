@@ -269,9 +269,6 @@
             @drop.stop
           >
             <div class="flex flex-col items-center space-y-4">
-              <span class="text-secondaryLight text-center">
-                {{ t("collection.import_or_create") }}
-              </span>
               <div class="flex gap-4 flex-col items-stretch">
                 <HoppButtonPrimary
                   :icon="IconImport"

@@ -84,7 +84,6 @@
               :placeholder="`${t('count.header', { count: index + 1 })}`"
               :auto-complete-source="commonHeaders"
               :env-index="index"
-              :inspection-results="getInspectorResult(headerKeyResults, index)"
               @change="
                 updateHeader(index, {
                   id: header.id,
@@ -97,9 +96,6 @@
             <SmartEnvInput
               v-model="header.value"
               :placeholder="`${t('count.value', { count: index + 1 })}`"
-              :inspection-results="
-                getInspectorResult(headerValueResults, index)
-              "
               :env-index="index"
               @change="
                 updateHeader(index, {
