@@ -38,7 +38,7 @@
               @keyup.enter="isUrlValid ? toggleConnection() : null"
             />
           </div>
-          <ButtonPrimary
+          <HoppButtonPrimary
             id="connect"
             :disabled="!isUrlValid"
             class="w-32"
@@ -84,21 +84,21 @@
       />
     </template>
     <template #secondary>
-      <SmartWindows
+      <HoppSmartWindows
         :id="'communication_tab'"
         v-model="currentTabId"
         :can-add-new-tab="false"
         @remove-tab="removeTab"
         @sort="sortTabs"
       >
-        <SmartWindow
+        <HoppSmartWindow
           v-for="tab in tabs"
           :id="tab.id"
           :key="'removable_tab_' + tab.id"
           :label="tab.name"
           :is-removable="tab.removable"
         >
-          <template #icon>
+          <template #prefix>
             <icon-lucide-rss
               :style="{
                 color: tab.color,
@@ -108,27 +108,27 @@
           </template>
           <RealtimeLog
             :title="t('mqtt.log')"
-            :log="((tab.id === 'all' ? logs : tab.logs) as LogEntryData[])"
+            :log="(tab.id === 'all' ? logs : tab.logs) as LogEntryData[]"
             @delete="clearLogEntries()"
           />
-        </SmartWindow>
-      </SmartWindows>
+        </HoppSmartWindow>
+      </HoppSmartWindows>
     </template>
     <template #sidebar>
       <div
         class="sticky z-10 flex flex-col flex-shrink-0 overflow-x-auto border-b divide-y rounded-t divide-dividerLight bg-primary border-dividerLight"
       >
         <div class="flex justify-between flex-1">
-          <ButtonSecondary
+          <HoppButtonSecondary
             :icon="IconPlus"
             :label="t('mqtt.new')"
             class="!rounded-none"
             @click="showSubscriptionModal(true)"
           />
           <span class="flex">
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{ theme: 'tooltip' }"
-              to="https://docs.hoppscotch.io/features/mqtt"
+              to="https://docs.hoppscotch.io/documentation/getting-started/realtime/mqtt"
               blank
               :title="t('app.wiki')"
               :icon="IconHelpCircle"
@@ -136,28 +136,19 @@
           </span>
         </div>
       </div>
-
-      <div
+      <HoppSmartPlaceholder
         v-if="topics.length === 0"
-        class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+        :src="`/images/states/${colorMode.value}/pack.svg`"
+        :alt="`${t('empty.subscription')}`"
+        :text="`${t('empty.subscription')}`"
       >
-        <img
-          :src="`/images/states/${colorMode.value}/pack.svg`"
-          loading="lazy"
-          class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-          :alt="`${t('empty.subscription')}`"
-        />
-        <span class="pb-4 text-center">
-          {{ t("empty.subscription") }}
-        </span>
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="t('mqtt.new')"
           filled
           outline
           @click="showSubscriptionModal(true)"
         />
-      </div>
-
+      </HoppSmartPlaceholder>
       <div v-else>
         <div
           v-for="(topic, index) in topics"
@@ -181,7 +172,7 @@
                 {{ topic.name }}
               </span>
             </span>
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{ theme: 'tooltip' }"
               :icon="IconTrash"
               color="red"

@@ -1,5 +1,5 @@
 <template>
-  <SmartLink
+  <HoppSmartLink
     :to="to"
     :exact="exact"
     :blank="blank"
@@ -21,50 +21,35 @@
       :class="label ? (reverse ? 'ml-2' : 'mr-2') : ''"
     />
     {{ label }}
-  </SmartLink>
+  </HoppSmartLink>
 </template>
 
-<script lang="ts">
-import { Component, defineComponent, PropType } from "vue"
+<script setup lang="ts">
+import HoppSmartLink from "./Link.vue"
+import type { Component } from "vue"
 
-export default defineComponent({
-  props: {
-    to: {
-      type: String,
-      default: "",
-    },
-    exact: {
-      type: Boolean,
-      default: true,
-    },
-    blank: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: "",
-    },
-    icon: {
-      type: Object as PropType<Component | null>,
-      default: null,
-    },
-    svg: {
-      type: Object as PropType<Component | null>,
-      default: null,
-    },
-    color: {
-      type: String,
-      default: "",
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    reverse: {
-      type: Boolean,
-      default: false,
-    },
-  },
-})
+withDefaults(
+  defineProps<{
+    to: string
+    exact: boolean
+    blank: boolean
+    label: string
+    icon: Component | null
+    svg: Component | null
+    color: string
+    disabled: boolean
+    reverse: boolean
+  }>(),
+  {
+    to: "",
+    exact: true,
+    blank: false,
+    label: "",
+    icon: null,
+    svg: null,
+    color: "",
+    disabled: false,
+    reverse: false,
+  }
+)
 </script>

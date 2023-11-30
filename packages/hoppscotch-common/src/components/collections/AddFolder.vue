@@ -1,36 +1,28 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="t('folder.new')"
     @close="emit('hide-modal')"
   >
     <template #body>
-      <div class="flex flex-col">
-        <input
-          id="selectLabelAddFolder"
-          v-model="name"
-          v-focus
-          class="input floating-input"
-          placeholder=" "
-          type="text"
-          autocomplete="off"
-          @keyup.enter="addFolder"
-        />
-        <label for="selectLabelAddFolder">
-          {{ t("action.label") }}
-        </label>
-      </div>
+      <HoppSmartInput
+        v-model="editingName"
+        placeholder=" "
+        input-styles="floating-input"
+        :label="t('action.label')"
+        @submit="addFolder"
+      />
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="t('action.save')"
           :loading="loadingState"
           outline
           @click="addFolder"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="t('action.cancel')"
           outline
           filled
@@ -38,7 +30,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -65,27 +57,27 @@ const emit = defineEmits<{
   (e: "add-folder", name: string): void
 }>()
 
-const name = ref("")
+const editingName = ref("")
 
 watch(
   () => props.show,
   (show) => {
     if (!show) {
-      name.value = ""
+      editingName.value = ""
     }
   }
 )
 
 const addFolder = () => {
-  if (name.value.trim() === "") {
+  if (editingName.value.trim() === "") {
     toast.error(t("folder.invalid_name"))
     return
   }
-  emit("add-folder", name.value)
+  emit("add-folder", editingName.value)
 }
 
 const hideModal = () => {
-  name.value = ""
+  editingName.value = ""
   emit("hide-modal")
 }
 </script>

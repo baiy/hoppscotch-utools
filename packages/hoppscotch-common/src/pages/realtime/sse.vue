@@ -36,7 +36,7 @@
               @keyup.enter="isUrlValid ? toggleSSEConnection() : null"
             />
           </div>
-          <ButtonPrimary
+          <HoppButtonPrimary
             id="start"
             :disabled="!isUrlValid"
             name="start"
@@ -57,7 +57,7 @@
     <template #secondary>
       <RealtimeLog
         :title="t('sse.log')"
-        :log="(log as LogEntryData[])"
+        :log="log as LogEntryData[]"
         @delete="clearLogEntries()"
       />
     </template>

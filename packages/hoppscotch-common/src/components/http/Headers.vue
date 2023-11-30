@@ -7,20 +7,20 @@
         {{ t("request.header_list") }}
       </label>
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
-          to="https://docs.hoppscotch.io/features/headers"
+          to="https://docs.hoppscotch.io/documentation/features/rest-api-testing"
           blank
           :title="t('app.wiki')"
           :icon="IconHelpCircle"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.clear_all')"
           :icon="IconTrash2"
           @click="clearContent()"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="bulkMode"
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.linewrap')"
@@ -28,14 +28,14 @@
           :icon="IconWrapText"
           @click.prevent="linewrapEnabled = !linewrapEnabled"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.bulk_mode')"
           :icon="IconEdit"
           :class="{ '!text-accent': bulkMode }"
           @click="bulkMode = !bulkMode"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('add.new')"
           :icon="IconPlus"
@@ -48,7 +48,7 @@
     <div v-else>
       <draggable
         v-model="workingHeaders"
-        :item-key="(header) => `header-${header.id}`"
+        :item-key="(header: WorkingHeader) => `header-${header.id}`"
         animation="250"
         handle=".draggable-handle"
         draggable=".draggable-content"
@@ -61,7 +61,7 @@
             class="flex border-b divide-x divide-dividerLight border-dividerLight draggable-content group"
           >
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{
                   theme: 'tooltip',
                   delay: [500, 20],
@@ -79,16 +79,13 @@
                 tabindex="-1"
               />
             </span>
-            <SmartAutoComplete
+            <SmartEnvInput
+              v-model="header.key"
               :placeholder="`${t('count.header', { count: index + 1 })}`"
-              :source="commonHeaders"
-              :spellcheck="false"
-              :value="header.key"
-              autofocus
-              styles=" bg-transparent flex flex-1
-            py-1 px-4 truncate "
-              class="flex-1 !flex"
-              @input="
+              :auto-complete-source="commonHeaders"
+              :env-index="index"
+              :inspection-results="getInspectorResult(headerKeyResults, index)"
+              @change="
                 updateHeader(index, {
                   id: header.id,
                   key: $event,
@@ -100,6 +97,10 @@
             <SmartEnvInput
               v-model="header.value"
               :placeholder="`${t('count.value', { count: index + 1 })}`"
+              :inspection-results="
+                getInspectorResult(headerValueResults, index)
+              "
+              :env-index="index"
               @change="
                 updateHeader(index, {
                   id: header.id,
@@ -110,7 +111,7 @@
               "
             />
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="
                   header.hasOwnProperty('active')
@@ -138,7 +139,7 @@
               />
             </span>
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('action.remove')"
                 :icon="IconTrash"
@@ -165,7 +166,7 @@
             class="flex border-b divide-x divide-dividerLight border-dividerLight draggable-content group"
           >
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 :icon="IconLock"
                 class="opacity-25 cursor-auto text-secondaryLight bg-divider"
                 tabindex="-1"
@@ -182,45 +183,45 @@
               readonly
             />
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-if="header.source === 'auth'"
+                v-tippy="{ theme: 'tooltip' }"
+                :title="t(masking ? 'state.show' : 'state.hide')"
                 :icon="masking ? IconEye : IconEyeOff"
                 @click="toggleMask()"
               />
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-else
+                v-tippy="{ theme: 'tooltip' }"
                 :icon="IconArrowUpRight"
+                :title="t('request.go_to_authorization_tab')"
                 class="cursor-auto text-primary hover:text-primary"
               />
             </span>
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
+                v-tippy="{ theme: 'tooltip' }"
                 :icon="IconArrowUpRight"
+                :title="t('request.go_to_authorization_tab')"
                 @click="changeTab(header.source)"
               />
             </span>
           </div>
         </template>
       </draggable>
-      <div
+      <HoppSmartPlaceholder
         v-if="workingHeaders.length === 0"
-        class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+        :src="`/images/states/${colorMode.value}/add_category.svg`"
+        :alt="`${t('empty.headers')}`"
+        :text="t('empty.headers')"
       >
-        <img
-          :src="`/images/states/${colorMode.value}/add_category.svg`"
-          loading="lazy"
-          class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-          :alt="`${t('empty.headers')}`"
-        />
-        <span class="pb-4 text-center">{{ t("empty.headers") }}</span>
-        <ButtonSecondary
+        <HoppButtonSecondary
           filled
           :label="`${t('add.new')}`"
           :icon="IconPlus"
-          class="mb-4"
           @click="addHeader"
         />
-      </div>
+      </HoppSmartPlaceholder>
     </div>
   </div>
 </template>
@@ -240,10 +241,11 @@ import IconEyeOff from "~icons/lucide/eye-off"
 import IconArrowUpRight from "~icons/lucide/arrow-up-right"
 import IconWrapText from "~icons/lucide/wrap-text"
 import { useColorMode } from "@composables/theming"
-import { computed, reactive, Ref, ref, watch } from "vue"
+import { computed, reactive, ref, watch } from "vue"
 import { isEqual, cloneDeep } from "lodash-es"
 import {
   HoppRESTHeader,
+  HoppRESTRequest,
   parseRawKeyValueEntriesE,
   rawKeyValueEntriesToString,
   RawKeyValueEntry,
@@ -253,18 +255,12 @@ import * as RA from "fp-ts/ReadonlyArray"
 import * as E from "fp-ts/Either"
 import * as O from "fp-ts/Option"
 import * as A from "fp-ts/Array"
-import draggable from "vuedraggable"
-import { RequestOptionTabs } from "./RequestOptions.vue"
+import draggable from "vuedraggable-es"
+import { RESTOptionTabs } from "./RequestOptions.vue"
 import { useCodemirror } from "@composables/codemirror"
-import {
-  getRESTRequest,
-  restHeaders$,
-  restRequest$,
-  setRESTHeaders,
-} from "~/newstore/RESTSession"
 import { commonHeaders } from "~/helpers/headers"
 import { useI18n } from "@composables/i18n"
-import { useReadonlyStream, useStream } from "@composables/stream"
+import { useReadonlyStream } from "@composables/stream"
 import { useToast } from "@composables/toast"
 import linter from "~/helpers/editor/linting/rawKeyValue"
 import { throwError } from "~/helpers/functional/error"
@@ -274,9 +270,16 @@ import {
   getComputedHeaders,
 } from "~/helpers/utils/EffectiveURL"
 import { aggregateEnvs$, getAggregateEnvs } from "~/newstore/environments"
+import { useVModel } from "@vueuse/core"
+import { useService } from "dioc/vue"
+import { InspectionService, InspectorResult } from "~/services/inspection"
+import { RESTTabService } from "~/services/tab/rest"
 
 const t = useI18n()
 const toast = useToast()
+
+const tabs = useService(RESTTabService)
+
 const colorMode = useColorMode()
 
 const idTicker = ref(0)
@@ -288,9 +291,15 @@ const linewrapEnabled = ref(true)
 
 const deletionToast = ref<{ goAway: (delay: number) => void } | null>(null)
 
+// v-model integration with props and emit
+const props = defineProps<{ modelValue: HoppRESTRequest }>()
+
 const emit = defineEmits<{
-  (e: "change-tab", value: RequestOptionTabs): void
+  (e: "change-tab", value: RESTOptionTabs): void
+  (e: "update:modelValue", value: HoppRESTRequest): void
 }>()
+
+const request = useVModel(props, "modelValue", emit)
 
 useCodemirror(
   bulkEditor,
@@ -307,13 +316,10 @@ useCodemirror(
   })
 )
 
-// The functional headers list (the headers actually in the system)
-const headers = useStream(restHeaders$, [], setRESTHeaders) as Ref<
-  HoppRESTHeader[]
->
+type WorkingHeader = HoppRESTHeader & { id: number }
 
 // The UI representation of the headers list (has the empty end headers)
-const workingHeaders = ref<Array<HoppRESTHeader & { id: number }>>([
+const workingHeaders = ref<Array<WorkingHeader>>([
   {
     id: idTicker.value++,
     key: "",
@@ -339,7 +345,7 @@ watch(workingHeaders, (headersList) => {
 
 // Sync logic between headers and working/bulk headers
 watch(
-  headers,
+  () => request.value.headers,
   (newHeadersList) => {
     // Sync should overwrite working headers
     const filteredWorkingHeaders = pipe(
@@ -388,8 +394,8 @@ watch(workingHeaders, (newWorkingHeaders) => {
     )
   )
 
-  if (!isEqual(headers.value, fixedHeaders)) {
-    headers.value = cloneDeep(fixedHeaders)
+  if (!isEqual(request.value.headers, fixedHeaders)) {
+    request.value.headers = cloneDeep(fixedHeaders)
   }
 })
 
@@ -405,8 +411,8 @@ watch(bulkHeaders, (newBulkHeaders) => {
     E.getOrElse(() => [] as RawKeyValueEntry[])
   )
 
-  if (!isEqual(headers.value, filteredBulkHeaders)) {
-    headers.value = filteredBulkHeaders
+  if (!isEqual(props.modelValue, filteredBulkHeaders)) {
+    request.value.headers = filteredBulkHeaders
   }
 })
 
@@ -481,11 +487,10 @@ const clearContent = () => {
   bulkHeaders.value = ""
 }
 
-const restRequest = useReadonlyStream(restRequest$, getRESTRequest())
 const aggregateEnvs = useReadonlyStream(aggregateEnvs$, getAggregateEnvs())
 
 const computedHeaders = computed(() =>
-  getComputedHeaders(restRequest.value, aggregateEnvs.value).map(
+  getComputedHeaders(request.value, aggregateEnvs.value).map(
     (header, index) => ({
       id: `header-${index}`,
       ...header,
@@ -509,4 +514,32 @@ const changeTab = (tab: ComputedHeader["source"]) => {
   if (tab === "auth") emit("change-tab", "authorization")
   else emit("change-tab", "bodyParams")
 }
+
+const inspectionService = useService(InspectionService)
+
+const headerKeyResults = inspectionService.getResultViewFor(
+  tabs.currentTabID.value,
+  (result) =>
+    result.locations.type === "header" && result.locations.position === "key"
+)
+
+const headerValueResults = inspectionService.getResultViewFor(
+  tabs.currentTabID.value,
+  (result) =>
+    result.locations.type === "header" && result.locations.position === "value"
+)
+
+const getInspectorResult = (results: InspectorResult[], index: number) => {
+  return results.filter((result) => {
+    if (result.locations.type === "url" || result.locations.type === "response")
+      return
+    return result.locations.index === index
+  })
+}
 </script>
+
+<style lang="scss" scoped>
+:deep(.cm-panels) {
+  @apply top-upperTertiaryStickyFold #{!important};
+}
+</style>

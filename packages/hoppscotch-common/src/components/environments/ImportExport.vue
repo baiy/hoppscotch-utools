@@ -1,5 +1,5 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="`${t('environment.title')}`"
@@ -14,7 +14,7 @@
           theme="popover"
           :on-shown="() => tippyActions!.focus()"
         >
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('action.more')"
             :icon="IconMoreVertical"
@@ -26,7 +26,7 @@
               tabindex="0"
               @keyup.escape="hide()"
             >
-              <SmartItem
+              <HoppSmartItem
                 :icon="IconGithub"
                 :label="t('import.from_gist')"
                 @click="
@@ -46,7 +46,7 @@
                     : undefined
                 "
               >
-                <SmartItem
+                <HoppSmartItem
                   :disabled="
                     !currentUser
                       ? true
@@ -71,11 +71,11 @@
     </template>
     <template #body>
       <div v-if="loading" class="flex flex-col items-center justify-center p-4">
-        <SmartSpinner class="my-4" />
+        <HoppSmartSpinner class="my-4" />
         <span class="text-secondaryLight">{{ t("state.loading") }}</span>
       </div>
       <div v-else class="flex flex-col space-y-2">
-        <SmartItem
+        <HoppSmartItem
           :icon="IconFolderPlus"
           :label="t('import.from_json')"
           @click="openDialogChooseFileToImportFrom"
@@ -88,7 +88,7 @@
           @change="importFromJSON"
         />
         <hr />
-        <SmartItem
+        <HoppSmartItem
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.download_file')"
           :icon="IconDownload"
@@ -97,7 +97,7 @@
         />
       </div>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -190,6 +190,12 @@ const createEnvironmentGist = async () => {
     )
 
     toast.success(t("export.gist_created").toString())
+
+    platform.analytics?.logEvent({
+      type: "HOPP_EXPORT_ENVIRONMENT",
+      platform: "rest",
+    })
+
     window.open(res.data.html_url)
   } catch (e) {
     toast.error(t("error.something_went_wrong").toString())
@@ -249,6 +255,13 @@ const openDialogChooseFileToImportFrom = () => {
 
 const importToTeams = async (content: Environment[]) => {
   loading.value = true
+
+  platform.analytics?.logEvent({
+    type: "HOPP_IMPORT_ENVIRONMENT",
+    platform: "rest",
+    workspaceType: "team",
+  })
+
   for (const [i, env] of content.entries()) {
     if (i === content.length - 1) {
       await pipe(
@@ -301,6 +314,12 @@ const importFromJSON = () => {
     return
   }
 
+  platform.analytics?.logEvent({
+    type: "HOPP_IMPORT_ENVIRONMENT",
+    platform: "rest",
+    workspaceType: "personal",
+  })
+
   const reader = new FileReader()
 
   reader.onload = ({ target }) => {
@@ -352,25 +371,41 @@ const importFromPostman = ({
   const environment: Environment = { name, variables: [] }
   values.forEach(({ key, value }) => environment.variables.push({ key, value }))
   const environments = [environment]
+
   importFromHoppscotch(environments)
 }
 
-const exportJSON = () => {
+const exportJSON = async () => {
   const dataToWrite = environmentJson.value
-  const file = new Blob([dataToWrite], { type: "application/json" })
-  const a = document.createElement("a")
-  const url = URL.createObjectURL(file)
-  a.href = url
 
-  // TODO: get uri from meta
-  a.download = `${url.split("/").pop()!.split("#")[0].split("?")[0]}.json`
-  document.body.appendChild(a)
-  a.click()
-  toast.success(t("state.download_started").toString())
-  setTimeout(() => {
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }, 1000)
+  const parsedCollections = JSON.parse(dataToWrite)
+
+  if (!parsedCollections.length) {
+    return toast.error(t("error.no_environments_to_export"))
+  }
+
+  const file = new Blob([dataToWrite], { type: "application/json" })
+  const url = URL.createObjectURL(file)
+
+  const filename = `${url.split("/").pop()!.split("#")[0].split("?")[0]}.json`
+
+  URL.revokeObjectURL(url)
+
+  const result = await platform.io.saveFileWithDialog({
+    data: dataToWrite,
+    contentType: "application/json",
+    suggestedFilename: filename,
+    filters: [
+      {
+        name: "JSON file",
+        extensions: ["json"],
+      },
+    ],
+  })
+
+  if (result.type === "unknown" || result.type === "saved") {
+    toast.success(t("state.download_started").toString())
+  }
 }
 
 const getErrorMessage = (err: GQLError<string>) => {

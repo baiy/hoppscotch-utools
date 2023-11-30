@@ -7,20 +7,20 @@
         {{ t("request.body") }}
       </label>
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
-          to="https://docs.hoppscotch.io/features/body"
+          to="https://docs.hoppscotch.io/documentation/getting-started/rest/uploading-data"
           blank
           :title="t('app.wiki')"
           :icon="IconHelpCircle"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.clear_all')"
           :icon="IconTrash2"
           @click="clearContent"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('add.new')"
           :icon="IconPlus"
@@ -44,7 +44,7 @@
           class="flex border-b divide-x divide-dividerLight border-dividerLight draggable-content group"
         >
           <span>
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{
                 theme: 'tooltip',
                 delay: [500, 20],
@@ -76,10 +76,10 @@
           />
           <div v-if="entry.isFile" class="file-chips-container">
             <div class="space-x-2 file-chips-wrapper">
-              <SmartFileChip
+              <HoppSmartFileChip
                 v-for="(file, fileIndex) in entry.value"
                 :key="`param-${index}-file-${fileIndex}`"
-                >{{ file.name }}</SmartFileChip
+                >{{ file.name }}</HoppSmartFileChip
               >
             </div>
           </div>
@@ -110,7 +110,7 @@
             </label>
           </span>
           <span>
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{ theme: 'tooltip' }"
               :title="
                 entry.hasOwnProperty('active')
@@ -140,7 +140,7 @@
             />
           </span>
           <span>
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{ theme: 'tooltip' }"
               :title="t('action.remove')"
               :icon="IconTrash"
@@ -152,25 +152,19 @@
       </template>
     </draggable>
 
-    <div
+    <HoppSmartPlaceholder
       v-if="workingParams.length === 0"
-      class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+      :src="`/images/states/${colorMode.value}/upload_single_file.svg`"
+      :alt="`${t('empty.body')}`"
+      :text="t('empty.body')"
     >
-      <img
-        :src="`/images/states/${colorMode.value}/upload_single_file.svg`"
-        loading="lazy"
-        class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-        :alt="`${t('empty.body')}`"
-      />
-      <span class="pb-4 text-center">{{ t("empty.body") }}</span>
-      <ButtonSecondary
+      <HoppButtonSecondary
         :label="`${t('add.new')}`"
         filled
         :icon="IconPlus"
-        class="mb-4"
         @click="addBodyParam"
       />
-    </div>
+    </HoppSmartPlaceholder>
   </div>
 </template>
 
@@ -186,14 +180,26 @@ import { ref, watch } from "vue"
 import { flow, pipe } from "fp-ts/function"
 import * as O from "fp-ts/Option"
 import * as A from "fp-ts/Array"
-import { FormDataKeyValue } from "@hoppscotch/data"
+import { FormDataKeyValue, HoppRESTReqBody } from "@hoppscotch/data"
 import { isEqual, clone } from "lodash-es"
-import draggable from "vuedraggable"
+import draggable from "vuedraggable-es"
 import { pluckRef } from "@composables/ref"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
 import { useColorMode } from "@composables/theming"
-import { useRESTRequestBody } from "~/newstore/RESTSession"
+import { useVModel } from "@vueuse/core"
+
+type Body = HoppRESTReqBody & { contentType: "multipart/form-data" }
+
+const props = defineProps<{
+  modelValue: Body
+}>()
+
+const emit = defineEmits<{
+  (e: "update:modelValue", val: Body): void
+}>()
+
+const body = useVModel(props, "modelValue", emit)
 
 type WorkingFormDataKeyValue = { id: number; entry: FormDataKeyValue }
 
@@ -206,7 +212,7 @@ const idTicker = ref(0)
 
 const deletionToast = ref<{ goAway: (delay: number) => void } | null>(null)
 
-const bodyParams = pluckRef<any, any>(useRESTRequestBody(), "body")
+const bodyParams = pluckRef(body, "body")
 
 // The UI representation of the parameters list (has the empty end param)
 const workingParams = ref<WorkingFormDataKeyValue[]>([
@@ -355,7 +361,7 @@ const clearContent = () => {
 const setRequestAttachment = (
   index: number,
   entry: FormDataKeyValue,
-  event: InputEvent
+  event: InputEvent | Event
 ) => {
   // check if file exists or not
   if ((event.target as HTMLInputElement).files?.length === 0) {

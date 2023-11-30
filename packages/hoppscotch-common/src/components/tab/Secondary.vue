@@ -1,5 +1,5 @@
 <template>
-  <SmartLink
+  <HoppSmartLink
     :to="to"
     :exact="exact"
     :blank="blank"
@@ -25,10 +25,10 @@
       class="svg-icons"
       :class="label ? 'mr-4 opacity-75' : ''"
     />
-    <span class="truncate">
+    <div class="truncate max-w-54">
       {{ label }}
-    </span>
-  </SmartLink>
+    </div>
+  </HoppSmartLink>
 </template>
 
 <script lang="ts">

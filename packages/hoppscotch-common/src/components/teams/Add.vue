@@ -1,31 +1,23 @@
 <template>
-  <SmartModal v-if="show" dialog :title="t('team.new')" @close="hideModal">
+  <HoppSmartModal v-if="show" dialog :title="t('team.new')" @close="hideModal">
     <template #body>
-      <div class="flex flex-col">
-        <input
-          id="selectLabelTeamAdd"
-          v-model="name"
-          v-focus
-          class="input floating-input"
-          placeholder=" "
-          type="text"
-          autocomplete="off"
-          @keyup.enter="addNewTeam"
-        />
-        <label for="selectLabelTeamAdd">
-          {{ t("action.label") }}
-        </label>
-      </div>
+      <HoppSmartInput
+        v-model="editingName"
+        :label="t('action.label')"
+        placeholder=" "
+        input-styles="floating-input"
+        @submit="addNewTeam"
+      />
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="t('action.save')"
           :loading="isLoading"
           outline
           @click="addNewTeam"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="t('action.cancel')"
           outline
           filled
@@ -33,7 +25,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -44,6 +36,7 @@ import { createTeam } from "~/helpers/backend/mutations/Team"
 import { TeamNameCodec } from "~/helpers/backend/types/TeamName"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
+import { platform } from "~/platform"
 
 const t = useI18n()
 
@@ -57,17 +50,23 @@ const emit = defineEmits<{
   (e: "hide-modal"): void
 }>()
 
-const name = ref<string | null>(null)
+const editingName = ref<string | null>(null)
 
 const isLoading = ref(false)
 
 const addNewTeam = async () => {
   isLoading.value = true
   await pipe(
-    TeamNameCodec.decode(name.value),
+    TeamNameCodec.decode(editingName.value),
     TE.fromEither,
     TE.mapLeft(() => "invalid_name" as const),
     TE.chainW(createTeam),
+    TE.chainFirstIOK(
+      () => () =>
+        platform.analytics?.logEvent({
+          type: "HOPP_CREATE_TEAM",
+        })
+    ),
     TE.match(
       (err) => {
         // err is of type "invalid_name" | GQLError<Err>
@@ -87,7 +86,7 @@ const addNewTeam = async () => {
 }
 
 const hideModal = () => {
-  name.value = null
+  editingName.value = null
   emit("hide-modal")
 }
 </script>

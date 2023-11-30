@@ -1,34 +1,33 @@
 <template>
-  <div class="flex flex-col flex-1">
-    <HttpResponseMeta :response="response" />
+  <div class="flex flex-col flex-1 relative">
+    <HttpResponseMeta :response="doc.response" />
     <LensesResponseBodyRenderer
       v-if="!loading && hasResponse"
-      v-model:selected-tab-preference="selectedTabPreference"
-      :response="response"
+      v-model:document="doc"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue"
-import { startPageProgress, completePageProgress } from "@modules/loadingbar"
-import { useReadonlyStream } from "@composables/stream"
-import { restResponse$ } from "~/newstore/RESTSession"
+import { useVModel } from "@vueuse/core"
+import { computed } from "vue"
+import { HoppRESTDocument } from "~/helpers/rest/document"
 
-const selectedTabPreference = ref<string | null>(null)
+const props = defineProps<{
+  document: HoppRESTDocument
+}>()
 
-const response = useReadonlyStream(restResponse$, null)
+const emit = defineEmits<{
+  (e: "update:tab", val: HoppRESTDocument): void
+}>()
+
+const doc = useVModel(props, "document", emit)
 
 const hasResponse = computed(
-  () => response.value?.type === "success" || response.value?.type === "fail"
+  () =>
+    doc.value.response?.type === "success" ||
+    doc.value.response?.type === "fail"
 )
 
-const loading = computed(
-  () => response.value === null || response.value.type === "loading"
-)
-
-watch(response, () => {
-  if (response.value?.type === "loading") startPageProgress()
-  else completePageProgress()
-})
+const loading = computed(() => doc.value.response?.type === "loading")
 </script>

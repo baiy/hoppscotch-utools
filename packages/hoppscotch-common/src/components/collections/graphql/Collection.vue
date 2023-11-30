@@ -29,7 +29,7 @@
         </span>
       </span>
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :icon="IconFilePlus"
           :title="t('request.new')"
@@ -37,10 +37,11 @@
           @click="
             emit('add-request', {
               path: `${collectionIndex}`,
+              index: collection.requests.length,
             })
           "
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :icon="IconFolderPlus"
           :title="t('folder.new')"
@@ -59,7 +60,7 @@
             theme="popover"
             :on-shown="() => tippyActions.focus()"
           >
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{ theme: 'tooltip' }"
               :title="t('action.more')"
               :icon="IconMoreVertical"
@@ -75,7 +76,7 @@
                 @keyup.delete="deleteAction.$el.click()"
                 @keyup.escape="hide()"
               >
-                <SmartItem
+                <HoppSmartItem
                   ref="requestAction"
                   :icon="IconFilePlus"
                   :label="`${t('request.new')}`"
@@ -89,7 +90,7 @@
                     }
                   "
                 />
-                <SmartItem
+                <HoppSmartItem
                   ref="folderAction"
                   :icon="IconFolderPlus"
                   :label="`${t('folder.new')}`"
@@ -103,7 +104,7 @@
                     }
                   "
                 />
-                <SmartItem
+                <HoppSmartItem
                   ref="edit"
                   :icon="IconEdit"
                   :label="`${t('action.edit')}`"
@@ -115,7 +116,7 @@
                     }
                   "
                 />
-                <SmartItem
+                <HoppSmartItem
                   ref="deleteAction"
                   :icon="IconTrash2"
                   :label="`${t('action.delete')}`"
@@ -171,22 +172,15 @@
           @duplicate-request="$emit('duplicate-request', $event)"
           @select="$emit('select', $event)"
         />
-        <div
+        <HoppSmartPlaceholder
           v-if="
             collection.folders.length === 0 && collection.requests.length === 0
           "
-          class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+          :src="`/images/states/${colorMode.value}/pack.svg`"
+          :alt="`${t('empty.collection')}`"
+          :text="t('empty.collection')"
         >
-          <img
-            :src="`/images/states/${colorMode.value}/pack.svg`"
-            loading="lazy"
-            class="inline-flex flex-col object-contain object-center w-16 h-16 mb-4"
-            :alt="`${t('empty.collection')}`"
-          />
-          <span class="pb-4 text-center">
-            {{ t("empty.collection") }}
-          </span>
-          <ButtonSecondary
+          <HoppButtonSecondary
             :label="t('add.new')"
             filled
             outline
@@ -196,10 +190,10 @@
               })
             "
           />
-        </div>
+        </HoppSmartPlaceholder>
       </div>
     </div>
-    <SmartConfirmModal
+    <HoppSmartConfirmModal
       :show="confirmRemove"
       :title="`${t('confirm.remove_collection')}`"
       @hide-modal="confirmRemove = false"
@@ -226,6 +220,8 @@ import {
   moveGraphqlRequest,
 } from "~/newstore/collections"
 import { Picked } from "~/helpers/types/HoppPicked"
+import { useService } from "dioc/vue"
+import { GQLTabService } from "~/services/tab/graphql"
 
 const props = defineProps({
   picked: { type: Object, default: null },
@@ -239,6 +235,8 @@ const props = defineProps({
 const colorMode = useColorMode()
 const toast = useToast()
 const t = useI18n()
+
+const tabs = useService(GQLTabService)
 
 // TODO: improve types plz
 const emit = defineEmits<{
@@ -299,7 +297,24 @@ const removeCollection = () => {
   ) {
     emit("select", null)
   }
-  removeGraphqlCollection(props.collectionIndex)
+
+  const possibleTabs = tabs.getTabsRefTo((tab) => {
+    const ctx = tab.document.saveContext
+
+    if (!ctx) return false
+
+    return (
+      ctx.originLocation === "user-collection" &&
+      ctx.folderPath.startsWith(props.collectionIndex.toString())
+    )
+  })
+
+  for (const tab of possibleTabs) {
+    tab.value.document.saveContext = undefined
+    tab.value.document.isDirty = true
+  }
+
+  removeGraphqlCollection(props.collectionIndex, props.collection.id)
   toast.success(`${t("state.deleted")}`)
 }
 

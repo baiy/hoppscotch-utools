@@ -7,7 +7,7 @@
         {{ t("response.body") }}
       </label>
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="response.body"
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.linewrap')"
@@ -15,7 +15,7 @@
           :icon="IconWrapText"
           @click.prevent="linewrapEnabled = !linewrapEnabled"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="response.body"
           v-tippy="{ theme: 'tooltip', allowHTML: true }"
           :title="`${t(
@@ -24,7 +24,7 @@
           :icon="downloadIcon"
           @click="downloadResponse"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="response.body"
           v-tippy="{ theme: 'tooltip', allowHTML: true }"
           :title="`${t(
@@ -117,3 +117,9 @@ useCodemirror(
 defineActionHandler("response.file.download", () => downloadResponse())
 defineActionHandler("response.copy", () => copyResponse())
 </script>
+
+<style lang="scss" scoped>
+:deep(.cm-panels) {
+  @apply top-lowerTertiaryStickyFold #{!important};
+}
+</style>

@@ -5,6 +5,7 @@
     "choose_file": "Vælg en fil",
     "clear": "Klar",
     "clear_all": "Slet alt",
+    "clear_history": "Clear all History",
     "close": "Close",
     "connect": "Opret forbindelse",
     "connecting": "Connecting",
@@ -19,6 +20,7 @@
     "edit": "Redigere",
     "filter": "Filter",
     "go_back": "Gå tilbage",
+    "go_forward": "Go forward",
     "group_by": "Group by",
     "label": "Etiket",
     "learn_more": "Lær mere",
@@ -30,6 +32,7 @@
     "paste": "Paste",
     "prettify": "Prettify",
     "remove": "Fjerne",
+    "rename": "Rename",
     "restore": "Gendan",
     "save": "Gemme",
     "scroll_to_bottom": "Scroll to bottom",
@@ -76,6 +79,8 @@
     "search": "Søg",
     "share": "Del",
     "shortcuts": "Genveje",
+    "social_description": "Follow us on social media to stay updated with the latest news, updates and releases.",
+    "social_links": "Social links",
     "spotlight": "Spotlight",
     "status": "Status",
     "status_description": "Check the status of the website",
@@ -117,21 +122,28 @@
   },
   "collection": {
     "created": "Samlingen er oprettet",
+    "different_parent": "Cannot reorder collection with different parent",
     "edit": "Rediger samling",
     "invalid_name": "Angiv et gyldigt navn til samlingen",
+    "invalid_root_move": "Collection already in the root",
+    "moved": "Moved Successfully",
     "my_collections": "Mine samlinger",
     "name": "Min nye samling",
     "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "Ny kollektion",
+    "order_changed": "Collection Order Updated",
     "renamed": "Samling omdøbt",
     "request_in_use": "Request in use",
     "save_as": "Gem som",
+    "save_to_collection": "Save to Collection",
     "select": "Vælg en samling",
     "select_location": "Vælg placering",
     "select_team": "Vælg et hold",
     "team_collections": "Teamsamlinger"
   },
   "confirm": {
+    "close_unsaved_tab": "Are you sure you want to close this tab?",
+    "close_unsaved_tabs": "Are you sure you want to close all tabs? {count} unsaved tabs will be lost.",
     "exit_team": "Are you sure you want to leave this team?",
     "logout": "Er du sikker på, at du vil logge af?",
     "remove_collection": "Er du sikker på, at du vil slette denne samling permanent?",
@@ -142,7 +154,13 @@
     "remove_team": "Er du sikker på, at du vil slette dette hold?",
     "remove_telemetry": "Er du sikker på, at du vil fravælge telemetri?",
     "request_change": "Are you sure you want to discard current request, unsaved changes will be lost.",
+    "save_unsaved_tab": "Do you want to save changes made in this tab?",
     "sync": "Er du sikker på, at du vil synkronisere dette arbejdsområde?"
+  },
+  "context_menu": {
+    "add_parameters": "Add to parameters",
+    "open_request_in_new_tab": "Open request in new tab",
+    "set_environment_variable": "Set as variable"
   },
   "count": {
     "header": "Overskrift {count}",
@@ -186,17 +204,31 @@
     "create_new": "Skab nyt miljø",
     "created": "Environment created",
     "deleted": "Environment deletion",
+    "duplicated": "Environment duplicated",
     "edit": "Rediger miljø",
+    "empty_variables": "No variables",
+    "global": "Global",
+    "global_variables": "Global variables",
     "invalid_name": "Angiv et gyldigt navn på miljøet",
+    "list": "Environment variables",
     "my_environments": "My Environments",
+    "name": "Name",
     "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "Nyt miljø",
+    "no_active_environment": "No active environment",
     "no_environment": "Intet miljø",
     "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
+    "quick_peek": "Environment Quick Peek",
+    "replace_with_variable": "Replace with variable",
+    "scope": "Scope",
     "select": "Vælg miljø",
+    "set": "Set environment",
+    "set_as_environment": "Set as environment",
     "team_environments": "Team Environments",
     "title": "Miljøer",
     "updated": "Environment updation",
+    "value": "Value",
+    "variable": "Variable",
     "variable_list": "Variabel liste"
   },
   "error": {
@@ -220,6 +252,7 @@
     "no_duration": "Ingen varighed",
     "no_results_found": "No matches found",
     "page_not_found": "This page could not be found",
+    "proxy_error": "Proxy error",
     "script_fail": "Kunne ikke udføre pre-request script",
     "something_went_wrong": "Noget gik galt",
     "test_script_fail": "Could not execute post-request script"
@@ -245,9 +278,13 @@
     "renamed": "Mappen omdøbt"
   },
   "graphql": {
+    "connection_switch_confirm": "Do you want to connect with the latest GraphQL endpoint?",
+    "connection_switch_new_url": "Switching to a tab will disconnected you from the active GraphQL connection. New connection URL is",
+    "connection_switch_url": "You're connected to a GraphQL endpoint the connection URL is",
     "mutations": "Mutationer",
     "schema": "Skema",
-    "subscriptions": "Abonnementer"
+    "subscriptions": "Abonnementer",
+    "switch_connection": "Switch connection"
   },
   "group": {
     "time": "Time",
@@ -301,15 +338,39 @@
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
     "title": "Importere"
   },
+  "inspections": {
+    "description": "Inspect possible errors",
+    "environment": {
+      "add_environment": "Add to Environment",
+      "not_found": "Environment variable “{environment}” not found."
+    },
+    "header": {
+      "cookie": "The browser doesn't allow Hoppscotch to set the Cookie Header. While we're working on the Hoppscotch Desktop App (coming soon), please use the Authorization Header instead."
+    },
+    "response": {
+      "401_error": "Please check your authentication credentials.",
+      "404_error": "Please check your request URL and method type.",
+      "cors_error": "Please check your Cross-Origin Resource Sharing configuration.",
+      "default_error": "Please check your request.",
+      "network_error": "Please check your network connection."
+    },
+    "title": "Inspector",
+    "url": {
+      "extension_not_installed": "Extension not installed.",
+      "extension_unknown_origin": "Make sure you've added the API endpoint's origin to the Hoppscotch Browser Extension list.",
+      "extention_enable_action": "Enable Browser Extension",
+      "extention_not_enabled": "Extension not enabled."
+    }
+  },
   "layout": {
     "collapse_collection": "Collapse or Expand Collections",
     "collapse_sidebar": "Collapse or Expand the sidebar",
     "column": "Vertical layout",
     "name": "Layout",
-    "row": "Horizontal layout",
-    "zen_mode": "Zen -tilstand"
+    "row": "Horizontal layout"
   },
   "modal": {
+    "close_unsaved_tab": "You have unsaved changes",
     "collections": "Samlinger",
     "confirm": "Bekræfte",
     "edit_request": "Rediger anmodning",
@@ -389,6 +450,8 @@
       "text": "Text"
     },
     "copy_link": "Kopier link",
+    "different_collection": "Cannot reorder requests from different collections",
+    "duplicated": "Request duplicated",
     "duration": "Varighed",
     "enter_curl": "Indtast cURL",
     "generate_code": "Generer kode",
@@ -396,8 +459,10 @@
     "header_list": "Overskriftsliste",
     "invalid_name": "Angiv et navn på anmodningen",
     "method": "Metode",
+    "moved": "Request moved",
     "name": "Anmodningsnavn",
     "new": "New Request",
+    "order_changed": "Request Order Updated",
     "override": "Override",
     "override_help": "Set <kbd>Content-Type</kbd> in Headers",
     "overriden": "Overridden",
@@ -407,6 +472,7 @@
     "payload": "Nyttelast",
     "query": "Forespørgsel",
     "raw_body": "Raw Request Body",
+    "rename": "Rename Request",
     "renamed": "Anmodning omdøbt",
     "run": "Løb",
     "save": "Gemme",
@@ -414,6 +480,7 @@
     "saved": "Anmodning gemt",
     "share": "Del",
     "share_description": "Share Hoppscotch with your friends",
+    "stop": "Stop",
     "title": "Anmodning",
     "type": "Anmodningstype",
     "url": "URL",
@@ -421,6 +488,7 @@
     "view_my_links": "View my links"
   },
   "response": {
+    "audio": "Audio",
     "body": "Svarorgan",
     "filter_response_body": "Filter JSON response body (uses JSONPath syntax)",
     "headers": "Overskrifter",
@@ -434,6 +502,7 @@
     "status": "Status",
     "time": "Tid",
     "title": "Respons",
+    "video": "Video",
     "waiting_for_connection": "venter på forbindelse",
     "xml": "XML"
   },
@@ -446,7 +515,6 @@
     "account_name_description": "Dette er dit visningsnavn.",
     "background": "Baggrund",
     "black_mode": "Sort",
-    "change_font_size": "Skift skriftstørrelse",
     "choose_language": "Vælg sprog",
     "dark_mode": "Mørk",
     "delete_account": "Delete account",
@@ -459,10 +527,6 @@
     "extensions": "Udvidelser",
     "extensions_use_toggle": "Brug browserudvidelsen til at sende anmodninger (hvis de findes)",
     "follow": "Follow Us",
-    "font_size": "Skriftstørrelse",
-    "font_size_large": "Stor",
-    "font_size_medium": "Medium",
-    "font_size_small": "Lille",
     "interceptor": "Aflytter",
     "interceptor_description": "Middleware mellem applikation og API'er.",
     "language": "Sprog",
@@ -527,19 +591,27 @@
       "settings": "Gå til siden Indstillinger",
       "title": "Navigation"
     },
+    "others": {
+      "prettify": "Prettify Editor's Content",
+      "title": "Others"
+    },
     "request": {
       "copy_request_link": "Kopiér anmodningslink",
       "delete_method": "Vælg SLET metode",
       "get_method": "Vælg GET -metode",
       "head_method": "Vælg HEAD -metode",
+      "import_curl": "Import cURL",
       "method": "Metode",
       "next_method": "Vælg Næste metode",
       "post_method": "Vælg POST -metode",
       "previous_method": "Vælg Forrige metode",
       "put_method": "Vælg PUT -metode",
+      "rename": "Rename Request",
       "reset_request": "Nulstil anmodning",
+      "save_request": "Save Request",
       "save_to_collections": "Gem i samlinger",
       "send_request": "Send anmodning",
+      "show_code": "Generate code snippet",
       "title": "Anmodning"
     },
     "response": {
@@ -568,6 +640,85 @@
     "events": "Begivenheder",
     "log": "Log",
     "url": "URL"
+  },
+  "spotlight": {
+    "change_language": "Change Language",
+    "environments": {
+      "delete": "Delete current environment",
+      "duplicate": "Duplicate current environment",
+      "duplicate_global": "Duplicate global environment",
+      "edit": "Edit current environment",
+      "edit_global": "Edit global environment",
+      "new": "Create new environment",
+      "new_variable": "Create a new environment variable",
+      "title": "Environments"
+    },
+    "general": {
+      "chat": "Chat with support",
+      "help_menu": "Help and support",
+      "open_docs": "Read Documentation",
+      "open_github": "Open GitHub repository",
+      "open_keybindings": "Keyboard shortcuts",
+      "social": "Social",
+      "title": "General"
+    },
+    "graphql": {
+      "connect": "Connect to server",
+      "disconnect": "Disconnect from server"
+    },
+    "miscellaneous": {
+      "invite": "Invite your friends to Hoppscotch",
+      "title": "Miscellaneous"
+    },
+    "request": {
+      "save_as_new": "Save as new request",
+      "select_method": "Select method",
+      "switch_to": "Switch to",
+      "tab_authorization": "Authorization tab",
+      "tab_body": "Body tab",
+      "tab_headers": "Headers tab",
+      "tab_parameters": "Parameters tab",
+      "tab_pre_request_script": "Pre-request script tab",
+      "tab_query": "Query tab",
+      "tab_tests": "Tests tab",
+      "tab_variables": "Variables tab"
+    },
+    "response": {
+      "copy": "Copy response",
+      "download": "Download response as file",
+      "title": "Response"
+    },
+    "section": {
+      "interceptor": "Interceptor",
+      "interface": "Interface",
+      "theme": "Theme",
+      "user": "User"
+    },
+    "settings": {
+      "change_interceptor": "Change Interceptor",
+      "change_language": "Change Language",
+      "theme": {
+        "black": "Black",
+        "dark": "Dark",
+        "light": "Light",
+        "system": "System preference"
+      }
+    },
+    "tab": {
+      "close_current": "Close current tab",
+      "close_others": "Close all other tabs",
+      "duplicate": "Duplicate current tab",
+      "new_tab": "Open a new tab",
+      "title": "Tabs"
+    },
+    "workspace": {
+      "delete": "Delete current team",
+      "edit": "Edit current team",
+      "invite": "Invite people to team",
+      "new": "Create new team",
+      "switch_to_personal": "Switch to your personal workspace",
+      "title": "Teams"
+    }
   },
   "sse": {
     "event_type": "Begivenhedstype",
@@ -626,8 +777,12 @@
   "tab": {
     "authorization": "Bemyndigelse",
     "body": "Legeme",
+    "close": "Close Tab",
+    "close_others": "Close other Tabs",
     "collections": "Samlinger",
     "documentation": "Dokumentation",
+    "duplicate": "Duplicate Tab",
+    "environments": "Environments",
     "headers": "Overskrifter",
     "history": "Historie",
     "mqtt": "MQTT",
@@ -652,6 +807,7 @@
     "email_do_not_match": "Email doesn't match with your account details. Contact your team owner.",
     "exit": "Afslut Team",
     "exit_disabled": "Kun ejeren kan ikke forlade teamet",
+    "invalid_coll_id": "Invalid collection ID",
     "invalid_email_format": "E -mailformatet er ugyldigt",
     "invalid_id": "Invalid team ID. Contact your team owner.",
     "invalid_invite_link": "Invalid invite link",
@@ -675,6 +831,7 @@
     "member_removed": "Bruger fjernet",
     "member_role_updated": "Brugerroller opdateret",
     "members": "Medlemmer",
+    "more_members": "+{count} more",
     "name_length_insufficient": "Holdnavnet bør mindst være 6 tegn langt",
     "name_updated": "Team name updated",
     "new": "Nyt team",
@@ -682,10 +839,13 @@
     "new_name": "Mit nye hold",
     "no_access": "Du har ikke redigeringsadgang til disse samlinger",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "no_request_found": "Request not found.",
     "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
+    "parent_coll_move": "Cannot move collection to a child collection",
     "pending_invites": "Pending invites",
     "permissions": "Tilladelser",
+    "same_target_destination": "Same target and destination",
     "saved": "Hold reddet",
     "select_a_team": "Select a team",
     "title": "Hold",
@@ -713,5 +873,11 @@
     "message": "Besked",
     "protocols": "Protokoller",
     "url": "URL"
+  },
+  "workspace": {
+    "change": "Change workspace",
+    "personal": "My Workspace",
+    "team": "Team Workspace",
+    "title": "Workspaces"
   }
 }

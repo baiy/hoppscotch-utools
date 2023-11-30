@@ -7,20 +7,20 @@
         {{ t("request.body") }}
       </label>
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
-          to="https://docs.hoppscotch.io/features/body"
+          to="https://docs.hoppscotch.io/documentation/getting-started/rest/uploading-data"
           blank
           :title="t('app.wiki')"
           :icon="IconHelpCircle"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.clear_all')"
           :icon="IconTrash2"
           @click="clearContent()"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="bulkMode"
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.linewrap')"
@@ -28,14 +28,14 @@
           :icon="IconWrapText"
           @click.prevent="linewrapEnabled = !linewrapEnabled"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.bulk_mode')"
           :icon="IconEdit"
           :class="{ '!text-accent': bulkMode }"
           @click="bulkMode = !bulkMode"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('add.new')"
           :icon="IconPlus"
@@ -61,7 +61,7 @@
             class="flex border-b divide-x divide-dividerLight border-dividerLight draggable-content group"
           >
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{
                   theme: 'tooltip',
                   delay: [500, 20],
@@ -104,7 +104,7 @@
               "
             />
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="
                   param.hasOwnProperty('active')
@@ -132,7 +132,7 @@
               />
             </span>
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('action.remove')"
                 :icon="IconTrash"
@@ -143,27 +143,19 @@
           </div>
         </template>
       </draggable>
-      <div
+      <HoppSmartPlaceholder
         v-if="workingUrlEncodedParams.length === 0"
-        class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+        :src="`/images/states/${colorMode.value}/add_category.svg`"
+        :alt="`${t('empty.body')}`"
+        :text="t('empty.body')"
       >
-        <img
-          :src="`/images/states/${colorMode.value}/add_category.svg`"
-          loading="lazy"
-          class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-          :alt="`${t('empty.body')}`"
-        />
-        <span class="pb-4 text-center">
-          {{ t("empty.body") }}
-        </span>
-        <ButtonSecondary
+        <HoppButtonSecondary
           filled
           :label="`${t('add.new')}`"
           :icon="IconPlus"
-          class="mb-4"
           @click="addUrlEncodedParam"
         />
-      </div>
+      </HoppSmartPlaceholder>
     </div>
   </div>
 </template>
@@ -181,6 +173,7 @@ import IconWrapText from "~icons/lucide/wrap-text"
 import { computed, reactive, ref, watch } from "vue"
 import { isEqual, cloneDeep } from "lodash-es"
 import {
+  HoppRESTReqBody,
   parseRawKeyValueEntries,
   parseRawKeyValueEntriesE,
   rawKeyValueEntriesToString,
@@ -191,16 +184,30 @@ import * as A from "fp-ts/Array"
 import * as O from "fp-ts/Option"
 import * as RA from "fp-ts/ReadonlyArray"
 import * as E from "fp-ts/Either"
-import draggable from "vuedraggable"
+import draggable from "vuedraggable-es"
 import { useCodemirror } from "@composables/codemirror"
 import linter from "~/helpers/editor/linting/rawKeyValue"
-import { useRESTRequestBody } from "~/newstore/RESTSession"
 import { pluckRef } from "@composables/ref"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
 import { useColorMode } from "@composables/theming"
 import { objRemoveKey } from "~/helpers/functional/object"
 import { throwError } from "~/helpers/functional/error"
+import { useVModel } from "@vueuse/core"
+
+type Body = HoppRESTReqBody & {
+  contentType: "application/x-www-form-urlencoded"
+}
+
+const props = defineProps<{
+  modelValue: Body
+}>()
+
+const emit = defineEmits<{
+  (e: "update:modelValue", val: Body): void
+}>()
+
+const body = useVModel(props, "modelValue", emit)
 
 const t = useI18n()
 const toast = useToast()
@@ -231,7 +238,7 @@ useCodemirror(
 )
 
 // The functional urlEncodedParams list (the urlEncodedParams actually in the system)
-const urlEncodedParamsRaw = pluckRef(useRESTRequestBody(), "body")
+const urlEncodedParamsRaw = pluckRef(body, "body")
 
 const urlEncodedParams = computed<RawKeyValueEntry[]>({
   get() {
@@ -417,3 +424,9 @@ const clearContent = () => {
   bulkUrlEncodedParams.value = ""
 }
 </script>
+
+<style lang="scss" scoped>
+:deep(.cm-panels) {
+  @apply top-upperFourthStickyFold #{!important};
+}
+</style>

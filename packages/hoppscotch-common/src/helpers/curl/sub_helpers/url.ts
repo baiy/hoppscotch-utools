@@ -2,7 +2,7 @@ import parser from "yargs-parser"
 import { pipe } from "fp-ts/function"
 import * as O from "fp-ts/Option"
 import * as A from "fp-ts/Array"
-import { getDefaultRESTRequest } from "~/newstore/RESTSession"
+import { getDefaultRESTRequest } from "~/helpers/rest/default"
 import { stringArrayJoin } from "~/helpers/functional/array"
 
 const defaultRESTReq = getDefaultRESTRequest()
@@ -71,9 +71,11 @@ const parseURL = (urlText: string | number) =>
  * @returns URL object
  */
 export function getURLObject(parsedArguments: parser.Arguments) {
+  const location = parsedArguments.location ?? undefined
+
   return pipe(
     // contains raw url strings
-    parsedArguments._.slice(1),
+    [...parsedArguments._.slice(1), location],
     A.findFirstMap(parseURL),
     // no url found
     O.getOrElse(() => new URL(defaultRESTReq.endpoint))

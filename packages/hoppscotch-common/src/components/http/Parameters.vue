@@ -7,20 +7,20 @@
         {{ t("request.parameter_list") }}
       </label>
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
-          to="https://docs.hoppscotch.io/features/parameters"
+          to="https://docs.hoppscotch.io/documentation/features/rest-api-testing"
           blank
           :title="t('app.wiki')"
           :icon="IconHelpCircle"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.clear_all')"
           :icon="IconTrash2"
           @click="clearContent()"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="bulkMode"
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.linewrap')"
@@ -28,14 +28,14 @@
           :icon="IconWrapText"
           @click.prevent="linewrapEnabled = !linewrapEnabled"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.bulk_mode')"
           :icon="IconEdit"
           :class="{ '!text-accent': bulkMode }"
           @click="bulkMode = !bulkMode"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('add.new')"
           :icon="IconPlus"
@@ -61,7 +61,7 @@
             class="flex border-b divide-x divide-dividerLight border-dividerLight draggable-content group"
           >
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{
                   theme: 'tooltip',
                   delay: [500, 20],
@@ -82,6 +82,9 @@
             <SmartEnvInput
               v-model="param.key"
               :placeholder="`${t('count.parameter', { count: index + 1 })}`"
+              :inspection-results="
+                getInspectorResult(parameterKeyResults, index)
+              "
               @change="
                 updateParam(index, {
                   id: param.id,
@@ -94,6 +97,9 @@
             <SmartEnvInput
               v-model="param.value"
               :placeholder="`${t('count.value', { count: index + 1 })}`"
+              :inspection-results="
+                getInspectorResult(parameterValueResults, index)
+              "
               @change="
                 updateParam(index, {
                   id: param.id,
@@ -104,7 +110,7 @@
               "
             />
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="
                   param.hasOwnProperty('active')
@@ -134,7 +140,7 @@
               />
             </span>
             <span>
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('action.remove')"
                 :icon="IconTrash"
@@ -145,26 +151,19 @@
           </div>
         </template>
       </draggable>
-
-      <div
+      <HoppSmartPlaceholder
         v-if="workingParams.length === 0"
-        class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+        :src="`/images/states/${colorMode.value}/add_files.svg`"
+        :alt="`${t('empty.parameters')}`"
+        :text="t('empty.parameters')"
       >
-        <img
-          :src="`/images/states/${colorMode.value}/add_files.svg`"
-          loading="lazy"
-          class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-          :alt="`${t('empty.parameters')}`"
-        />
-        <span class="pb-4 text-center">{{ t("empty.parameters") }}</span>
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="`${t('add.new')}`"
           :icon="IconPlus"
           filled
-          class="mb-4"
           @click="addParam"
         />
-      </div>
+      </HoppSmartPlaceholder>
     </div>
   </div>
 </template>
@@ -179,7 +178,7 @@ import IconCheckCircle from "~icons/lucide/check-circle"
 import IconCircle from "~icons/lucide/circle"
 import IconTrash from "~icons/lucide/trash"
 import IconWrapText from "~icons/lucide/wrap-text"
-import { reactive, Ref, ref, watch } from "vue"
+import { reactive, ref, watch } from "vue"
 import { flow, pipe } from "fp-ts/function"
 import * as O from "fp-ts/Option"
 import * as A from "fp-ts/Array"
@@ -192,21 +191,24 @@ import {
   RawKeyValueEntry,
 } from "@hoppscotch/data"
 import { isEqual, cloneDeep } from "lodash-es"
-import draggable from "vuedraggable"
+import draggable from "vuedraggable-es"
 import linter from "~/helpers/editor/linting/rawKeyValue"
 import { useCodemirror } from "@composables/codemirror"
 import { useColorMode } from "@composables/theming"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
-import { useStream } from "@composables/stream"
-import { restParams$, setRESTParams } from "~/newstore/RESTSession"
 import { throwError } from "@functional/error"
 import { objRemoveKey } from "@functional/object"
+import { useVModel } from "@vueuse/core"
+import { useService } from "dioc/vue"
+import { InspectionService, InspectorResult } from "~/services/inspection"
+import { RESTTabService } from "~/services/tab/rest"
 
 const colorMode = useColorMode()
 
 const t = useI18n()
 const toast = useToast()
+const tabs = useService(RESTTabService)
 
 const idTicker = ref(0)
 
@@ -232,8 +234,16 @@ useCodemirror(
   })
 )
 
+const props = defineProps<{
+  modelValue: HoppRESTParam[]
+}>()
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: Array<HoppRESTParam>): void
+}>()
+
 // The functional parameters list (the parameters actually applied to the session)
-const params = useStream(restParams$, [], setRESTParams) as Ref<HoppRESTParam[]>
+const params = useVModel(props, "modelValue", emit)
 
 // The UI representation of the parameters list (has the empty end param)
 const workingParams = ref<Array<HoppRESTParam & { id: number }>>([
@@ -397,4 +407,33 @@ const clearContent = () => {
 
   bulkParams.value = ""
 }
+
+const inspectionService = useService(InspectionService)
+
+const parameterKeyResults = inspectionService.getResultViewFor(
+  tabs.currentTabID.value,
+  (result) =>
+    result.locations.type === "parameter" && result.locations.position === "key"
+)
+
+const parameterValueResults = inspectionService.getResultViewFor(
+  tabs.currentTabID.value,
+  (result) =>
+    result.locations.type === "parameter" &&
+    result.locations.position === "value"
+)
+
+const getInspectorResult = (results: InspectorResult[], index: number) => {
+  return results.filter((result) => {
+    if (result.locations.type === "url" || result.locations.type === "response")
+      return
+    return result.locations.index === index
+  })
+}
 </script>
+
+<style lang="scss" scoped>
+:deep(.cm-panels) {
+  @apply top-upperTertiaryStickyFold #{!important};
+}
+</style>

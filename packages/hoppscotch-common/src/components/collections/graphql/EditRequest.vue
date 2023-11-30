@@ -1,35 +1,27 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="`${t('modal.edit_request')}`"
     @close="hideModal"
   >
     <template #body>
-      <div class="flex flex-col">
-        <input
-          id="selectLabelGqlEditReq"
-          v-model="requestUpdateData.name"
-          v-focus
-          class="input floating-input"
-          placeholder=" "
-          type="text"
-          autocomplete="off"
-          @keyup.enter="saveRequest"
-        />
-        <label for="selectLabelGqlEditReq">
-          {{ t("action.label") }}
-        </label>
-      </div>
+      <HoppSmartInput
+        v-model="requestUpdateData.name"
+        placeholder=" "
+        :label="t('action.label')"
+        input-styles="floating-input"
+        @submit="saveRequest"
+      />
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="`${t('action.save')}`"
           outline
           @click="saveRequest"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="`${t('action.cancel')}`"
           outline
           filled
@@ -37,7 +29,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script lang="ts">

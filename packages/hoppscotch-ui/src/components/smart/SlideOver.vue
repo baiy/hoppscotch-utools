@@ -23,8 +23,7 @@
         >
           <h3 class="ml-4 heading">{{ title }}</h3>
           <span class="flex items-center">
-            <kbd class="mr-2 shortcut-key">ESC</kbd>
-            <ButtonSecondary :icon="IconX" @click="close()" />
+            <HoppButtonSecondary :icon="IconX" @click="close()" />
           </span>
         </div>
         <slot name="content"></slot>
@@ -34,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { HoppButtonSecondary } from "../button"
 import { onMounted, watch } from "vue"
 import IconX from "~icons/lucide/x"
 

@@ -14,7 +14,7 @@
         <label class="font-semibold truncate text-secondaryLight">
           {{ t("test.report") }}
         </label>
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.clear')"
           :icon="IconTrash2"
@@ -28,9 +28,11 @@
               class="flex items-center justify-between flex-1 min-w-0 transition cursor-pointer focus:outline-none text-secondaryLight text-tiny group"
             >
               <span
-                class="inline-flex items-center justify-center px-4 py-2 transition group-hover:text-secondary"
+                class="inline-flex items-center justify-center px-4 py-2 transition group-hover:text-secondary truncate"
               >
-                <icon-lucide-chevron-right class="mr-2 indicator" />
+                <icon-lucide-chevron-right
+                  class="mr-2 indicator flex flex-shrink-0"
+                />
                 <span class="truncate capitalize-first">
                   {{ t("environment.title") }}
                 </span>
@@ -42,19 +44,19 @@
                 class="flex p-4 bg-error text-secondaryDark"
                 role="alert"
               >
-                <component :is="IconAlertTriangle" class="mr-4 svg-icons" />
+                <icon-lucide-alert-triangle class="mr-4 svg-icons" />
                 <div class="flex flex-col">
                   <p>
                     {{ t("environment.no_environment_description") }}
                   </p>
                   <p class="flex mt-3 space-x-2">
-                    <ButtonSecondary
+                    <HoppButtonSecondary
                       :label="t('environment.add_to_global')"
                       class="text-tiny !bg-primary"
                       filled
                       @click="addEnvToGlobal()"
                     />
-                    <ButtonSecondary
+                    <HoppButtonSecondary
                       :label="t('environment.create_new')"
                       class="text-tiny !bg-primary"
                       filled
@@ -151,55 +153,44 @@
         </div>
       </div>
     </div>
-    <div
+    <HoppSmartPlaceholder
       v-else-if="testResults && testResults.scriptError"
-      class="flex flex-col items-center justify-center flex-1 p-4"
+      :src="`/images/states/${colorMode.value}/youre_lost.svg`"
+      :alt="`${t('error.test_script_fail')}`"
+      :heading="t('error.test_script_fail')"
+      :text="t('helpers.test_script_fail')"
     >
-      <img
-        :src="`/images/states/${colorMode.value}/youre_lost.svg`"
-        loading="lazy"
-        class="inline-flex flex-col object-contain object-center w-32 h-32 my-4"
-        :alt="`${t('error.test_script_fail')}`"
-      />
-      <span class="mb-2 font-semibold text-center">
-        {{ t("error.test_script_fail") }}
-      </span>
-      <span
-        class="max-w-sm mb-6 text-center whitespace-normal text-secondaryLight"
-      >
-        {{ t("helpers.test_script_fail") }}
-      </span>
-    </div>
-    <div
+    </HoppSmartPlaceholder>
+    <HoppSmartPlaceholder
       v-else
-      class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+      :src="`/images/states/${colorMode.value}/validation.svg`"
+      :alt="`${t('empty.tests')}`"
+      :heading="t('empty.tests')"
+      :text="t('helpers.tests')"
     >
-      <img
-        :src="`/images/states/${colorMode.value}/validation.svg`"
-        loading="lazy"
-        class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-        :alt="`${t('empty.tests')}`"
-      />
-      <span class="pb-2 text-center">
-        {{ t("empty.tests") }}
-      </span>
-      <span class="pb-4 text-center">
-        {{ t("helpers.tests") }}
-      </span>
-      <ButtonSecondary
+      <HoppButtonSecondary
         outline
         :label="`${t('action.learn_more')}`"
-        to="https://docs.hoppscotch.io/features/tests"
+        to="https://docs.hoppscotch.io/documentation/getting-started/rest/tests"
         blank
         :icon="IconExternalLink"
         reverse
         class="my-4"
       />
-    </div>
+    </HoppSmartPlaceholder>
     <EnvironmentsMyDetails
-      :show="showModalDetails"
+      :show="showMyEnvironmentDetailsModal"
       action="new"
       :env-vars="getAdditionVars"
+      @hide-modal="displayModalAdd(false)"
+    />
+    <EnvironmentsTeamsDetails
+      :show="showTeamEnvironmentDetailsModal"
+      action="new"
+      :env-vars="getAdditionVars"
+      :editing-team-id="
+        workspace.type === 'team' ? workspace.teamID : undefined
+      "
       @hide-modal="displayModalAdd(false)"
     />
   </div>
@@ -216,30 +207,42 @@ import {
   setGlobalEnvVariables,
   setSelectedEnvironmentIndex,
 } from "~/newstore/environments"
-import { restTestResults$, setRESTTestResults } from "~/newstore/RESTSession"
 import { HoppTestResult } from "~/helpers/types/HoppTestResult"
 
 import IconTrash2 from "~icons/lucide/trash-2"
 import IconExternalLink from "~icons/lucide/external-link"
-import IconAlertTriangle from "~icons/lucide/alert-triangle"
 import IconCheck from "~icons/lucide/check"
 import IconClose from "~icons/lucide/x"
 
 import { useColorMode } from "~/composables/theming"
+import { useVModel } from "@vueuse/core"
+import { useService } from "dioc/vue"
+import { WorkspaceService } from "~/services/workspace.service"
+
+const props = defineProps<{
+  modelValue: HoppTestResult | null | undefined
+}>()
+
+const emit = defineEmits<{
+  (e: "update:modelValue", val: HoppTestResult | null | undefined): void
+}>()
+
+const testResults = useVModel(props, "modelValue", emit)
 
 const t = useI18n()
 const colorMode = useColorMode()
 
-const showModalDetails = ref(false)
+const workspaceService = useService(WorkspaceService)
+const workspace = workspaceService.currentWorkspace
+
+const showMyEnvironmentDetailsModal = ref(false)
+const showTeamEnvironmentDetailsModal = ref(false)
 
 const displayModalAdd = (shouldDisplay: boolean) => {
-  showModalDetails.value = shouldDisplay
+  if (workspace.value.type === "personal")
+    showMyEnvironmentDetailsModal.value = shouldDisplay
+  else showTeamEnvironmentDetailsModal.value = shouldDisplay
 }
-
-const testResults = useReadonlyStream(
-  restTestResults$,
-  null
-) as Ref<HoppTestResult | null>
 
 /**
  * Get the "addition" environment variables
@@ -250,7 +253,9 @@ const getAdditionVars = () =>
     ? testResults.value.envDiff.selected.additions
     : []
 
-const clearContent = () => setRESTTestResults(null)
+const clearContent = () => {
+  testResults.value = null
+}
 
 const haveEnvVariables = computed(() => {
   if (!testResults.value) return false

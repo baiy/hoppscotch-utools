@@ -1,9 +1,9 @@
 <template>
   <div>
     <div
-      class="sticky z-10 flex justify-between flex-1 flex-shrink-0 overflow-x-auto border-b top-upperSecondaryStickyFold border-dividerLight bg-primary"
+      class="sticky z-10 flex justify-between flex-1 flex-shrink-0 overflow-x-auto border-b top-upperPrimaryStickyFold border-dividerLight bg-primary"
     >
-      <ButtonSecondary
+      <HoppButtonSecondary
         v-if="team === undefined || team.myRole === 'VIEWER'"
         v-tippy="{ theme: 'tooltip' }"
         disabled
@@ -12,7 +12,7 @@
         :title="t('team.no_access')"
         :label="t('action.new')"
       />
-      <ButtonSecondary
+      <HoppButtonSecondary
         v-else
         :icon="IconPlus"
         :label="`${t('action.new')}`"
@@ -20,61 +20,61 @@
         @click="displayModalAdd(true)"
       />
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
-          to="https://docs.hoppscotch.io/features/environments"
+          to="https://docs.hoppscotch.io/documentation/features/environments"
           blank
           :title="t('app.wiki')"
           :icon="IconHelpCircle"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="team !== undefined && team.myRole === 'VIEWER'"
           v-tippy="{ theme: 'tooltip' }"
           disabled
-          :icon="IconArchive"
+          :icon="IconImport"
           :title="t('modal.import_export')"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-else
           v-tippy="{ theme: 'tooltip' }"
-          :icon="IconArchive"
+          :icon="IconImport"
           :title="t('modal.import_export')"
           @click="displayModalImportExport(true)"
         />
       </div>
     </div>
-    <div
-      v-if="!loading && teamEnvironments.length === 0 && !adapterError"
-      class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+    <HoppSmartPlaceholder
+      v-if="!loading && !teamEnvironments.length && !adapterError"
+      :src="`/images/states/${colorMode.value}/blockchain.svg`"
+      :alt="`${t('empty.environments')}`"
+      :text="t('empty.environments')"
     >
-      <img
-        :src="`/images/states/${colorMode.value}/blockchain.svg`"
-        loading="lazy"
-        class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-        :alt="`${t('empty.environments')}`"
-      />
-      <span class="pb-4 text-center">
-        {{ t("empty.environments") }}
-      </span>
-      <ButtonSecondary
-        v-if="team === undefined || team.myRole === 'VIEWER'"
-        v-tippy="{ theme: 'tooltip' }"
-        disabled
-        filled
-        class="mb-4"
-        :icon="IconPlus"
-        :title="t('team.no_access')"
-        :label="t('action.new')"
-      />
-      <ButtonSecondary
-        v-else
-        :label="`${t('add.new')}`"
-        filled
-        outline
-        class="mb-4"
-        @click="displayModalAdd(true)"
-      />
-    </div>
+      <div class="flex flex-col items-center space-y-4">
+        <span class="text-secondaryLight text-center">
+          {{ t("environment.import_or_create") }}
+        </span>
+        <div class="flex gap-4 flex-col items-stretch">
+          <HoppButtonPrimary
+            :icon="IconImport"
+            :label="t('import.title')"
+            filled
+            outline
+            :title="isTeamViewer ? t('team.no_access') : ''"
+            :disabled="isTeamViewer"
+            @click="isTeamViewer ? null : displayModalImportExport(true)"
+          />
+          <HoppButtonSecondary
+            :label="`${t('add.new')}`"
+            filled
+            outline
+            :icon="IconPlus"
+            :title="isTeamViewer ? t('team.no_access') : ''"
+            :disabled="isTeamViewer"
+            @click="isTeamViewer ? null : displayModalAdd(true)"
+          />
+        </div>
+      </div>
+    </HoppSmartPlaceholder>
     <div v-else-if="!loading">
       <EnvironmentsTeamsEnvironment
         v-for="(environment, index) in JSON.parse(
@@ -87,14 +87,14 @@
       />
     </div>
     <div v-if="loading" class="flex flex-col items-center justify-center p-4">
-      <SmartSpinner class="my-4" />
+      <HoppSmartSpinner class="my-4" />
       <span class="text-secondaryLight">{{ t("state.loading") }}</span>
     </div>
     <div
       v-if="!loading && adapterError"
       class="flex flex-col items-center py-4"
     >
-      <i class="mb-4 material-icons">help_outline</i>
+      <icon-lucide-help-circle class="mb-4 svg-icons" />
       {{ getErrorMessage(adapterError) }}
     </div>
     <EnvironmentsTeamsDetails
@@ -117,22 +117,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import { GQLError } from "~/helpers/backend/GQLClient"
 import { TeamEnvironment } from "~/helpers/teams/TeamEnvironment"
 import { useI18n } from "~/composables/i18n"
 import { useColorMode } from "~/composables/theming"
 import IconPlus from "~icons/lucide/plus"
-import IconArchive from "~icons/lucide/archive"
 import IconHelpCircle from "~icons/lucide/help-circle"
-import { Team } from "~/helpers/backend/graphql"
+import IconImport from "~icons/lucide/folder-down"
 import { defineActionHandler } from "~/helpers/actions"
+import { GetMyTeamsQuery } from "~/helpers/backend/graphql"
 
 const t = useI18n()
 
 const colorMode = useColorMode()
 
-type SelectedTeam = Team | undefined
+type SelectedTeam = GetMyTeamsQuery["myTeams"][number] | undefined
 
 const props = defineProps<{
   team: SelectedTeam
@@ -146,6 +146,8 @@ const showModalDetails = ref(false)
 const action = ref<"new" | "edit">("edit")
 const editingEnvironment = ref<TeamEnvironment | null>(null)
 const editingVariableName = ref("")
+
+const isTeamViewer = computed(() => props.team?.myRole === "VIEWER")
 
 const displayModalAdd = (shouldDisplay: boolean) => {
   action.value = "new"
@@ -185,7 +187,7 @@ const getErrorMessage = (err: GQLError<string>) => {
 defineActionHandler(
   "modals.team.environment.edit",
   ({ envName, variableName }) => {
-    editingVariableName.value = variableName
+    if (variableName) editingVariableName.value = variableName
     const teamEnvToEdit = props.teamEnvironments.find(
       (environment) => environment.environment.name === envName
     )

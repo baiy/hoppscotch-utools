@@ -2,7 +2,7 @@
   <div>
     <div class="flex justify-between bg-primary">
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="EXPAND_NAVIGATION ? t('hide.sidebar') : t('show.sidebar')"
           :icon="IconSidebar"
@@ -10,20 +10,8 @@
           :class="{ '-rotate-180': !EXPAND_NAVIGATION }"
           @click="EXPAND_NAVIGATION = !EXPAND_NAVIGATION"
         />
-        <ButtonSecondary
-          v-tippy="{ theme: 'tooltip' }"
-          :title="`${ZEN_MODE ? t('action.turn_off') : t('action.turn_on')} ${t(
-            'layout.zen_mode'
-          )}`"
-          :icon="ZEN_MODE ? IconMinimize : IconMaximize"
-          :class="{
-            '!text-accent !focus-visible:text-accentDark !hover:text-accentDark':
-              ZEN_MODE,
-          }"
-          @click="ZEN_MODE = !ZEN_MODE"
-        />
         <tippy interactive trigger="click" theme="popover">
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('settings.interceptor')"
             :icon="IconShieldCheck"
@@ -32,6 +20,12 @@
             <AppInterceptor />
           </template>
         </tippy>
+        <HoppButtonSecondary
+          v-if="platform.platformFeatureFlags.cookiesEnabled ?? false"
+          :label="t('app.cookies')"
+          :icon="IconCookie"
+          @click="showCookiesModal = true"
+        />
       </div>
       <div class="flex">
         <tippy
@@ -40,8 +34,8 @@
           theme="popover"
           :on-shown="() => tippyActions!.focus()"
         >
-          <ButtonSecondary
-            :icon="IconHelpCircle"
+          <HoppButtonSecondary
+            :icon="IconLifeBuoy"
             class="!rounded-none"
             :label="`${t('app.help')}`"
           />
@@ -55,7 +49,7 @@
               @keyup.c="chat!.$el.click()"
               @keyup.escape="hide()"
             >
-              <SmartItem
+              <HoppSmartItem
                 ref="documentation"
                 :icon="IconBook"
                 :label="`${t('app.documentation')}`"
@@ -64,7 +58,7 @@
                 :shortcut="['D']"
                 @click="hide()"
               />
-              <SmartItem
+              <HoppSmartItem
                 ref="shortcuts"
                 :icon="IconZap"
                 :label="`${t('app.keyboard_shortcuts')}`"
@@ -76,7 +70,8 @@
                   }
                 "
               />
-              <SmartItem
+              <!--
+              <HoppSmartItem
                 ref="chat"
                 :icon="IconMessageCircle"
                 :label="`${t('app.chat_with_us')}`"
@@ -88,36 +83,50 @@
                   }
                 "
               />
-              <SmartItem
-                :icon="IconGift"
-                :label="`${t('app.whats_new')}`"
-                to="https://docs.hoppscotch.io/changelog"
-                blank
-                @click="hide()"
-              />
-              <SmartItem
-                :icon="IconActivity"
-                :label="t('app.status')"
-                to="https://status.hoppscotch.io"
-                blank
-                @click="hide()"
-              />
+              -->
+              <template
+                v-for="footerItem in platform.ui?.additionalFooterMenuItems"
+                :key="footerItem.id"
+              >
+                <template v-if="footerItem.action.type === 'link'">
+                  <HoppSmartItem
+                    :icon="footerItem.icon"
+                    :label="footerItem.text(t)"
+                    :to="footerItem.action.href"
+                    blank
+                    @click="hide()"
+                  />
+                </template>
+                <HoppSmartItem
+                  v-else
+                  :icon="footerItem.icon"
+                  :label="footerItem.text(t)"
+                  blank
+                  @click="
+                    () => {
+                      // @ts-expect-error TypeScript not understanding the type
+                      footerItem.action.do()
+                      hide()
+                    }
+                  "
+                />
+              </template>
               <hr />
-              <SmartItem
+              <HoppSmartItem
                 :icon="IconGithub"
                 :label="`${t('app.github')}`"
                 to="https://github.com/hoppscotch/hoppscotch"
                 blank
                 @click="hide()"
               />
-              <SmartItem
+              <HoppSmartItem
                 :icon="IconTwitter"
                 :label="`${t('app.twitter')}`"
                 to="https://hoppscotch.io/twitter"
                 blank
                 @click="hide()"
               />
-              <SmartItem
+              <HoppSmartItem
                 :icon="IconUserPlus"
                 :label="`${t('app.invite')}`"
                 @click="
@@ -127,10 +136,10 @@
                   }
                 "
               />
-              <SmartItem
+              <HoppSmartItem
                 :icon="IconLock"
                 :label="`${t('app.terms_and_privacy')}`"
-                to="https://docs.hoppscotch.io/privacy"
+                to="https://docs.hoppscotch.io/support/privacy"
                 blank
                 @click="hide()"
               />
@@ -148,22 +157,22 @@
             </div>
           </template>
         </tippy>
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip', allowHTML: true }"
           :title="`${t(
             'app.shortcuts'
-          )} <kbd>${getSpecialKey()}</kbd><kbd>K</kbd>`"
+          )} <kbd>${getSpecialKey()}</kbd><kbd>/</kbd>`"
           :icon="IconZap"
           @click="invokeAction('flyouts.keybinds.toggle')"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="navigatorShare"
           v-tippy="{ theme: 'tooltip' }"
           :icon="IconShare2"
           :title="t('request.share')"
           @click="nativeShare()"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="COLUMN_LAYOUT ? t('layout.row') : t('layout.column')"
           :icon="IconColumns"
@@ -177,7 +186,7 @@
             'rotate-180': SIDEBAR_ON_LEFT,
           }"
         >
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="SIDEBAR ? t('hide.sidebar') : t('show.sidebar')"
             :icon="IconSidebarOpen"
@@ -192,30 +201,29 @@
       :show="showDeveloperOptions"
       @hide-modal="showDeveloperOptions = false"
     />
+    <CookiesAllModal
+      :show="showCookiesModal"
+      @hide-modal="showCookiesModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref } from "vue"
 import { version } from "~/../package.json"
+import IconCookie from "~icons/lucide/cookie"
 import IconSidebar from "~icons/lucide/sidebar"
-import IconMinimize from "~icons/lucide/minimize"
-import IconMaximize from "~icons/lucide/maximize"
 import IconZap from "~icons/lucide/zap"
 import IconShare2 from "~icons/lucide/share-2"
 import IconColumns from "~icons/lucide/columns"
 import IconSidebarOpen from "~icons/lucide/sidebar-open"
 import IconShieldCheck from "~icons/lucide/shield-check"
-import IconHelpCircle from "~icons/lucide/help-circle"
 import IconBook from "~icons/lucide/book"
-import IconMessageCircle from "~icons/lucide/message-circle"
-import IconGift from "~icons/lucide/gift"
-import IconActivity from "~icons/lucide/activity"
 import IconGithub from "~icons/lucide/github"
 import IconTwitter from "~icons/lucide/twitter"
 import IconUserPlus from "~icons/lucide/user-plus"
 import IconLock from "~icons/lucide/lock"
-import { showChat } from "@modules/crisp"
+import IconLifeBuoy from "~icons/lucide/life-buoy"
 import { useSetting } from "@composables/settings"
 import { useI18n } from "@composables/i18n"
 import { useReadonlyStream } from "@composables/stream"
@@ -223,14 +231,15 @@ import { platform } from "~/platform"
 import { TippyComponent } from "vue-tippy"
 import { getPlatformSpecialKey as getSpecialKey } from "~/helpers/platformutils"
 import { invokeAction } from "@helpers/actions"
-import SmartItem from "@hoppscotch/ui/src/components/smart/Item.vue"
+import { HoppSmartItem } from "@hoppscotch/ui"
 
 const t = useI18n()
+
 const showDeveloperOptions = ref(false)
+const showCookiesModal = ref(false)
 
 const EXPAND_NAVIGATION = useSetting("EXPAND_NAVIGATION")
 const SIDEBAR = useSetting("SIDEBAR")
-const ZEN_MODE = useSetting("ZEN_MODE")
 const COLUMN_LAYOUT = useSetting("COLUMN_LAYOUT")
 const SIDEBAR_ON_LEFT = useSetting("SIDEBAR_ON_LEFT")
 
@@ -239,13 +248,6 @@ const navigatorShare = !!navigator.share
 const currentUser = useReadonlyStream(
   platform.auth.getCurrentUserStream(),
   platform.auth.getCurrentUser()
-)
-
-watch(
-  () => ZEN_MODE.value,
-  () => {
-    EXPAND_NAVIGATION.value = !ZEN_MODE.value
-  }
 )
 
 const nativeShare = () => {
@@ -262,10 +264,6 @@ const nativeShare = () => {
   }
 }
 
-const chatWithUs = () => {
-  showChat()
-}
-
 const showDeveloperOptionModal = () => {
   if (currentUser.value) {
     showDeveloperOptions.value = true
@@ -274,7 +272,7 @@ const showDeveloperOptionModal = () => {
 
 // Template refs
 const tippyActions = ref<TippyComponent | null>(null)
-const documentation = ref<typeof SmartItem>()
-const shortcuts = ref<typeof SmartItem>()
-const chat = ref<typeof SmartItem>()
+const documentation = ref<typeof HoppSmartItem>()
+const shortcuts = ref<typeof HoppSmartItem>()
+const chat = ref<typeof HoppSmartItem>()
 </script>

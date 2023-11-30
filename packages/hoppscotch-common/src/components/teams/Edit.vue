@@ -1,28 +1,20 @@
 <template>
-  <SmartModal v-if="show" dialog :title="t('team.edit')" @close="hideModal">
+  <HoppSmartModal v-if="show" dialog :title="t('team.edit')" @close="hideModal">
     <template #body>
       <div class="flex flex-col">
-        <div class="relative flex">
-          <input
-            id="selectLabelTeamEdit"
-            v-model="name"
-            v-focus
-            class="input floating-input"
-            placeholder=" "
-            type="text"
-            autocomplete="off"
-            @keyup.enter="saveTeam"
-          />
-          <label for="selectLabelTeamEdit">
-            {{ t("action.label") }}
-          </label>
-        </div>
+        <HoppSmartInput
+          v-model="editingName"
+          placeholder=" "
+          :label="t('action.label')"
+          input-styles="floating-input"
+          @submit="saveTeam"
+        />
         <div class="flex items-center justify-between flex-1 pt-4">
           <label for="memberList" class="p-4">
             {{ t("team.members") }}
           </label>
           <div class="flex">
-            <ButtonSecondary
+            <HoppButtonSecondary
               :icon="IconUserPlus"
               :label="t('team.invite')"
               filled
@@ -36,31 +28,24 @@
         </div>
         <div v-if="teamDetails.loading" class="border rounded border-divider">
           <div class="flex items-center justify-center p-4">
-            <SmartSpinner />
+            <HoppSmartSpinner />
           </div>
         </div>
         <div
           v-if="
             !teamDetails.loading &&
             E.isRight(teamDetails.data) &&
-            teamDetails.data.right.team.teamMembers
+            teamDetails.data.right.team?.teamMembers
           "
           class="border rounded border-divider"
         >
-          <div
-            v-if="teamDetails.data.right.team.teamMembers === 0"
-            class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+          <HoppSmartPlaceholder
+            v-if="teamDetails.data.right.team.teamMembers.length === 0"
+            :src="`/images/states/${colorMode.value}/add_group.svg`"
+            :alt="`${t('empty.members')}`"
+            :text="t('empty.members')"
           >
-            <img
-              :src="`/images/states/${colorMode.value}/add_group.svg`"
-              loading="lazy"
-              class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-              :alt="`${t('empty.members')}`"
-            />
-            <span class="pb-4 text-center">
-              {{ t("empty.members") }}
-            </span>
-            <ButtonSecondary
+            <HoppButtonSecondary
               :icon="IconUserPlus"
               :label="t('team.invite')"
               @click="
@@ -69,7 +54,7 @@
                 }
               "
             />
-          </div>
+          </HoppSmartPlaceholder>
           <div v-else class="divide-y divide-dividerLight">
             <div
               v-for="(member, index) in membersList"
@@ -106,7 +91,7 @@
                       tabindex="0"
                       @keyup.escape="hide()"
                     >
-                      <SmartItem
+                      <HoppSmartItem
                         label="OWNER"
                         :icon="
                           member.role === 'OWNER' ? IconCircleDot : IconCircle
@@ -119,7 +104,7 @@
                           }
                         "
                       />
-                      <SmartItem
+                      <HoppSmartItem
                         label="EDITOR"
                         :icon="
                           member.role === 'EDITOR' ? IconCircleDot : IconCircle
@@ -132,7 +117,7 @@
                           }
                         "
                       />
-                      <SmartItem
+                      <HoppSmartItem
                         label="VIEWER"
                         :icon="
                           member.role === 'VIEWER' ? IconCircleDot : IconCircle
@@ -150,7 +135,7 @@
                 </tippy>
               </span>
               <div class="flex">
-                <ButtonSecondary
+                <HoppButtonSecondary
                   id="member"
                   v-tippy="{ theme: 'tooltip' }"
                   :title="t('action.remove')"
@@ -167,20 +152,20 @@
           v-if="!teamDetails.loading && E.isLeft(teamDetails.data)"
           class="flex flex-col items-center"
         >
-          <component :is="IconHelpCircle" class="mb-4 svg-icons" />
+          <icon-lucide-help-circle class="mb-4 svg-icons" />
           {{ t("error.something_went_wrong") }}
         </div>
       </div>
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="t('action.save')"
           :loading="isLoading"
           outline
           @click="saveTeam"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="t('action.cancel')"
           outline
           filled
@@ -188,11 +173,11 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import * as E from "fp-ts/Either"
 import {
   GetTeamDocument,
@@ -220,7 +205,6 @@ import IconCircleDot from "~icons/lucide/circle-dot"
 import IconCircle from "~icons/lucide/circle"
 import IconUserPlus from "~icons/lucide/user-plus"
 import IconUserMinus from "~icons/lucide/user-minus"
-import IconHelpCircle from "~icons/lucide/help-circle"
 
 const t = useI18n()
 const colorMode = useColorMode()
@@ -244,12 +228,12 @@ const props = defineProps<{
 
 const toast = useToast()
 
-const name = toRef(props.editingTeam, "name")
+const editingName = ref(props.editingTeam.name)
 
 watch(
   () => props.editingTeam.name,
   (newName: string) => {
-    name.value = newName
+    editingName.value = newName
   }
 )
 
@@ -397,11 +381,11 @@ const isLoading = ref(false)
 
 const saveTeam = async () => {
   isLoading.value = true
-  if (name.value !== "") {
-    if (TeamNameCodec.is(name.value)) {
+  if (editingName.value !== "") {
+    if (TeamNameCodec.is(editingName.value)) {
       const updateTeamNameResult = await renameTeam(
         props.editingTeamID,
-        name.value
+        editingName.value
       )()
       if (E.isLeft(updateTeamNameResult)) {
         toast.error(`${t("error.something_went_wrong")}`)

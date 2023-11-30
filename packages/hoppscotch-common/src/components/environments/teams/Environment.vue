@@ -26,7 +26,7 @@
         theme="popover"
         :on-shown="() => tippyActions!.focus()"
       >
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.more')"
           :icon="IconMoreVertical"
@@ -39,10 +39,11 @@
             role="menu"
             @keyup.e="edit!.$el.click()"
             @keyup.d="duplicate!.$el.click()"
+            @keyup.j="exportAsJsonEl!.$el.click()"
             @keyup.delete="deleteAction!.$el.click()"
             @keyup.escape="options!.tippy().hide()"
           >
-            <SmartItem
+            <HoppSmartItem
               ref="edit"
               :icon="IconEdit"
               :label="`${t('action.edit')}`"
@@ -54,7 +55,8 @@
                 }
               "
             />
-            <SmartItem
+
+            <HoppSmartItem
               ref="duplicate"
               :icon="IconCopy"
               :label="`${t('action.duplicate')}`"
@@ -66,7 +68,19 @@
                 }
               "
             />
-            <SmartItem
+            <HoppSmartItem
+              ref="exportAsJsonEl"
+              :icon="IconEdit"
+              :label="`${t('export.as_json')}`"
+              :shortcut="['J']"
+              @click="
+                () => {
+                  exportEnvironmentAsJSON()
+                  hide()
+                }
+              "
+            />
+            <HoppSmartItem
               ref="deleteAction"
               :icon="IconTrash2"
               :label="`${t('action.delete')}`"
@@ -82,7 +96,7 @@
         </template>
       </tippy>
     </span>
-    <SmartConfirmModal
+    <HoppSmartConfirmModal
       :show="confirmRemove"
       :title="`${t('confirm.remove_environment')}`"
       @hide-modal="confirmRemove = false"
@@ -108,7 +122,8 @@ import IconCopy from "~icons/lucide/copy"
 import IconTrash2 from "~icons/lucide/trash-2"
 import IconMoreVertical from "~icons/lucide/more-vertical"
 import { TippyComponent } from "vue-tippy"
-import SmartItem from "@hoppscotch/ui/src/components/smart/Item.vue"
+import { HoppSmartItem } from "@hoppscotch/ui"
+import { exportAsJSON } from "~/helpers/import-export/export/environment"
 
 const t = useI18n()
 const toast = useToast()
@@ -124,11 +139,17 @@ const emit = defineEmits<{
 
 const confirmRemove = ref(false)
 
+const exportEnvironmentAsJSON = () =>
+  exportAsJSON(props.environment)
+    ? toast.success(t("state.download_started"))
+    : toast.error(t("state.download_failed"))
+
 const tippyActions = ref<TippyComponent | null>(null)
 const options = ref<TippyComponent | null>(null)
-const edit = ref<typeof SmartItem>()
-const duplicate = ref<typeof SmartItem>()
-const deleteAction = ref<typeof SmartItem>()
+const edit = ref<typeof HoppSmartItem>()
+const duplicate = ref<typeof HoppSmartItem>()
+const deleteAction = ref<typeof HoppSmartItem>()
+const exportAsJsonEl = ref<typeof HoppSmartItem>()
 
 const removeEnvironment = () => {
   pipe(
@@ -154,7 +175,7 @@ const duplicateEnvironments = () => {
         toast.error(`${getErrorMessage(err)}`)
       },
       () => {
-        toast.success(`${t("team_environment.duplicate")}`)
+        toast.success(`${t("environment.duplicated")}`)
       }
     )
   )()

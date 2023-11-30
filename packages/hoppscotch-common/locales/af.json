@@ -5,6 +5,7 @@
     "choose_file": "Kies 'n lêer",
     "clear": "Duidelik",
     "clear_all": "Maak alles skoon",
+    "clear_history": "Clear all History",
     "close": "Close",
     "connect": "Koppel",
     "connecting": "Connecting",
@@ -19,6 +20,7 @@
     "edit": "Redigeer",
     "filter": "Filter",
     "go_back": "Gaan terug",
+    "go_forward": "Go forward",
     "group_by": "Group by",
     "label": "Etiket",
     "learn_more": "Leer meer",
@@ -30,6 +32,7 @@
     "paste": "Paste",
     "prettify": "Prettify",
     "remove": "Verwyder",
+    "rename": "Rename",
     "restore": "Herstel",
     "save": "Stoor",
     "scroll_to_bottom": "Scroll to bottom",
@@ -76,6 +79,8 @@
     "search": "Soek",
     "share": "Deel",
     "shortcuts": "Kortpaaie",
+    "social_description": "Follow us on social media to stay updated with the latest news, updates and releases.",
+    "social_links": "Social links",
     "spotlight": "Kollig",
     "status": "Status",
     "status_description": "Check the status of the website",
@@ -117,21 +122,28 @@
   },
   "collection": {
     "created": "Versameling geskep",
+    "different_parent": "Cannot reorder collection with different parent",
     "edit": "Wysig versameling",
     "invalid_name": "Gee 'n geldige naam vir die versameling",
+    "invalid_root_move": "Collection already in the root",
+    "moved": "Moved Successfully",
     "my_collections": "My versamelings",
     "name": "My nuwe versameling",
     "name_length_insufficient": "Collection name should be at least 3 characters long",
     "new": "Nuwe versameling",
+    "order_changed": "Collection Order Updated",
     "renamed": "Versameling hernoem",
     "request_in_use": "Request in use",
     "save_as": "Stoor as",
+    "save_to_collection": "Save to Collection",
     "select": "Kies 'n versameling",
     "select_location": "Kies ligging",
     "select_team": "Kies 'n span",
     "team_collections": "Spanversamelings"
   },
   "confirm": {
+    "close_unsaved_tab": "Are you sure you want to close this tab?",
+    "close_unsaved_tabs": "Are you sure you want to close all tabs? {count} unsaved tabs will be lost.",
     "exit_team": "Are you sure you want to leave this team?",
     "logout": "Weet u seker dat u wil afmeld?",
     "remove_collection": "Weet u seker dat u hierdie versameling permanent wil uitvee?",
@@ -142,7 +154,13 @@
     "remove_team": "Weet u seker dat u hierdie span wil uitvee?",
     "remove_telemetry": "Weet u seker dat u van Telemetry wil afskakel?",
     "request_change": "Are you sure you want to discard current request, unsaved changes will be lost.",
+    "save_unsaved_tab": "Do you want to save changes made in this tab?",
     "sync": "Is u seker dat u hierdie werkruimte wil sinkroniseer?"
+  },
+  "context_menu": {
+    "add_parameters": "Add to parameters",
+    "open_request_in_new_tab": "Open request in new tab",
+    "set_environment_variable": "Set as variable"
   },
   "count": {
     "header": "Koptekst {count}",
@@ -186,17 +204,31 @@
     "create_new": "Skep nuwe omgewing",
     "created": "Environment created",
     "deleted": "Environment deletion",
+    "duplicated": "Environment duplicated",
     "edit": "Bewerk omgewing",
+    "empty_variables": "No variables",
+    "global": "Global",
+    "global_variables": "Global variables",
     "invalid_name": "Gee 'n geldige naam vir die omgewing",
+    "list": "Environment variables",
     "my_environments": "My Environments",
+    "name": "Name",
     "nested_overflow": "nested environment variables are limited to 10 levels",
     "new": "Nuwe omgewing",
+    "no_active_environment": "No active environment",
     "no_environment": "Geen omgewing nie",
     "no_environment_description": "No environments were selected. Choose what to do with the following variables.",
+    "quick_peek": "Environment Quick Peek",
+    "replace_with_variable": "Replace with variable",
+    "scope": "Scope",
     "select": "Kies omgewing",
+    "set": "Set environment",
+    "set_as_environment": "Set as environment",
     "team_environments": "Team Environments",
     "title": "Omgewings",
     "updated": "Environment updation",
+    "value": "Value",
+    "variable": "Variable",
     "variable_list": "Veranderlike lys"
   },
   "error": {
@@ -220,6 +252,7 @@
     "no_duration": "Geen duur nie",
     "no_results_found": "No matches found",
     "page_not_found": "This page could not be found",
+    "proxy_error": "Proxy error",
     "script_fail": "Kon nie voorafversoekskrip uitvoer nie",
     "something_went_wrong": "Iets het verkeerd geloop",
     "test_script_fail": "Could not execute post-request script"
@@ -245,9 +278,13 @@
     "renamed": "Vouer hernoem"
   },
   "graphql": {
+    "connection_switch_confirm": "Do you want to connect with the latest GraphQL endpoint?",
+    "connection_switch_new_url": "Switching to a tab will disconnected you from the active GraphQL connection. New connection URL is",
+    "connection_switch_url": "You're connected to a GraphQL endpoint the connection URL is",
     "mutations": "Mutasies",
     "schema": "Skema",
-    "subscriptions": "Inskrywings"
+    "subscriptions": "Inskrywings",
+    "switch_connection": "Switch connection"
   },
   "group": {
     "time": "Time",
@@ -301,15 +338,39 @@
     "json_description": "Import collections from a Hoppscotch Collections JSON file",
     "title": "Invoer"
   },
+  "inspections": {
+    "description": "Inspect possible errors",
+    "environment": {
+      "add_environment": "Add to Environment",
+      "not_found": "Environment variable “{environment}” not found."
+    },
+    "header": {
+      "cookie": "The browser doesn't allow Hoppscotch to set the Cookie Header. While we're working on the Hoppscotch Desktop App (coming soon), please use the Authorization Header instead."
+    },
+    "response": {
+      "401_error": "Please check your authentication credentials.",
+      "404_error": "Please check your request URL and method type.",
+      "cors_error": "Please check your Cross-Origin Resource Sharing configuration.",
+      "default_error": "Please check your request.",
+      "network_error": "Please check your network connection."
+    },
+    "title": "Inspector",
+    "url": {
+      "extension_not_installed": "Extension not installed.",
+      "extension_unknown_origin": "Make sure you've added the API endpoint's origin to the Hoppscotch Browser Extension list.",
+      "extention_enable_action": "Enable Browser Extension",
+      "extention_not_enabled": "Extension not enabled."
+    }
+  },
   "layout": {
     "collapse_collection": "Collapse or Expand Collections",
     "collapse_sidebar": "Collapse or Expand the sidebar",
     "column": "Vertical layout",
     "name": "Layout",
-    "row": "Horizontal layout",
-    "zen_mode": "Zen -modus"
+    "row": "Horizontal layout"
   },
   "modal": {
+    "close_unsaved_tab": "You have unsaved changes",
     "collections": "Versamelings",
     "confirm": "Bevestig",
     "edit_request": "Wysig versoek",
@@ -389,6 +450,8 @@
       "text": "Text"
     },
     "copy_link": "Kopieer skakel",
+    "different_collection": "Cannot reorder requests from different collections",
+    "duplicated": "Request duplicated",
     "duration": "Duur",
     "enter_curl": "Voer cURL in",
     "generate_code": "Genereer kode",
@@ -396,8 +459,10 @@
     "header_list": "Koplys",
     "invalid_name": "Gee 'n naam vir die versoek",
     "method": "Metode",
+    "moved": "Request moved",
     "name": "Versoek naam",
     "new": "New Request",
+    "order_changed": "Request Order Updated",
     "override": "Override",
     "override_help": "Set <kbd>Content-Type</kbd> in Headers",
     "overriden": "Overridden",
@@ -407,6 +472,7 @@
     "payload": "Nuttingslading",
     "query": "Navraag",
     "raw_body": "Rou versoeksliggaam",
+    "rename": "Rename Request",
     "renamed": "Versoek hernoem",
     "run": "Hardloop",
     "save": "Stoor",
@@ -414,6 +480,7 @@
     "saved": "Versoek gestoor",
     "share": "Deel",
     "share_description": "Share Hoppscotch with your friends",
+    "stop": "Stop",
     "title": "Versoek",
     "type": "Soort versoek",
     "url": "URL",
@@ -421,6 +488,7 @@
     "view_my_links": "View my links"
   },
   "response": {
+    "audio": "Audio",
     "body": "Reaksie liggaam",
     "filter_response_body": "Filter JSON response body (uses JSONPath syntax)",
     "headers": "Opskrifte",
@@ -434,6 +502,7 @@
     "status": "Status",
     "time": "Tyd",
     "title": "Reaksie",
+    "video": "Video",
     "waiting_for_connection": "wag vir verbinding",
     "xml": "XML"
   },
@@ -446,7 +515,6 @@
     "account_name_description": "Dit is u vertoonnaam.",
     "background": "Agtergrond",
     "black_mode": "Swart",
-    "change_font_size": "Verander lettergrootte",
     "choose_language": "Kies taal",
     "dark_mode": "Donker",
     "delete_account": "Delete account",
@@ -459,10 +527,6 @@
     "extensions": "Uitbreidings",
     "extensions_use_toggle": "Gebruik die blaaieruitbreiding om versoeke te stuur (indien teenwoordig)",
     "follow": "Follow Us",
-    "font_size": "Skrifgrootte",
-    "font_size_large": "Groot",
-    "font_size_medium": "Medium",
-    "font_size_small": "Klein",
     "interceptor": "Onderskepper",
     "interceptor_description": "Middelware tussen toepassing en API's.",
     "language": "Taal",
@@ -527,19 +591,27 @@
       "settings": "Gaan na die instellingsbladsy",
       "title": "Navigasie"
     },
+    "others": {
+      "prettify": "Prettify Editor's Content",
+      "title": "Others"
+    },
     "request": {
       "copy_request_link": "Kopieer versoekskakel",
       "delete_method": "Kies DELETE metode",
       "get_method": "Kies GET -metode",
       "head_method": "Kies HOOF metode",
+      "import_curl": "Import cURL",
       "method": "Metode",
       "next_method": "Kies Volgende metode",
       "post_method": "Kies POST -metode",
       "previous_method": "Kies Vorige metode",
       "put_method": "Kies PUT -metode",
+      "rename": "Rename Request",
       "reset_request": "Herstel versoek",
+      "save_request": "Save Request",
       "save_to_collections": "Stoor in versamelings",
       "send_request": "Stuur versoek",
+      "show_code": "Generate code snippet",
       "title": "Versoek"
     },
     "response": {
@@ -568,6 +640,85 @@
     "events": "Gebeurtenisse",
     "log": "Meld",
     "url": "URL"
+  },
+  "spotlight": {
+    "change_language": "Change Language",
+    "environments": {
+      "delete": "Delete current environment",
+      "duplicate": "Duplicate current environment",
+      "duplicate_global": "Duplicate global environment",
+      "edit": "Edit current environment",
+      "edit_global": "Edit global environment",
+      "new": "Create new environment",
+      "new_variable": "Create a new environment variable",
+      "title": "Environments"
+    },
+    "general": {
+      "chat": "Chat with support",
+      "help_menu": "Help and support",
+      "open_docs": "Read Documentation",
+      "open_github": "Open GitHub repository",
+      "open_keybindings": "Keyboard shortcuts",
+      "social": "Social",
+      "title": "General"
+    },
+    "graphql": {
+      "connect": "Connect to server",
+      "disconnect": "Disconnect from server"
+    },
+    "miscellaneous": {
+      "invite": "Invite your friends to Hoppscotch",
+      "title": "Miscellaneous"
+    },
+    "request": {
+      "save_as_new": "Save as new request",
+      "select_method": "Select method",
+      "switch_to": "Switch to",
+      "tab_authorization": "Authorization tab",
+      "tab_body": "Body tab",
+      "tab_headers": "Headers tab",
+      "tab_parameters": "Parameters tab",
+      "tab_pre_request_script": "Pre-request script tab",
+      "tab_query": "Query tab",
+      "tab_tests": "Tests tab",
+      "tab_variables": "Variables tab"
+    },
+    "response": {
+      "copy": "Copy response",
+      "download": "Download response as file",
+      "title": "Response"
+    },
+    "section": {
+      "interceptor": "Interceptor",
+      "interface": "Interface",
+      "theme": "Theme",
+      "user": "User"
+    },
+    "settings": {
+      "change_interceptor": "Change Interceptor",
+      "change_language": "Change Language",
+      "theme": {
+        "black": "Black",
+        "dark": "Dark",
+        "light": "Light",
+        "system": "System preference"
+      }
+    },
+    "tab": {
+      "close_current": "Close current tab",
+      "close_others": "Close all other tabs",
+      "duplicate": "Duplicate current tab",
+      "new_tab": "Open a new tab",
+      "title": "Tabs"
+    },
+    "workspace": {
+      "delete": "Delete current team",
+      "edit": "Edit current team",
+      "invite": "Invite people to team",
+      "new": "Create new team",
+      "switch_to_personal": "Switch to your personal workspace",
+      "title": "Teams"
+    }
   },
   "sse": {
     "event_type": "Soort gebeurtenis",
@@ -626,8 +777,12 @@
   "tab": {
     "authorization": "Magtiging",
     "body": "Liggaam",
+    "close": "Close Tab",
+    "close_others": "Close other Tabs",
     "collections": "Versamelings",
     "documentation": "Dokumentasie",
+    "duplicate": "Duplicate Tab",
+    "environments": "Environments",
     "headers": "Opskrifte",
     "history": "Geskiedenis",
     "mqtt": "MQTT",
@@ -652,6 +807,7 @@
     "email_do_not_match": "Email doesn't match with your account details. Contact your team owner.",
     "exit": "Verlaat span",
     "exit_disabled": "Slegs eienaar kan nie die span verlaat nie",
+    "invalid_coll_id": "Invalid collection ID",
     "invalid_email_format": "Die e -posformaat is ongeldig",
     "invalid_id": "Invalid team ID. Contact your team owner.",
     "invalid_invite_link": "Invalid invite link",
@@ -675,6 +831,7 @@
     "member_removed": "Gebruiker verwyder",
     "member_role_updated": "Gebruikersrolle opgedateer",
     "members": "Lede",
+    "more_members": "+{count} more",
     "name_length_insufficient": "Spannaam moet ten minste 6 karakters lank wees",
     "name_updated": "Team name updated",
     "new": "Nuwe span",
@@ -682,10 +839,13 @@
     "new_name": "My nuwe span",
     "no_access": "U het nie redigeertoegang tot hierdie versamelings nie",
     "no_invite_found": "Invitation not found. Contact your team owner.",
+    "no_request_found": "Request not found.",
     "not_found": "Team not found. Contact your team owner.",
     "not_valid_viewer": "You are not a valid viewer. Contact your team owner.",
+    "parent_coll_move": "Cannot move collection to a child collection",
     "pending_invites": "Pending invites",
     "permissions": "Toestemmings",
+    "same_target_destination": "Same target and destination",
     "saved": "Span gered",
     "select_a_team": "Select a team",
     "title": "Spanne",
@@ -713,5 +873,11 @@
     "message": "Boodskap",
     "protocols": "Protokolle",
     "url": "URL"
+  },
+  "workspace": {
+    "change": "Change workspace",
+    "personal": "My Workspace",
+    "team": "Team Workspace",
+    "title": "Workspaces"
   }
 }

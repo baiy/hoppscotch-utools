@@ -27,36 +27,12 @@
         >
           {{ team.name || t("state.nothing_found") }}
         </label>
-        <div class="flex mt-2 overflow-hidden -space-x-1">
-          <div
-            v-for="(member, index) in team.teamMembers"
-            :key="`member-${index}`"
-            v-tippy="{ theme: 'tooltip' }"
-            :title="
-              member.user.displayName ||
-              member.user.email ||
-              t('default_hopp_displayName')
-            "
-            class="inline-flex"
-          >
-            <ProfilePicture
-              v-if="member.user.photoURL"
-              :url="member.user.photoURL"
-              :alt="member.user.displayName"
-              class="ring-primary ring-2"
-            />
-            <ProfilePicture
-              v-else
-              :initial="member.user.displayName || member.user.email"
-              class="ring-primary ring-2"
-            />
-          </div>
-        </div>
+        <TeamsMemberStack :team-members="team.teamMembers" class="mt-4" />
       </div>
     </div>
     <div v-if="!compact" class="flex items-end justify-between flex-shrink-0">
       <span>
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="team.myRole === 'OWNER'"
           :icon="IconEdit"
           class="rounded-none"
@@ -67,7 +43,7 @@
             }
           "
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="team.myRole === 'OWNER'"
           :icon="IconUserPlus"
           class="rounded-none"
@@ -87,7 +63,7 @@
           theme="popover"
           :on-shown="() => tippyActions.focus()"
         >
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('action.more')"
             :icon="IconMoreVertical"
@@ -108,7 +84,7 @@
               "
               @keyup.escape="hide()"
             >
-              <SmartItem
+              <HoppSmartItem
                 v-if="team.myRole === 'OWNER'"
                 ref="edit"
                 :icon="IconEdit"
@@ -121,7 +97,7 @@
                   }
                 "
               />
-              <SmartItem
+              <HoppSmartItem
                 v-if="!(team.myRole === 'OWNER' && team.ownersCount == 1)"
                 ref="exit"
                 :icon="IconUserX"
@@ -134,7 +110,7 @@
                   }
                 "
               />
-              <SmartItem
+              <HoppSmartItem
                 v-if="team.myRole === 'OWNER'"
                 ref="deleteAction"
                 :icon="IconTrash2"
@@ -152,13 +128,13 @@
         </tippy>
       </span>
     </div>
-    <SmartConfirmModal
+    <HoppSmartConfirmModal
       :show="confirmRemove"
       :title="t('confirm.remove_team')"
       @hide-modal="confirmRemove = false"
       @resolve="deleteTeam()"
     />
-    <SmartConfirmModal
+    <HoppSmartConfirmModal
       :show="confirmExit"
       :title="t('confirm.exit_team')"
       @hide-modal="confirmExit = false"
@@ -171,7 +147,7 @@
 import { ref } from "vue"
 import { pipe } from "fp-ts/function"
 import * as TE from "fp-ts/TaskEither"
-import { TeamMemberRole } from "~/helpers/backend/graphql"
+import { GetMyTeamsQuery } from "~/helpers/backend/graphql"
 import {
   deleteTeam as backendDeleteTeam,
   leaveTeam,
@@ -189,18 +165,7 @@ import IconTrash2 from "~icons/lucide/trash-2"
 const t = useI18n()
 
 const props = defineProps<{
-  team: {
-    name: string
-    myRole: TeamMemberRole
-    ownersCount: number
-    teamMembers: Array<{
-      user: {
-        displayName: string
-        photoURL: string | null
-        email: string | null
-      }
-    }>
-  }
+  team: GetMyTeamsQuery["myTeams"][number]
   teamID: string
   compact: boolean
 }>()

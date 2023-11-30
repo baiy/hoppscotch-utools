@@ -2,29 +2,20 @@
   <div class="autocomplete-wrapper">
     <input
       ref="acInput"
-      :value="text"
+      v-model="text"
       type="text"
       autocomplete="off"
       :placeholder="placeholder"
       :spellcheck="spellcheck"
       :autocapitalize="autocapitalize"
       :class="styles"
-      @input.stop="
-        (e) => {
-          $emit('input', e.target.value)
-          updateSuggestions(e)
-        }
-      "
+      @input.stop="onInput"
       @keyup="updateSuggestions"
       @click="updateSuggestions"
       @keydown="handleKeystroke"
-      @change="$emit('change', $event)"
+      @change="emit('change', $event)"
     />
-    <ul
-      v-if="suggestions.length > 0 && suggestionsVisible"
-      class="suggestions"
-      :style="{ transform: `translate(${suggestionsOffsetLeft}px, 0)` }"
-    >
+    <ul v-if="suggestions.length > 0 && suggestionsVisible" class="suggestions">
       <li
         v-for="(suggestion, index) in suggestions"
         :key="`suggestion-${index}`"
@@ -37,167 +28,153 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { onMounted, ref, computed } from "vue"
 
-export default defineComponent({
-  props: {
-    spellcheck: {
-      type: Boolean,
-      default: true,
-      required: false,
-    },
+const acInput = ref<HTMLInputElement>()
 
-    autocapitalize: {
-      type: String,
-      default: "off",
-      required: false,
-    },
-
-    placeholder: {
-      type: String,
-      default: "",
-      required: false,
-    },
-
-    source: {
-      type: Array,
-      required: true,
-    },
-
-    value: {
-      type: String,
-      default: "",
-      required: false,
-    },
-
-    styles: {
-      type: String,
-      default: "",
-    },
-  },
-  emits: ["input", "change"],
-  data() {
-    return {
-      text: this.value,
-      selectionStart: 0,
-      suggestionsOffsetLeft: 0,
-      currentSuggestionIndex: -1,
-      suggestionsVisible: false,
-    }
+const props = defineProps({
+  spellcheck: {
+    type: Boolean,
+    default: true,
+    required: false,
   },
 
-  computed: {
-    /**
-     * Gets the suggestions list to be displayed under the input box.
-     *
-     * @returns {default.props.source|{type, required}}
-     */
-    suggestions() {
-      const input = this.text.substring(0, this.selectionStart)
-
-      return (
-        this.source
-          .filter(
-            (entry) =>
-              entry.toLowerCase().startsWith(input.toLowerCase()) &&
-              input.toLowerCase() !== entry.toLowerCase()
-          )
-          // Cut off the part that's already been typed.
-          .map((entry) => entry.substring(this.selectionStart))
-          // We only want the top 10 suggestions.
-          .slice(0, 10)
-      )
-    },
+  autocapitalize: {
+    type: String,
+    default: "off",
+    required: false,
   },
 
-  watch: {
-    value(newValue) {
-      this.text = newValue
-    },
+  placeholder: {
+    type: String,
+    default: "",
+    required: false,
   },
 
-  mounted() {
-    this.updateSuggestions({
-      target: this.$refs.acInput,
-    })
+  source: {
+    type: Array<string>,
+    required: true,
   },
 
-  methods: {
-    updateSuggestions(event) {
-      // Hide suggestions if ESC pressed.
-      if (event.code && event.code === "Escape") {
-        event.preventDefault()
-        this.suggestionsVisible = false
-        this.currentSuggestionIndex = -1
-        return
-      }
+  value: {
+    type: String,
+    default: "",
+    required: false,
+  },
 
-      // As suggestions is a reactive property, this implicitly
-      // causes suggestions to update.
-      this.selectionStart = this.$refs.acInput.selectionStart
-      this.suggestionsOffsetLeft = 12 * this.selectionStart
-      this.suggestionsVisible = true
-    },
-
-    forceSuggestion(text) {
-      const input = this.text.substring(0, this.selectionStart)
-      this.text = input + text
-
-      this.selectionStart = this.text.length
-      this.suggestionsVisible = true
-      this.currentSuggestionIndex = -1
-
-      this.$emit("input", this.text)
-    },
-
-    handleKeystroke(event) {
-      switch (event.code) {
-        case "Enter":
-          event.preventDefault()
-          if (this.currentSuggestionIndex > -1)
-            this.forceSuggestion(
-              this.suggestions.find(
-                (_item, index) => index === this.currentSuggestionIndex
-              )
-            )
-          break
-
-        case "ArrowUp":
-          event.preventDefault()
-          this.currentSuggestionIndex =
-            this.currentSuggestionIndex - 1 >= 0
-              ? this.currentSuggestionIndex - 1
-              : 0
-          break
-
-        case "ArrowDown":
-          event.preventDefault()
-          this.currentSuggestionIndex =
-            this.currentSuggestionIndex < this.suggestions.length - 1
-              ? this.currentSuggestionIndex + 1
-              : this.suggestions.length - 1
-          break
-
-        case "Tab": {
-          const activeSuggestion =
-            this.suggestions[
-              this.currentSuggestionIndex >= 0 ? this.currentSuggestionIndex : 0
-            ]
-
-          if (!activeSuggestion) {
-            return
-          }
-
-          event.preventDefault()
-          const input = this.text.substring(0, this.selectionStart)
-          this.text = input + activeSuggestion
-          break
-        }
-      }
-    },
+  styles: {
+    type: String,
+    default: "",
   },
 })
+
+const emit = defineEmits<{
+  (e: "input", v: string): void
+  (e: "change", v: Event): void
+}>()
+
+const text = ref(props.value)
+const selectionStart = ref(0)
+const currentSuggestionIndex = ref(-1)
+const suggestionsVisible = ref(false)
+
+onMounted(() => {
+  updateSuggestions({
+    target: acInput,
+  })
+})
+
+const suggestions = computed(() => {
+  const input = text.value.substring(0, selectionStart.value)
+  return (
+    props.source
+      .filter(
+        (entry) =>
+          entry.toLowerCase().startsWith(input.toLowerCase()) &&
+          input.toLowerCase() !== entry.toLowerCase()
+      )
+      // We only want the top 10 suggestions.
+      .slice(0, 10)
+  )
+})
+
+function updateSuggestions(event: any) {
+  // Hide suggestions if ESC pressed.
+  if (event.code && event.code === "Escape") {
+    event.preventDefault()
+    suggestionsVisible.value = false
+    currentSuggestionIndex.value = -1
+    return
+  }
+
+  // As suggestions is a reactive property, this implicitly
+  // causes suggestions to update.
+  selectionStart.value = acInput.value?.selectionStart ?? -1
+  suggestionsVisible.value = true
+}
+
+const onInput = (e: Event) => {
+  emit("input", (e.target as HTMLInputElement).value)
+  updateSuggestions(e)
+}
+
+function forceSuggestion(suggestion: string) {
+  text.value = suggestion
+
+  selectionStart.value = text.value.length
+  suggestionsVisible.value = true
+  currentSuggestionIndex.value = -1
+
+  emit("input", text.value)
+}
+
+function handleKeystroke(event: any) {
+  switch (event.code) {
+    case "ArrowUp":
+      event.preventDefault()
+
+      currentSuggestionIndex.value =
+        currentSuggestionIndex.value - 1 >= 0
+          ? currentSuggestionIndex.value - 1
+          : 0
+      break
+
+    case "ArrowDown":
+      event.preventDefault()
+
+      currentSuggestionIndex.value =
+        currentSuggestionIndex.value < suggestions.value.length - 1
+          ? currentSuggestionIndex.value + 1
+          : suggestions.value.length - 1
+      break
+
+    case "Enter":
+      event.preventDefault()
+
+      if (currentSuggestionIndex.value > -1)
+        forceSuggestion(
+          suggestions.value.find(
+            (_item, index) => index === currentSuggestionIndex.value
+          )!
+        )
+      break
+
+    case "Tab": {
+      event.preventDefault()
+
+      const activeSuggestion =
+        suggestions.value[
+          currentSuggestionIndex.value >= 0 ? currentSuggestionIndex.value : 0
+        ]
+
+      if (!activeSuggestion) return
+
+      forceSuggestion(activeSuggestion)
+      break
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -211,16 +188,17 @@ export default defineComponent({
   }
 
   ul.suggestions {
+    @apply absolute;
     @apply hidden;
     @apply bg-popover;
-    @apply absolute;
-    @apply mx-2;
-    @apply left-0;
+    @apply -left-px;
     @apply z-50;
     @apply shadow-lg;
     @apply max-h-46;
     @apply overflow-y-auto;
-    top: calc(100% - 4px);
+    @apply border-b border-x border-divider;
+
+    top: calc(100% + 1px);
     border-radius: 0 0 8px 8px;
 
     li {
@@ -228,15 +206,16 @@ export default defineComponent({
       @apply block;
       @apply py-2 px-4;
       @apply text-secondary;
+      @apply font-semibold;
 
       &:last-child {
-        border-radius: 0 0 8px 8px;
+        border-radius: 0 0 0 8px;
       }
 
       &:hover,
       &.active {
-        @apply bg-accentDark;
-        @apply text-accentContrast;
+        @apply bg-primaryDark;
+        @apply text-secondaryDark;
         @apply cursor-pointer;
       }
     }

@@ -14,8 +14,8 @@
           :on-shown="() => tippyActions.focus()"
         >
           <span class="select-wrapper">
-            <ButtonSecondary
-              :label="contentType || t('state.none')"
+            <HoppButtonSecondary
+              :label="body.contentType || t('state.none')"
               class="pr-8 ml-2 rounded-none"
             />
           </span>
@@ -26,13 +26,15 @@
               tabindex="0"
               @keyup.escape="hide()"
             >
-              <SmartItem
+              <HoppSmartItem
                 :label="t('state.none')"
-                :info-icon="contentType === null ? IconDone : null"
-                :active-info-icon="contentType === null"
+                :info-icon="
+                  (body.contentType === null ? IconDone : null) as any
+                "
+                :active-info-icon="body.contentType === null"
                 @click="
                   () => {
-                    contentType = null
+                    body.contentType = null
                     hide()
                   }
                 "
@@ -50,19 +52,21 @@
                   </span>
                 </div>
                 <div class="flex flex-col">
-                  <SmartItem
+                  <HoppSmartItem
                     v-for="(
                       contentTypeItem, contentTypeIndex
                     ) in contentTypeItems.contentTypes"
                     :key="`contentTypeItem-${contentTypeIndex}`"
                     :label="contentTypeItem"
                     :info-icon="
-                      contentTypeItem === contentType ? IconDone : null
+                      contentTypeItem === body.contentType
+                        ? IconDone
+                        : undefined
                     "
-                    :active-info-icon="contentTypeItem === contentType"
+                    :active-info-icon="contentTypeItem === body.contentType"
                     @click="
                       () => {
-                        contentType = contentTypeItem
+                        body.contentType = contentTypeItem
                         hide()
                       }
                     "
@@ -72,7 +76,7 @@
             </div>
           </template>
         </tippy>
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip', allowHTML: true }"
           :title="t('request.override_help')"
           :label="
@@ -93,68 +97,65 @@
         />
       </span>
     </div>
-    <HttpBodyParameters v-if="contentType === 'multipart/form-data'" />
-    <HttpURLEncodedParams
-      v-else-if="contentType === 'application/x-www-form-urlencoded'"
+    <HttpBodyParameters
+      v-if="body.contentType === 'multipart/form-data'"
+      v-model="body"
     />
-    <HttpRawBody v-else-if="contentType !== null" :content-type="contentType" />
-    <div
-      v-if="contentType == null"
-      class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+    <HttpURLEncodedParams
+      v-else-if="body.contentType === 'application/x-www-form-urlencoded'"
+      v-model="body"
+    />
+    <HttpRawBody v-else-if="body.contentType !== null" v-model="body" />
+    <HoppSmartPlaceholder
+      v-if="body.contentType == null"
+      :src="`/images/states/${colorMode.value}/upload_single_file.svg`"
+      :alt="`${t('empty.body')}`"
+      :text="t('empty.body')"
     >
-      <img
-        :src="`/images/states/${colorMode.value}/upload_single_file.svg`"
-        loading="lazy"
-        class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-        :alt="`${t('empty.body')}`"
-      />
-      <span class="pb-4 text-center">{{ t("empty.body") }}</span>
-      <ButtonSecondary
+      <HoppButtonSecondary
         outline
         :label="`${t('app.documentation')}`"
-        to="https://docs.hoppscotch.io/features/body"
+        to="https://docs.hoppscotch.io/documentation/getting-started/rest/uploading-data"
         blank
         :icon="IconExternalLink"
         reverse
-        class="mb-4"
       />
-    </div>
+    </HoppSmartPlaceholder>
   </div>
 </template>
 
 <script setup lang="ts">
-import IconDone from "~icons/lucide/check"
-import IconInfo from "~icons/lucide/info"
-import IconRefreshCW from "~icons/lucide/refresh-cw"
-import IconExternalLink from "~icons/lucide/external-link"
-import { computed, ref } from "vue"
-import { pipe } from "fp-ts/function"
-import * as A from "fp-ts/Array"
-import * as O from "fp-ts/Option"
-import { RequestOptionTabs } from "./RequestOptions.vue"
-import { useStream } from "@composables/stream"
 import { useI18n } from "@composables/i18n"
 import { useColorMode } from "@composables/theming"
+import { HoppRESTHeader, HoppRESTReqBody } from "@hoppscotch/data"
+import { useVModel } from "@vueuse/core"
+import * as A from "fp-ts/Array"
+import { pipe } from "fp-ts/function"
+import * as O from "fp-ts/Option"
+import { computed, ref } from "vue"
 import { segmentedContentTypes } from "~/helpers/utils/contenttypes"
-import {
-  restContentType$,
-  restHeaders$,
-  setRESTContentType,
-  setRESTHeaders,
-  addRESTHeader,
-} from "~/newstore/RESTSession"
+import IconDone from "~icons/lucide/check"
+import IconExternalLink from "~icons/lucide/external-link"
+import IconInfo from "~icons/lucide/info"
+import IconRefreshCW from "~icons/lucide/refresh-cw"
+import { RESTOptionTabs } from "./RequestOptions.vue"
 
 const colorMode = useColorMode()
 const t = useI18n()
 
-const emit = defineEmits<{
-  (e: "change-tab", value: string): void
+const props = defineProps<{
+  body: HoppRESTReqBody
+  headers: HoppRESTHeader[]
 }>()
 
-const contentType = useStream(restContentType$, null, setRESTContentType)
+const emit = defineEmits<{
+  (e: "change-tab", value: RESTOptionTabs): void
+  (e: "update:headers", value: HoppRESTHeader[]): void
+  (e: "update:body", value: HoppRESTReqBody): void
+}>()
 
-// The functional headers list (the headers actually in the system)
-const headers = useStream(restHeaders$, [], setRESTHeaders)
+const headers = useVModel(props, "headers", emit)
+const body = useVModel(props, "body", emit)
 
 const overridenContentType = computed(() =>
   pipe(
@@ -165,10 +166,12 @@ const overridenContentType = computed(() =>
   )
 )
 
-const contentTypeOverride = (tab: RequestOptionTabs) => {
+const contentTypeOverride = (tab: RESTOptionTabs) => {
   emit("change-tab", tab)
   if (!isContentTypeAlreadyExist()) {
-    addRESTHeader({
+    // TODO: Fix this
+
+    headers.value.push({
       key: "Content-Type",
       value: "",
       active: true,

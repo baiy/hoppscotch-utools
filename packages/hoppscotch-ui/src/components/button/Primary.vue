@@ -1,13 +1,14 @@
 <template>
-  <SmartLink
+  <HoppSmartLink
     :to="to"
+    :exact="exact"
     :blank="blank"
-    class="relative inline-flex items-center justify-center py-2 font-bold transition focus:outline-none focus-visible:bg-accentDark"
+    class="inline-flex items-center justify-center font-semibold transition whitespace-nowrap focus:outline-none"
     :class="[
       color
         ? `text-${color}-800 bg-${color}-200 hover:(text-${color}-900 bg-${color}-300) focus-visible:(text-${color}-900 bg-${color}-300)`
         : `text-accentContrast bg-accent hover:bg-accentDark focus-visible:bg-accentDark`,
-      label ? 'px-4' : 'px-2',
+      label ? 'px-4 py-2' : 'p-2',
       rounded ? 'rounded-full' : 'rounded',
       { 'opacity-75 cursor-not-allowed': disabled },
       { 'pointer-events-none': loading },
@@ -39,7 +40,9 @@
           label ? (reverse ? 'ml-2' : 'mr-2') : '',
         ]"
       />
-      {{ label }}
+      <div class="truncate max-w-54">
+        {{ label }}
+      </div>
       <div v-if="shortcut.length" class="<sm:hidden">
         <kbd
           v-for="(key, index) in shortcut"
@@ -54,12 +57,13 @@
       v-if="loading"
       class="absolute inset-0 flex items-center justify-center"
     >
-      <SmartSpinner />
+      <HoppSmartSpinner />
     </span>
-  </SmartLink>
+  </HoppSmartLink>
 </template>
 
 <script setup lang="ts">
+import { HoppSmartLink, HoppSmartSpinner } from "../smart"
 import type { Component } from "vue"
 
 interface Props {
@@ -80,6 +84,7 @@ interface Props {
   outline?: boolean
   shortcut?: string[]
 }
+
 withDefaults(defineProps<Props>(), {
   to: "",
   exact: true,

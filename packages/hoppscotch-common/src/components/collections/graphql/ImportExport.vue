@@ -1,5 +1,5 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="`${t('modal.collections')}`"
@@ -9,7 +9,7 @@
     <template #actions>
       <span>
         <tippy interactive trigger="click" theme="popover">
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('action.more')"
             :icon="IconMoreVertical"
@@ -22,7 +22,7 @@
               tabindex="0"
               @keyup.escape="hide()"
             >
-              <SmartItem
+              <HoppSmartItem
                 :icon="IconGithub"
                 :label="t('import.from_gist')"
                 @click="
@@ -42,7 +42,7 @@
                     : undefined
                 "
               >
-                <SmartItem
+                <HoppSmartItem
                   :disabled="
                     !currentUser
                       ? true
@@ -67,7 +67,7 @@
     </template>
     <template #body>
       <div class="flex flex-col space-y-2">
-        <SmartItem
+        <HoppSmartItem
           :icon="IconFolderPlus"
           :label="t('import.from_json')"
           @click="openDialogChooseFileToImportFrom"
@@ -80,7 +80,7 @@
           @change="importFromJSON"
         />
         <hr />
-        <SmartItem
+        <HoppSmartItem
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.download_file')"
           :icon="IconDownload"
@@ -89,7 +89,7 @@
         />
       </div>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -244,27 +244,56 @@ const importFromJSON = () => {
       return
     }
     appendGraphqlCollections(collections)
+
+    platform.analytics?.logEvent({
+      type: "HOPP_IMPORT_COLLECTION",
+      importer: "json",
+      workspaceType: "personal",
+      platform: "gql",
+    })
+
     fileImported()
   }
   reader.readAsText(inputChooseFileToImportFrom.value.files[0])
   inputChooseFileToImportFrom.value.value = ""
 }
 
-const exportJSON = () => {
+const exportJSON = async () => {
   const dataToWrite = collectionJson.value
-  const file = new Blob([dataToWrite], { type: "application/json" })
-  const a = document.createElement("a")
-  const url = URL.createObjectURL(file)
-  a.href = url
 
-  // TODO: get uri from meta
-  a.download = `${url.split("/").pop()!.split("#")[0].split("?")[0]}.json`
-  document.body.appendChild(a)
-  a.click()
-  toast.success(t("state.download_started").toString())
-  setTimeout(() => {
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }, 1000)
+  const parsedCollections = JSON.parse(dataToWrite)
+
+  if (!parsedCollections.length) {
+    return toast.error(t("error.no_collections_to_export"))
+  }
+
+  const file = new Blob([dataToWrite], { type: "application/json" })
+  const url = URL.createObjectURL(file)
+
+  const filename = `${url.split("/").pop()!.split("#")[0].split("?")[0]}.json`
+
+  URL.revokeObjectURL(url)
+
+  const result = await platform.io.saveFileWithDialog({
+    data: dataToWrite,
+    contentType: "application/json",
+    suggestedFilename: filename,
+    filters: [
+      {
+        name: "Hoppscotch Collection JSON file",
+        extensions: ["json"],
+      },
+    ],
+  })
+
+  if (result.type === "unknown" || result.type === "saved") {
+    platform?.analytics?.logEvent({
+      type: "HOPP_EXPORT_COLLECTION",
+      exporter: "json",
+      platform: "gql",
+    })
+
+    toast.success(t("state.download_started").toString())
+  }
 }
 </script>

@@ -33,7 +33,7 @@
         theme="popover"
         :on-shown="() => tippyActions!.focus()"
       >
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.more')"
           :icon="IconMoreVertical"
@@ -46,6 +46,7 @@
             role="menu"
             @keyup.e="edit!.$el.click()"
             @keyup.d="duplicate!.$el.click()"
+            @keyup.j="exportAsJsonEl!.$el.click()"
             @keyup.delete="
               !(environmentIndex === 'Global')
                 ? deleteAction!.$el.click()
@@ -53,7 +54,7 @@
             "
             @keyup.escape="hide()"
           >
-            <SmartItem
+            <HoppSmartItem
               ref="edit"
               :icon="IconEdit"
               :label="`${t('action.edit')}`"
@@ -65,7 +66,7 @@
                 }
               "
             />
-            <SmartItem
+            <HoppSmartItem
               ref="duplicate"
               :icon="IconCopy"
               :label="`${t('action.duplicate')}`"
@@ -77,7 +78,19 @@
                 }
               "
             />
-            <SmartItem
+            <HoppSmartItem
+              ref="exportAsJsonEl"
+              :icon="IconEdit"
+              :label="`${t('export.as_json')}`"
+              :shortcut="['J']"
+              @click="
+                () => {
+                  exportEnvironmentAsJSON()
+                  hide()
+                }
+              "
+            />
+            <HoppSmartItem
               v-if="environmentIndex !== 'Global'"
               ref="deleteAction"
               :icon="IconTrash2"
@@ -94,7 +107,7 @@
         </template>
       </tippy>
     </span>
-    <SmartConfirmModal
+    <HoppSmartConfirmModal
       :show="confirmRemove"
       :title="`${t('confirm.remove_environment')}`"
       @hide-modal="confirmRemove = false"
@@ -115,14 +128,13 @@ import {
   deleteEnvironment,
   duplicateEnvironment,
   createEnvironment,
-  setEnvironmentVariables,
   getGlobalVariables,
-  environmentsStore,
 } from "~/newstore/environments"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
 import { TippyComponent } from "vue-tippy"
-import SmartItem from "@hoppscotch/ui/src/components/smart/Item.vue"
+import { HoppSmartItem } from "@hoppscotch/ui"
+import { exportAsJSON } from "~/helpers/import-export/export/environment"
 
 const t = useI18n()
 const toast = useToast()
@@ -138,27 +150,37 @@ const emit = defineEmits<{
 
 const confirmRemove = ref(false)
 
+const exportEnvironmentAsJSON = () => {
+  const { environment, environmentIndex } = props
+  exportAsJSON(environment, environmentIndex)
+    ? toast.success(t("state.download_started"))
+    : toast.error(t("state.download_failed"))
+}
+
 const tippyActions = ref<TippyComponent | null>(null)
 const options = ref<TippyComponent | null>(null)
-const edit = ref<typeof SmartItem>()
-const duplicate = ref<typeof SmartItem>()
-const deleteAction = ref<typeof SmartItem>()
+const edit = ref<typeof HoppSmartItem>()
+const duplicate = ref<typeof HoppSmartItem>()
+const exportAsJsonEl = ref<typeof HoppSmartItem>()
+const deleteAction = ref<typeof HoppSmartItem>()
 
 const removeEnvironment = () => {
   if (props.environmentIndex === null) return
-  if (props.environmentIndex !== "Global")
-    deleteEnvironment(props.environmentIndex)
+  if (props.environmentIndex !== "Global") {
+    deleteEnvironment(props.environmentIndex, props.environment.id)
+  }
   toast.success(`${t("state.deleted")}`)
 }
 
 const duplicateEnvironments = () => {
   if (props.environmentIndex === null) return
   if (props.environmentIndex === "Global") {
-    createEnvironment(`Global - ${t("action.duplicate")}`)
-    setEnvironmentVariables(
-      environmentsStore.value.environments.length - 1,
+    createEnvironment(
+      `Global - ${t("action.duplicate")}`,
       cloneDeep(getGlobalVariables())
     )
   } else duplicateEnvironment(props.environmentIndex)
+
+  toast.success(`${t("environment.duplicated")}`)
 }
 </script>

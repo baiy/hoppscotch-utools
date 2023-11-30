@@ -1,7 +1,7 @@
 <template>
   <div class="flex w-screen h-screen">
     <Splitpanes class="no-splitter" :dbl-click-splitter="false" horizontal>
-      <Pane v-if="!zenMode" style="height: auto">
+      <Pane style="height: auto">
         <AppHeader />
       </Pane>
       <Pane :class="spacerClass" class="flex flex-1 !overflow-auto md:mb-0">
@@ -24,7 +24,10 @@
             >
               <Pane class="flex flex-1 !overflow-auto">
                 <main class="flex flex-1 w-full" role="main">
-                  <RouterView v-slot="{ Component }" class="flex flex-1">
+                  <RouterView
+                    v-slot="{ Component }"
+                    class="flex flex-1 min-w-0"
+                  >
                     <Transition name="fade" mode="out-in" appear>
                       <component :is="Component" />
                     </Transition>
@@ -47,7 +50,7 @@
       </Pane>
     </Splitpanes>
     <AppActionHandler />
-    <AppPowerSearch :show="showSearch" @hide-modal="showSearch = false" />
+    <AppSpotlight :show="showSearch" @hide-modal="showSearch = false" />
     <AppSupport
       v-if="mdAndLarger"
       :show="showSupport"
@@ -70,15 +73,14 @@ import { applySetting } from "~/newstore/settings"
 import { getLocalConfig, setLocalConfig } from "~/newstore/localpersistence"
 import { useToast } from "~/composables/toast"
 import { useI18n } from "~/composables/i18n"
+import { platform } from "~/platform"
 
 const router = useRouter()
 
 const showSearch = ref(false)
 const showSupport = ref(false)
 
-const fontSize = useSetting("FONT_SIZE")
 const expandNavigation = useSetting("EXPAND_NAVIGATION")
-const zenMode = useSetting("ZEN_MODE")
 const rightSidebar = useSetting("SIDEBAR")
 const columnLayout = useSetting("COLUMN_LAYOUT")
 
@@ -97,7 +99,10 @@ onBeforeMount(() => {
 
 onMounted(() => {
   const cookiesAllowed = getLocalConfig("cookiesAllowed") === "yes"
-  if (!cookiesAllowed) {
+  const platformAllowsCookiePrompts =
+    platform.platformFeatureFlags.promptAsUsingCookies ?? true
+
+  if (!cookiesAllowed && platformAllowsCookiePrompts) {
     toast.show(`${t("app.we_use_cookies")}`, {
       duration: 0,
       action: [
@@ -106,7 +111,9 @@ onMounted(() => {
           onClick: (_, toastObject) => {
             setLocalConfig("cookiesAllowed", "yes")
             toastObject.goAway(0)
-            window.open("https://docs.hoppscotch.io/privacy", "_blank")?.focus()
+            window
+              .open("https://docs.hoppscotch.io/support/privacy", "_blank")
+              ?.focus()
           },
         },
         {
@@ -128,24 +135,9 @@ watch(mdAndLarger, () => {
     columnLayout.value = true
   }
 })
-
-const spacerClass = computed(() => {
-  if (fontSize.value === "small" && expandNavigation.value)
-    return "spacer-small"
-  if (fontSize.value === "medium" && expandNavigation.value)
-    return "spacer-medium"
-  if (fontSize.value === "large" && expandNavigation.value)
-    return "spacer-large"
-  if (
-    (fontSize.value === "small" ||
-      fontSize.value === "medium" ||
-      fontSize.value === "large") &&
-    !expandNavigation.value
-  )
-    return "spacer-expand"
-
-  return ""
-})
+const spacerClass = computed(() =>
+  expandNavigation.value ? "spacer-small" : "spacer-expand"
+)
 
 defineActionHandler("modals.search.toggle", () => {
   showSearch.value = !showSearch.value

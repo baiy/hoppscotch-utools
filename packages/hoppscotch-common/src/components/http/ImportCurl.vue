@@ -1,5 +1,5 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="`${t('import.curl')}`"
@@ -13,26 +13,26 @@
               cURL
             </label>
             <div class="flex items-center">
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('action.clear_all')"
                 :icon="IconTrash2"
                 @click="clearContent()"
               />
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('state.linewrap')"
                 :class="{ '!text-accent': linewrapEnabled }"
                 :icon="IconWrapText"
                 @click.prevent="linewrapEnabled = !linewrapEnabled"
               />
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip', allowHTML: true }"
                 :title="t('action.download_file')"
                 :icon="downloadIcon"
                 @click="downloadResponse"
               />
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip', allowHTML: true }"
                 :title="t('action.copy')"
                 :icon="copyIcon"
@@ -51,13 +51,13 @@
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           ref="importButton"
           :label="`${t('import.title')}`"
           outline
           @click="handleImport"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="`${t('action.cancel')}`"
           outline
           filled
@@ -65,7 +65,7 @@
         />
       </span>
       <span class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           :icon="pasteIcon"
           :label="`${t('action.paste')}`"
           filled
@@ -74,14 +74,13 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, watch } from "vue"
 import { refAutoReset } from "@vueuse/core"
 import { useCodemirror } from "@composables/codemirror"
-import { setRESTRequest } from "~/newstore/RESTSession"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
 import { parseCurlToHoppRESTReq } from "~/helpers/curl"
@@ -94,10 +93,15 @@ import IconWrapText from "~icons/lucide/wrap-text"
 import IconClipboard from "~icons/lucide/clipboard"
 import IconCheck from "~icons/lucide/check"
 import IconTrash2 from "~icons/lucide/trash-2"
+import { platform } from "~/platform"
+import { RESTTabService } from "~/services/tab/rest"
+import { useService } from "dioc/vue"
 
 const t = useI18n()
 
 const toast = useToast()
+
+const tabs = useService(RESTTabService)
 
 const curl = ref("")
 
@@ -144,7 +148,11 @@ const handleImport = () => {
   try {
     const req = parseCurlToHoppRESTReq(text)
 
-    setRESTRequest(req)
+    platform.analytics?.logEvent({
+      type: "HOPP_REST_IMPORT_CURL",
+    })
+
+    tabs.currentActiveTab.value.document.request = req
   } catch (e) {
     console.error(e)
     toast.error(`${t("error.curl_invalid_format")}`)

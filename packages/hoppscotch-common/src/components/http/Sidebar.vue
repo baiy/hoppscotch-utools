@@ -1,28 +1,32 @@
 <template>
-  <SmartTabs
+  <HoppSmartTabs
     v-model="selectedNavigationTab"
     styles="sticky overflow-x-auto flex-shrink-0 bg-primary z-10 top-0"
     vertical
     render-inactive-tabs
   >
-    <SmartTab :id="'history'" :icon="IconClock" :label="`${t('tab.history')}`">
-      <History :page="'rest'" />
-    </SmartTab>
-    <SmartTab
+    <HoppSmartTab
       :id="'collections'"
       :icon="IconFolder"
       :label="`${t('tab.collections')}`"
     >
       <Collections />
-    </SmartTab>
-    <SmartTab
+    </HoppSmartTab>
+    <HoppSmartTab
       :id="'env'"
       :icon="IconLayers"
-      :label="`${t('environment.title')}`"
+      :label="`${t('tab.environments')}`"
     >
       <Environments />
-    </SmartTab>
-  </SmartTabs>
+    </HoppSmartTab>
+    <HoppSmartTab
+      :id="'history'"
+      :icon="IconClock"
+      :label="`${t('tab.history')}`"
+    >
+      <History :page="'rest'" />
+    </HoppSmartTab>
+  </HoppSmartTabs>
 </template>
 
 <script setup lang="ts">
@@ -36,5 +40,5 @@ const t = useI18n()
 
 type RequestOptionTabs = "history" | "collections" | "env"
 
-const selectedNavigationTab = ref<RequestOptionTabs>("history")
+const selectedNavigationTab = ref<RequestOptionTabs>("collections")
 </script>

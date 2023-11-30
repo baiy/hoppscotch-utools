@@ -1,5 +1,5 @@
 import { BehaviorSubject, Subject } from "rxjs"
-import { logHoppRequestRunToAnalytics } from "../fb/analytics"
+import { platform } from "~/platform"
 
 export type SSEEvent = { time: number } & (
   | { type: "STARTING" }
@@ -63,7 +63,8 @@ export class SSEConnection {
       })
     }
 
-    logHoppRequestRunToAnalytics({
+    platform.analytics?.logEvent({
+      type: "HOPP_REQUEST_RUN",
       platform: "sse",
     })
   }

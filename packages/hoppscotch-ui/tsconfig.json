@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "allowJs": true,
     "useDefineForClassFields": true,
     "module": "ESNext",
     "moduleResolution": "Node",
@@ -22,13 +23,7 @@
       "@workers/*": ["./src/workers/*"],
       "@functional/*": ["./src/helpers/functional/*"]
     },
-    "types": [
-      "vite/client",
-      "unplugin-icons/types/vue",
-      "vite-plugin-pages/client",
-      "vite-plugin-vue-layouts/client",
-      "vite-plugin-pwa/client"
-    ]
+    "types": ["vite/client", "unplugin-icons/types/vue"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

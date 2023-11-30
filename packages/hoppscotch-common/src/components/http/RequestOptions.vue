@@ -1,95 +1,118 @@
 <template>
-  <SmartTabs
-    v-model="selectedRealtimeTab"
+  <HoppSmartTabs
+    v-model="selectedOptionTab"
     styles="sticky overflow-x-auto flex-shrink-0 bg-primary top-upperMobilePrimaryStickyFold sm:top-upperPrimaryStickyFold z-10"
     render-inactive-tabs
   >
-    <SmartTab
+    <HoppSmartTab
       :id="'params'"
       :label="`${t('tab.parameters')}`"
       :info="`${newActiveParamsCount$}`"
     >
-      <HttpParameters />
-    </SmartTab>
-    <SmartTab :id="'bodyParams'" :label="`${t('tab.body')}`">
-      <HttpBody @change-tab="changeTab" />
-    </SmartTab>
-    <SmartTab
+      <HttpParameters v-model="request.params" />
+    </HoppSmartTab>
+    <HoppSmartTab :id="'bodyParams'" :label="`${t('tab.body')}`">
+      <HttpBody
+        v-model:headers="request.headers"
+        v-model:body="request.body"
+        @change-tab="changeOptionTab"
+      />
+    </HoppSmartTab>
+    <HoppSmartTab
       :id="'headers'"
       :label="`${t('tab.headers')}`"
       :info="`${newActiveHeadersCount$}`"
     >
-      <HttpHeaders @change-tab="changeTab" />
-    </SmartTab>
-    <SmartTab :id="'authorization'" :label="`${t('tab.authorization')}`">
-      <HttpAuthorization />
-    </SmartTab>
-    <SmartTab
+      <HttpHeaders v-model="request" @change-tab="changeOptionTab" />
+    </HoppSmartTab>
+    <HoppSmartTab :id="'authorization'" :label="`${t('tab.authorization')}`">
+      <HttpAuthorization v-model="request.auth" />
+    </HoppSmartTab>
+    <HoppSmartTab
       :id="'preRequestScript'"
       :label="`${t('tab.pre_request_script')}`"
       :indicator="
-        preRequestScript && preRequestScript.length > 0 ? true : false
+        request.preRequestScript && request.preRequestScript.length > 0
+          ? true
+          : false
       "
     >
-      <HttpPreRequestScript />
-    </SmartTab>
-    <SmartTab
+      <HttpPreRequestScript v-model="request.preRequestScript" />
+    </HoppSmartTab>
+    <HoppSmartTab
       :id="'tests'"
       :label="`${t('tab.tests')}`"
-      :indicator="testScript && testScript.length > 0 ? true : false"
+      :indicator="
+        request.testScript && request.testScript.length > 0 ? true : false
+      "
     >
-      <HttpTests />
-    </SmartTab>
-  </SmartTabs>
+      <HttpTests v-model="request.testScript" />
+    </HoppSmartTab>
+  </HoppSmartTabs>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { map } from "rxjs/operators"
-import { useReadonlyStream } from "@composables/stream"
-import {
-  restActiveHeadersCount$,
-  restActiveParamsCount$,
-  usePreRequestScript,
-  useTestScript,
-} from "~/newstore/RESTSession"
 import { useI18n } from "@composables/i18n"
+import { HoppRESTRequest } from "@hoppscotch/data"
+import { useVModel } from "@vueuse/core"
+import { computed } from "vue"
+import { defineActionHandler } from "~/helpers/actions"
 
-export type RequestOptionTabs =
-  | "params"
-  | "bodyParams"
-  | "headers"
-  | "authorization"
+const VALID_OPTION_TABS = [
+  "params",
+  "bodyParams",
+  "headers",
+  "authorization",
+  "preRequestScript",
+  "tests",
+] as const
+
+export type RESTOptionTabs = (typeof VALID_OPTION_TABS)[number]
 
 const t = useI18n()
 
-const selectedRealtimeTab = ref<RequestOptionTabs>("params")
+// v-model integration with props and emit
+const props = withDefaults(
+  defineProps<{
+    modelValue: HoppRESTRequest
+    optionTab: RESTOptionTabs
+  }>(),
+  {
+    optionTab: "params",
+  }
+)
 
-const changeTab = (e: RequestOptionTabs) => {
-  selectedRealtimeTab.value = e
+const emit = defineEmits<{
+  (e: "update:modelValue", value: HoppRESTRequest): void
+  (e: "update:optionTab", value: RESTOptionTabs): void
+}>()
+
+const request = useVModel(props, "modelValue", emit)
+const selectedOptionTab = useVModel(props, "optionTab", emit)
+
+const changeOptionTab = (e: RESTOptionTabs) => {
+  selectedOptionTab.value = e
 }
 
-const newActiveParamsCount$ = useReadonlyStream(
-  restActiveParamsCount$.pipe(
-    map((e) => {
-      if (e === 0) return null
-      return `${e}`
-    })
-  ),
-  null
-)
+const newActiveParamsCount$ = computed(() => {
+  const e = request.value.params.filter(
+    (x) => x.active && (x.key !== "" || x.value !== "")
+  ).length
 
-const newActiveHeadersCount$ = useReadonlyStream(
-  restActiveHeadersCount$.pipe(
-    map((e) => {
-      if (e === 0) return null
-      return `${e}`
-    })
-  ),
-  null
-)
+  if (e === 0) return null
+  return `${e}`
+})
 
-const preRequestScript = usePreRequestScript()
+const newActiveHeadersCount$ = computed(() => {
+  const e = request.value.headers.filter(
+    (x) => x.active && (x.key !== "" || x.value !== "")
+  ).length
 
-const testScript = useTestScript()
+  if (e === 0) return null
+  return `${e}`
+})
+
+defineActionHandler("request.open-tab", ({ tab }) => {
+  selectedOptionTab.value = tab as RESTOptionTabs
+})
 </script>

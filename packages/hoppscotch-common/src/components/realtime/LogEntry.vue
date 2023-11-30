@@ -17,7 +17,7 @@
             <span
               v-tippy="{ theme: 'tooltip' }"
               :title="relativeTime"
-              class="mx-auto truncate ts-font text-secondaryLight hover:text-secondary hover:text-center"
+              class="mx-auto truncate text-tiny text-secondaryLight hover:text-secondary hover:text-center"
             >
               {{ shortDateTime(entry.ts) }}
             </span>
@@ -34,14 +34,14 @@
             </div>
           </div>
         </div>
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.copy')"
           :icon="copyQueryIcon"
           class="hidden group-hover:inline-flex"
           @click="copyQuery(entry.payload)"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :icon="IconChevronDown"
           class="transform"
           :class="{ 'rotate-180': !minimized }"
@@ -50,14 +50,14 @@
       </div>
     </div>
     <div v-if="!minimized" class="overflow-hidden bg-primaryContrast">
-      <SmartTabs
+      <HoppSmartTabs
         v-model="selectedTab"
         styles="bg-primaryLight"
         render-inactive-tabs
       >
-        <SmartTab v-if="isJSON(entry.payload)" id="json" label="JSON" />
-        <SmartTab id="raw" label="Raw" />
-      </SmartTabs>
+        <HoppSmartTab v-if="isJSON(entry.payload)" id="json" label="JSON" />
+        <HoppSmartTab id="raw" label="Raw" />
+      </HoppSmartTabs>
       <div
         class="z-10 flex items-center justify-between pl-4 border-b border-dividerLight top-lowerSecondaryStickyFold"
       >
@@ -65,20 +65,20 @@
           {{ t("response.body") }}
         </label>
         <div class="flex">
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('state.linewrap')"
             :class="{ '!text-accent': linewrapEnabled }"
             :icon="IconWrapText"
             @click.prevent="linewrapEnabled = !linewrapEnabled"
           />
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('action.download_file')"
             :icon="downloadIcon"
             @click="downloadResponse"
           />
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('action.copy')"
             :icon="copyIcon"
@@ -123,7 +123,7 @@
                   tabindex="0"
                   @keyup.escape="hide()"
                 >
-                  <SmartItem
+                  <HoppSmartItem
                     v-for="(arrayMember, astIndex) in item.astParent.values"
                     :key="`ast-${astIndex}`"
                     :label="`${astIndex}`"
@@ -142,7 +142,7 @@
                   tabindex="0"
                   @keyup.escape="hide()"
                 >
-                  <SmartItem
+                  <HoppSmartItem
                     v-for="(objectMember, astIndex) in item.astParent.members"
                     :key="`ast-${astIndex}`"
                     :label="objectMember.key.value"
@@ -160,7 +160,7 @@
                 ref="tippyActions"
                 class="flex flex-col focus:outline-none"
               >
-                <SmartItem
+                <HoppSmartItem
                   label="{}"
                   @click="
                     () => {
@@ -175,7 +175,7 @@
                 ref="tippyActions"
                 class="flex flex-col focus:outline-none"
               >
-                <SmartItem
+                <HoppSmartItem
                   label="[]"
                   @click="
                     () => {
@@ -209,7 +209,7 @@ import IconWrapText from "~icons/lucide/wrap-text"
 import * as LJSON from "lossless-json"
 import * as O from "fp-ts/Option"
 import { pipe } from "fp-ts/function"
-import { ref, computed, reactive, watch, markRaw } from "vue"
+import { ref, computed, reactive, watch, markRaw, PropType } from "vue"
 import { refAutoReset, useTimeAgo } from "@vueuse/core"
 import { LogEntryData } from "./Log.vue"
 import { useI18n } from "@composables/i18n"
@@ -227,7 +227,16 @@ import { shortDateTime } from "~/helpers/utils/date"
 
 const t = useI18n()
 
-const props = defineProps<{ entry: LogEntryData }>()
+const props = defineProps({
+  entry: {
+    type: Object as PropType<LogEntryData>,
+    required: true,
+  },
+  isOpen: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 // Template refs
 const tippyActions = ref<any | null>(null)
@@ -304,7 +313,7 @@ const outlinePath = computed(() =>
 )
 
 // Code for UI Changes
-const minimized = ref(true)
+const minimized = ref(props.isOpen ? false : true)
 watch(minimized, () => {
   selectedTab.value = isJSON(props.entry.payload) ? "json" : "raw"
 })
@@ -342,7 +351,9 @@ const ENTRY_COLORS = {
 } as const
 
 // Assigns color based on entry event
-const entryColor = computed(() => ENTRY_COLORS[props.entry.event])
+const entryColor = computed(
+  () => props.entry.event && ENTRY_COLORS[props.entry.event]
+)
 
 const ICONS = {
   info: {
@@ -394,9 +405,5 @@ const icon = computed(() => markRaw(ICONS[props.entry.source].icon))
   @apply py-1;
   @apply transition;
   @apply hover: text-secondary;
-}
-
-.ts-font {
-  font-size: 0.6rem;
 }
 </style>

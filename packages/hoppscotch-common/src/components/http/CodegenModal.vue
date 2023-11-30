@@ -1,5 +1,5 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="`${t('request.generate_code')}`"
@@ -18,9 +18,9 @@
           :on-shown="() => tippyActions.focus()"
         >
           <span class="select-wrapper">
-            <ButtonSecondary
+            <HoppButtonSecondary
               :label="
-                CodegenDefinitions.find((x) => x.name === codegenType).caption
+                CodegenDefinitions.find((x) => x.name === codegenType)!.caption
               "
               outline
               class="flex-1 pr-8"
@@ -28,7 +28,7 @@
           </span>
           <template #content="{ hide }">
             <div class="flex flex-col space-y-2">
-              <div class="sticky top-0 flex-shrink-0 overflow-x-auto">
+              <div class="sticky z-10 top-0 flex-shrink-0 overflow-x-auto">
                 <input
                   v-model="searchQuery"
                   type="search"
@@ -43,7 +43,7 @@
                 tabindex="0"
                 @keyup.escape="hide()"
               >
-                <SmartItem
+                <HoppSmartItem
                   v-for="codegen in filteredCodegenDefinitions"
                   :key="codegen.name"
                   :label="codegen.caption"
@@ -56,20 +56,14 @@
                     }
                   "
                 />
-                <div
-                  v-if="
-                    !(
-                      filteredCodegenDefinitions.length !== 0 ||
-                      CodegenDefinitions.length === 0
-                    )
-                  "
-                  class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+                <HoppSmartPlaceholder
+                  v-if="filteredCodegenDefinitions.length === 0"
+                  :text="`${t('state.nothing_found')} ‟${searchQuery}”`"
                 >
-                  <icon-lucide-search class="pb-2 opacity-75 svg-icons" />
-                  <span class="my-2 text-center">
-                    {{ t("state.nothing_found") }} "{{ searchQuery }}"
-                  </span>
-                </div>
+                  <template #icon>
+                    <icon-lucide-search class="pb-2 opacity-75 svg-icons" />
+                  </template>
+                </HoppSmartPlaceholder>
               </div>
             </div>
           </template>
@@ -89,20 +83,20 @@
               {{ t("request.generated_code") }}
             </label>
             <div class="flex items-center">
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('state.linewrap')"
                 :class="{ '!text-accent': linewrapEnabled }"
                 :icon="IconWrapText"
                 @click.prevent="linewrapEnabled = !linewrapEnabled"
               />
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip', allowHTML: true }"
                 :title="t('action.download_file')"
                 :icon="downloadIcon"
                 @click="downloadResponse"
               />
-              <ButtonSecondary
+              <HoppButtonSecondary
                 v-tippy="{ theme: 'tooltip', allowHTML: true }"
                 :title="t('action.copy')"
                 :icon="copyIcon"
@@ -119,13 +113,13 @@
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="`${t('action.copy')}`"
           :icon="copyCodeIcon"
           outline
           @click="copyRequestCode"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="`${t('action.dismiss')}`"
           outline
           filled
@@ -133,7 +127,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -148,7 +142,6 @@ import {
   resolvesEnvsInBody,
 } from "~/helpers/utils/EffectiveURL"
 import { getAggregateEnvs } from "~/newstore/environments"
-import { getRESTRequest } from "~/newstore/RESTSession"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
 import {
@@ -164,6 +157,10 @@ import {
 import IconCopy from "~icons/lucide/copy"
 import IconCheck from "~icons/lucide/check"
 import IconWrapText from "~icons/lucide/wrap-text"
+import cloneDeep from "lodash-es/cloneDeep"
+import { platform } from "~/platform"
+import { RESTTabService } from "~/services/tab/rest"
+import { useService } from "dioc/vue"
 
 const t = useI18n()
 
@@ -177,7 +174,8 @@ const emit = defineEmits<{
 
 const toast = useToast()
 
-const request = ref(getRESTRequest())
+const tabs = useService(RESTTabService)
+const request = ref(cloneDeep(tabs.currentActiveTab.value.document.request))
 const codegenType = ref<CodegenName>("shell-curl")
 const errorState = ref(false)
 
@@ -246,7 +244,11 @@ watch(
   () => props.show,
   (goingToShow) => {
     if (goingToShow) {
-      request.value = getRESTRequest()
+      request.value = cloneDeep(tabs.currentActiveTab.value.document.request)
+
+      platform.analytics?.logEvent({
+        type: "HOPP_REST_CODEGEN_OPENED",
+      })
     }
   }
 )

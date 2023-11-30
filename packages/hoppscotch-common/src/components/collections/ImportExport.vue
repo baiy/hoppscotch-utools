@@ -1,5 +1,5 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="t('modal.collections')"
@@ -7,7 +7,7 @@
     @close="hideModal"
   >
     <template #actions>
-      <ButtonSecondary
+      <HoppButtonSecondary
         v-if="importerType !== null"
         v-tippy="{ theme: 'tooltip' }"
         :title="t('action.go_back')"
@@ -101,7 +101,7 @@
             </div>
           </div>
         </div>
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="t('import.title')"
           :disabled="enableImportButton"
           :loading="importingMyCollections"
@@ -109,9 +109,9 @@
         />
       </div>
       <div v-else class="flex flex-col">
-        <SmartExpand>
+        <HoppSmartExpand>
           <template #body>
-            <SmartItem
+            <HoppSmartItem
               v-for="(importer, index) in importerModules"
               :key="`importer-${index}`"
               :icon="importer.icon"
@@ -119,10 +119,10 @@
               @click="importerType = index"
             />
           </template>
-        </SmartExpand>
+        </HoppSmartExpand>
         <hr />
         <div class="flex flex-col space-y-2">
-          <SmartItem
+          <HoppSmartItem
             v-tippy="{ theme: 'tooltip' }"
             :title="t('action.download_file')"
             :icon="IconDownload"
@@ -131,6 +131,7 @@
             @click="emit('export-json-collection')"
           />
           <span
+            v-if="platform.platformFeatureFlags.exportAsGIST"
             v-tippy="{ theme: 'tooltip' }"
             :title="
               !currentUser
@@ -141,7 +142,7 @@
             "
             class="flex"
           >
-            <SmartItem
+            <HoppSmartItem
               :disabled="
                 !currentUser
                   ? true
@@ -158,7 +159,7 @@
         </div>
       </div>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -283,6 +284,14 @@ const importerAction = async (stepResults: StepReturnValue[]) => {
           emit("import-to-teams", result)
         } else {
           appendRESTCollections(result)
+
+          platform.analytics?.logEvent({
+            type: "HOPP_IMPORT_COLLECTION",
+            importer: importerModule.value!.name,
+            platform: "rest",
+            workspaceType: "personal",
+          })
+
           fileImported()
         }
       }

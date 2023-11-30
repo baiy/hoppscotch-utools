@@ -7,7 +7,6 @@ import { HoppModule } from "."
 
 import languages from "../../languages.json"
 
-import en from "../../locales/en.json"
 import { throwError } from "~/helpers/functional/error"
 import { getLocalConfig, setLocalConfig } from "~/newstore/localpersistence"
 
@@ -59,7 +58,13 @@ export const FALLBACK_LANG = pipe(
 )
 
 // A reference to the i18n instance
-let i18nInstance: I18n<any, any, any> | null = null
+let i18nInstance: I18n<
+  Record<string, unknown>,
+  Record<string, unknown>,
+  Record<string, unknown>,
+  string,
+  true
+> | null = null
 
 const resolveCurrentLocale = () =>
   pipe(
@@ -116,6 +121,13 @@ export const changeAppLanguage = async (locale: string) => {
   setLocalConfig("locale", locale)
 }
 
+/**
+ * Returns the i18n instance
+ */
+export function getI18n() {
+  return i18nInstance!.global.t
+}
+
 export default <HoppModule>{
   onVueAppInit(app) {
     const i18n = createI18n(<I18nOptions>{
@@ -123,11 +135,6 @@ export default <HoppModule>{
       fallbackLocale: "en",
       legacy: false,
       allowComposition: true,
-
-      // TODO: Fix this to allow for dynamic imports
-      messages: {
-        en,
-      },
     })
 
     app.use(i18n)

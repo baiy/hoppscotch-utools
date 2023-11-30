@@ -4,12 +4,20 @@
       v-if="invalidLink"
       class="flex flex-col items-center justify-center flex-1"
     >
-      <i class="pb-2 opacity-75 material-icons">error_outline</i>
+      <icon-lucide-alert-triangle class="mb-2 opacity-75 svg-icons" />
       <h1 class="text-center heading">
         {{ t("error.invalid_link") }}
       </h1>
       <p class="mt-2 text-center">
         {{ t("error.invalid_link_description") }}
+      </p>
+      <p class="mt-4">
+        <HoppButtonSecondary
+          to="/"
+          :icon="IconHome"
+          filled
+          :label="t('app.home')"
+        />
       </p>
     </div>
     <div v-else class="flex flex-col items-center justify-center flex-1 p-4">
@@ -17,14 +25,14 @@
         v-if="shortcodeDetails.loading"
         class="flex flex-col items-center justify-center flex-1 p-4"
       >
-        <SmartSpinner />
+        <HoppSmartSpinner />
       </div>
       <div v-else>
         <div
           v-if="!shortcodeDetails.loading && E.isLeft(shortcodeDetails.data)"
           class="flex flex-col items-center p-4"
         >
-          <i class="pb-2 opacity-75 material-icons">error_outline</i>
+          <icon-lucide-alert-triangle class="mb-2 opacity-75 svg-icons" />
           <h1 class="text-center heading">
             {{ t("error.invalid_link") }}
           </h1>
@@ -32,13 +40,13 @@
             {{ t("error.invalid_link_description") }}
           </p>
           <p class="mt-4">
-            <ButtonSecondary
+            <HoppButtonSecondary
               to="/"
               :icon="IconHome"
               filled
               :label="t('app.home')"
             />
-            <ButtonSecondary
+            <HoppButtonSecondary
               :icon="IconRefreshCW"
               :label="t('app.reload')"
               filled
@@ -59,8 +67,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, watch } from "vue"
+<script setup lang="ts">
+import { onMounted, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import * as E from "fp-ts/Either"
 import { safelyExtractRESTRequest } from "@hoppscotch/data"
@@ -71,75 +79,75 @@ import {
   ResolveShortcodeQuery,
   ResolveShortcodeQueryVariables,
 } from "~/helpers/backend/graphql"
-import { getDefaultRESTRequest, setRESTRequest } from "~/newstore/RESTSession"
 
 import IconHome from "~icons/lucide/home"
 import IconRefreshCW from "~icons/lucide/refresh-cw"
+import { getDefaultRESTRequest } from "~/helpers/rest/default"
+import { platform } from "~/platform"
+import { RESTTabService } from "~/services/tab/rest"
+import { useService } from "dioc/vue"
 
-export default defineComponent({
-  setup() {
-    const route = useRoute()
-    const router = useRouter()
+const route = useRoute()
+const router = useRouter()
 
-    const t = useI18n()
+const t = useI18n()
 
-    const shortcodeDetails = useGQLQuery<
-      ResolveShortcodeQuery,
-      ResolveShortcodeQueryVariables,
-      ""
-    >({
-      query: ResolveShortcodeDocument,
-      variables: {
-        code: route.params.id as string,
-      },
+const tabs = useService(RESTTabService)
+
+const invalidLink = ref(false)
+const shortcodeID = ref("")
+
+const shortcodeDetails = useGQLQuery<
+  ResolveShortcodeQuery,
+  ResolveShortcodeQueryVariables,
+  ""
+>({
+  query: ResolveShortcodeDocument,
+  variables: {
+    code: route.params.id.toString(),
+  },
+})
+
+watch(
+  () => shortcodeDetails.data,
+  () => addRequestToTab()
+)
+
+const addRequestToTab = () => {
+  if (shortcodeDetails.loading) return
+
+  const data = shortcodeDetails.data
+
+  if (E.isRight(data)) {
+    if (!data.right.shortcode?.request) {
+      invalidLink.value = true
+      return
+    }
+
+    platform.analytics?.logEvent({
+      type: "HOPP_SHORTCODE_RESOLVED",
     })
 
-    watch(
-      () => shortcodeDetails.data,
-      () => {
-        if (shortcodeDetails.loading) return
+    const request: unknown = JSON.parse(data.right.shortcode?.request as string)
 
-        const data = shortcodeDetails.data
+    tabs.createNewTab({
+      request: safelyExtractRESTRequest(request, getDefaultRESTRequest()),
+      isDirty: false,
+    })
 
-        if (E.isRight(data)) {
-          const request: unknown = JSON.parse(
-            data.right.shortcode?.request as string
-          )
+    router.push({ path: "/" })
+  }
+}
 
-          setRESTRequest(
-            safelyExtractRESTRequest(request, getDefaultRESTRequest())
-          )
+const reloadApplication = () => {
+  window.location.reload()
+}
 
-          router.push({ path: "/" })
-        }
-      }
-    )
-
-    const reloadApplication = () => {
-      window.location.reload()
-    }
-
-    return {
-      E,
-      shortcodeDetails,
-      reloadApplication,
-      t,
-      route,
-      IconHome,
-      IconRefreshCW,
-    }
-  },
-  data() {
-    return {
-      invalidLink: false,
-      shortcodeID: "",
-    }
-  },
-  mounted() {
-    if (typeof this.route.params.id === "string") {
-      this.shortcodeID = this.route.params.id
-    }
-    this.invalidLink = !this.shortcodeID
-  },
+onMounted(() => {
+  if (typeof route.params.id === "string") {
+    shortcodeID.value = route.params.id
+    shortcodeDetails.execute()
+  }
+  invalidLink.value = !shortcodeID.value
 })
 </script>

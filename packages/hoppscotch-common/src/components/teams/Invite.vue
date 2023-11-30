@@ -1,8 +1,13 @@
 <template>
-  <SmartModal v-if="show" dialog :title="t('team.invite')" @close="hideModal">
+  <HoppSmartModal
+    v-if="show"
+    dialog
+    :title="t('team.invite')"
+    @close="hideModal"
+  >
     <template #body>
       <div v-if="sendInvitesResult.length" class="flex flex-col px-4">
-        <div class="flex flex-col items-center justify-center max-w-md">
+        <div class="flex flex-col items-center justify-center max-w-md mb-8">
           <icon-lucide-users class="w-6 h-6 text-accent" />
           <h3 class="my-2 text-lg text-center">
             {{ t("team.we_sent_invite_link") }}
@@ -11,28 +16,49 @@
             {{ t("team.we_sent_invite_link_description") }}
           </p>
         </div>
-        <div
-          class="flex flex-col p-4 mt-8 border rounded space-y-6 border-dividerLight"
-        >
+        <div v-if="successInvites.length">
+          <label class="mb-4 block">
+            {{ t("team.success_invites") }}
+          </label>
           <div
-            v-for="(invitee, index) in sendInvitesResult"
-            :key="`invitee-${index}`"
+            class="flex flex-col p-4 border rounded space-y-6 border-dividerLight"
           >
-            <p class="flex items-center">
-              <component
-                :is="
-                  invitee.status === 'error' ? IconAlertTriangle : IconMailCheck
-                "
-                class="mr-4 svg-icons"
-                :class="
-                  invitee.status === 'error' ? 'text-red-500' : 'text-green-500'
-                "
-              />
-              <span class="truncate">{{ invitee.email }}</span>
-            </p>
-            <p v-if="invitee.status === 'error'" class="mt-2 ml-8 text-red-500">
-              {{ getErrorMessage(invitee.error) }}
-            </p>
+            <div
+              v-for="(invitee, index) in successInvites"
+              :key="`invitee-${index}`"
+            >
+              <p class="flex items-center">
+                <component
+                  :is="IconMailCheck"
+                  class="mr-4 svg-icons text-green-500"
+                />
+                <span class="truncate">{{ invitee.email }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div v-if="failedInvites.length" class="mt-6">
+          <label class="mb-4 block">
+            {{ t("team.failed_invites") }}
+          </label>
+          <div
+            class="flex flex-col p-4 border rounded space-y-6 border-dividerLight"
+          >
+            <div
+              v-for="(invitee, index) in failedInvites"
+              :key="`invitee-${index}`"
+            >
+              <p class="flex items-center">
+                <component
+                  :is="IconAlertTriangle"
+                  class="mr-4 svg-icons text-red-500"
+                />
+                <span class="truncate">{{ invitee.email }}</span>
+              </p>
+              <p class="mt-2 ml-8 text-red-500">
+                {{ getErrorMessage(invitee.error) }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -40,7 +66,7 @@
         v-else-if="sendingInvites"
         class="flex items-center justify-center p-4"
       >
-        <SmartSpinner />
+        <HoppSmartSpinner />
       </div>
       <div v-else class="flex flex-col">
         <div class="flex items-center justify-between flex-1">
@@ -53,7 +79,7 @@
             v-if="pendingInvites.loading"
             class="flex items-center justify-center p-4"
           >
-            <SmartSpinner />
+            <HoppSmartSpinner />
           </div>
           <div v-else>
             <div
@@ -62,7 +88,7 @@
             >
               <div
                 v-for="(invitee, index) in pendingInvites.data.right.team
-                  .teamInvitations"
+                  ?.teamInvitations"
                 :key="`invitee-${index}`"
                 class="flex divide-x divide-dividerLight"
               >
@@ -82,7 +108,7 @@
                   readonly
                 />
                 <div class="flex">
-                  <ButtonSecondary
+                  <HoppButtonSecondary
                     v-tippy="{ theme: 'tooltip' }"
                     :title="t('action.remove')"
                     :icon="IconTrash"
@@ -93,22 +119,19 @@
                 </div>
               </div>
             </div>
-            <div
+            <HoppSmartPlaceholder
               v-if="
                 E.isRight(pendingInvites.data) &&
-                pendingInvites.data.right.team.teamInvitations.length === 0
+                pendingInvites.data.right.team?.teamInvitations.length === 0
               "
-              class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+              :text="t('empty.pending_invites')"
             >
-              <span class="text-center">
-                {{ t("empty.pending_invites") }}
-              </span>
-            </div>
+            </HoppSmartPlaceholder>
             <div
               v-if="!pendingInvites.loading && E.isLeft(pendingInvites.data)"
               class="flex flex-col items-center p-4"
             >
-              <component :is="IconHelpCircle" class="mb-4 svg-icons" />
+              <icon-lucide-help-circle class="mb-4 svg-icons" />
               {{ t("error.something_went_wrong") }}
             </div>
           </div>
@@ -118,7 +141,7 @@
             {{ t("team.invite_tooltip") }}
           </label>
           <div class="flex">
-            <ButtonSecondary
+            <HoppButtonSecondary
               :icon="IconPlus"
               :label="t('add.new')"
               filled
@@ -162,7 +185,7 @@
                     tabindex="0"
                     @keyup.escape="hide()"
                   >
-                    <SmartItem
+                    <HoppSmartItem
                       label="OWNER"
                       :icon="
                         invitee.value === 'OWNER' ? IconCircleDot : IconCircle
@@ -170,12 +193,12 @@
                       :active="invitee.value === 'OWNER'"
                       @click="
                         () => {
-                          updateNewInviteeRole(index, 'OWNER')
+                          updateNewInviteeRole(index, TeamMemberRole.Owner)
                           hide()
                         }
                       "
                     />
-                    <SmartItem
+                    <HoppSmartItem
                       label="EDITOR"
                       :icon="
                         invitee.value === 'EDITOR' ? IconCircleDot : IconCircle
@@ -183,12 +206,12 @@
                       :active="invitee.value === 'EDITOR'"
                       @click="
                         () => {
-                          updateNewInviteeRole(index, 'EDITOR')
+                          updateNewInviteeRole(index, TeamMemberRole.Editor)
                           hide()
                         }
                       "
                     />
-                    <SmartItem
+                    <HoppSmartItem
                       label="VIEWER"
                       :icon="
                         invitee.value === 'VIEWER' ? IconCircleDot : IconCircle
@@ -196,7 +219,7 @@
                       :active="invitee.value === 'VIEWER'"
                       @click="
                         () => {
-                          updateNewInviteeRole(index, 'VIEWER')
+                          updateNewInviteeRole(index, TeamMemberRole.Viewer)
                           hide()
                         }
                       "
@@ -206,7 +229,7 @@
               </tippy>
             </span>
             <div class="flex">
-              <ButtonSecondary
+              <HoppButtonSecondary
                 id="member"
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('action.remove')"
@@ -216,25 +239,18 @@
               />
             </div>
           </div>
-          <div
+          <HoppSmartPlaceholder
             v-if="newInvites.length === 0"
-            class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+            :src="`/images/states/${colorMode.value}/add_group.svg`"
+            :alt="`${t('empty.invites')}`"
+            :text="`${t('empty.invites')}`"
           >
-            <img
-              :src="`/images/states/${colorMode.value}/add_group.svg`"
-              loading="lazy"
-              class="inline-flex flex-col object-contain object-center w-16 h-16 mb-4"
-              :alt="`${t('empty.invites')}`"
-            />
-            <span class="pb-4 text-center">
-              {{ t("empty.invites") }}
-            </span>
-            <ButtonSecondary
+            <HoppButtonSecondary
               :label="t('add.new')"
               filled
               @click="addNewInvitee"
             />
-          </div>
+          </HoppSmartPlaceholder>
         </div>
         <div
           v-if="newInvites.length"
@@ -243,8 +259,7 @@
           <span
             class="flex items-center justify-center px-2 py-1 mb-4 font-semibold border rounded-full bg-primaryDark border-divider"
           >
-            <component
-              :is="IconHelpCircle"
+            <icon-lucide-help-circle
               class="mr-2 text-secondaryLight svg-icons"
             />
             {{ t("profile.roles") }}
@@ -294,7 +309,7 @@
         v-if="sendInvitesResult.length"
         class="flex justify-between flex-1 text-secondaryLight"
       >
-        <ButtonSecondary
+        <HoppButtonSecondary
           class="link !p-0"
           :label="t('team.invite_more')"
           :icon="IconArrowLeft"
@@ -310,15 +325,19 @@
             }
           "
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           class="link !p-0"
           :label="`${t('action.dismiss')}`"
           @click="hideModal"
         />
       </p>
       <span v-else class="flex space-x-2">
-        <ButtonPrimary :label="t('team.invite')" outline @click="sendInvites" />
-        <ButtonSecondary
+        <HoppButtonPrimary
+          :label="t('team.invite')"
+          outline
+          @click="sendInvites"
+        />
+        <HoppButtonSecondary
           :label="t('action.cancel')"
           outline
           filled
@@ -326,7 +345,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -359,7 +378,6 @@ import { useColorMode } from "~/composables/theming"
 
 import IconTrash from "~icons/lucide/trash"
 import IconPlus from "~icons/lucide/plus"
-import IconHelpCircle from "~icons/lucide/help-circle"
 import IconAlertTriangle from "~icons/lucide/alert-triangle"
 import IconMailCheck from "~icons/lucide/mail-check"
 import IconCircleDot from "~icons/lucide/circle-dot"
@@ -487,6 +505,12 @@ type SendInvitesErrorType =
     }
 
 const sendInvitesResult = ref<Array<SendInvitesErrorType>>([])
+const successInvites = computed(() =>
+  sendInvitesResult.value.filter((invitee) => invitee.status === "success")
+)
+const failedInvites = computed(() =>
+  sendInvitesResult.value.filter((invitee) => invitee.status === "error")
+)
 
 const sendingInvites = ref<boolean>(false)
 

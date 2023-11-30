@@ -1,36 +1,28 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="t('modal.edit_request')"
     @close="hideModal"
   >
     <template #body>
-      <div class="flex flex-col">
-        <input
-          id="selectLabelEditReq"
-          v-model="name"
-          v-focus
-          class="input floating-input"
-          placeholder=" "
-          type="text"
-          autocomplete="off"
-          @keyup.enter="editRequest"
-        />
-        <label for="selectLabelEditReq">
-          {{ t("action.label") }}
-        </label>
-      </div>
+      <HoppSmartInput
+        v-model="editingName"
+        placeholder=" "
+        :label="t('action.label')"
+        input-styles="floating-input"
+        @submit="editRequest"
+      />
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="t('action.save')"
           :loading="loadingState"
           outline
           @click="editRequest"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="t('action.cancel')"
           outline
           filled
@@ -38,13 +30,13 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
 import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
+import { useVModel } from "@vueuse/core"
 
 const toast = useToast()
 const t = useI18n()
@@ -53,40 +45,34 @@ const props = withDefaults(
   defineProps<{
     show: boolean
     loadingState: boolean
-    editingRequestName: string
+    modelValue?: string
   }>(),
   {
     show: false,
     loadingState: false,
-    editingRequestName: "",
+    modelValue: "",
   }
 )
 
 const emit = defineEmits<{
   (e: "submit", name: string): void
   (e: "hide-modal"): void
+  (e: "update:modelValue", value: string): void
 }>()
 
-const name = ref("")
-
-watch(
-  () => props.editingRequestName,
-  (newName) => {
-    name.value = newName
-  }
-)
+const editingName = useVModel(props, "modelValue")
 
 const editRequest = () => {
-  if (name.value.trim() === "") {
+  if (editingName.value.trim() === "") {
     toast.error(t("request.invalid_name"))
     return
   }
 
-  emit("submit", name.value)
+  emit("submit", editingName.value)
 }
 
 const hideModal = () => {
-  name.value = ""
+  editingName.value = ""
   emit("hide-modal")
 }
 </script>

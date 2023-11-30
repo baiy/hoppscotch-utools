@@ -4,6 +4,7 @@
   @apply after:backface-hidden;
   @apply selection:bg-accentDark;
   @apply selection:text-accentContrast;
+  @apply overscroll-none;
 }
 
 :root {
@@ -28,6 +29,10 @@
 ::-webkit-scrollbar {
   @apply w-4;
   @apply h-0;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
 }
 
 input::placeholder,
@@ -132,10 +137,10 @@ a {
 
 .cm-tooltip {
   .tippy-box {
-    @apply shadow-none;
+    @apply shadow-none #{!important};
     @apply fixed;
     @apply inline-flex;
-    @apply -mt-8;
+    @apply -mt-7.5;
   }
 }
 
@@ -165,12 +170,6 @@ a {
       @apply truncate;
       @apply sm:inline-flex;
     }
-
-    .env-icon {
-      @apply transition;
-      @apply inline-flex;
-      @apply items-center;
-    }
   }
 
   .tippy-svg-arrow {
@@ -189,10 +188,11 @@ a {
   @apply border-solid border-dividerDark;
   @apply rounded;
   @apply shadow-lg;
+  @apply max-w-[45vw] #{!important};
 
   .tippy-content {
     @apply flex flex-col;
-    @apply max-h-56;
+    @apply max-h-[45vh];
     @apply items-stretch;
     @apply overflow-y-auto;
     @apply text-secondary text-body;
@@ -200,6 +200,10 @@ a {
     @apply leading-normal;
     @apply focus:outline-none;
     scroll-behavior: smooth;
+
+    & > span {
+      @apply block #{!important};
+    }
   }
 
   .tippy-svg-arrow {
@@ -215,6 +219,7 @@ a {
 
 [data-v-tippy] {
   @apply flex flex-1;
+  @apply truncate;
 }
 
 [interactive] > div {
@@ -323,9 +328,10 @@ pre.ace_editor {
   @apply after:justify-center;
   @apply after:pointer-events-none;
   @apply after:font-icon;
-  @apply after:text-secondaryLight;
+  @apply after:text-current;
   @apply after:right-3;
-  @apply after:content-["\e313"];
+  @apply after:content-["\e5cf"];
+  @apply after:text-lg;
 }
 
 .info-response {
@@ -458,6 +464,14 @@ pre.ace_editor {
   @apply bg-dividerLight;
 }
 
+.splitpanes--horizontal .splitpanes__pane {
+  @apply transition-none;
+}
+
+.splitpanes--vertical .splitpanes__pane {
+  @apply transition-none;
+}
+
 .cm-focused {
   @apply select-auto;
   @apply outline-none #{!important};
@@ -471,6 +485,10 @@ pre.ace_editor {
   }
 }
 
+.cm-scroller {
+  @apply overscroll-y-auto;
+}
+
 .cm-editor {
   .cm-line::selection {
     @apply bg-accentDark #{!important};
@@ -481,6 +499,22 @@ pre.ace_editor {
     @apply bg-accentDark #{!important};
     @apply text-accentContrast #{!important};
   }
+}
+
+.cm-panel.cm-search [name="close"] {
+  @apply flex;
+  @apply items-center;
+  @apply justify-center;
+  @apply min-h-5;
+  @apply min-w-5;
+  @apply bg-primaryDark #{!important};
+  @apply sticky #{!important};
+  @apply right-0 #{!important};
+  @apply ml-auto #{!important};
+  @apply my-auto #{!important};
+  @apply rounded #{!important};
+  @apply outline #{!important};
+  @apply outline-divider #{!important};
 }
 
 .shortcut-key {
@@ -557,4 +591,12 @@ details[open] summary .indicator {
 .color-picker[type="color"]::-webkit-color-swatch {
   @apply rounded;
   @apply border-0;
+}
+
+.gql-operation-not-highlight {
+  @apply opacity-50;
+}
+
+.gql-operation-highlight {
+  @apply opacity-100;
 }

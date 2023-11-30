@@ -1,19 +1,23 @@
 import { FormDataKeyValue, HoppRESTRequest } from "@hoppscotch/data"
+import { getDefaultRESTRequest } from "./rest/default"
 import { isJSONContentType } from "./utils/contenttypes"
-import { getDefaultRESTRequest } from "~/newstore/RESTSession"
 
 /**
  * Handles translations for all the hopp.io REST Shareable URL params
  */
 export function translateExtURLParams(
-  urlParams: Record<string, any>
+  urlParams: Record<string, any>,
+  initialReq?: HoppRESTRequest
 ): HoppRESTRequest {
-  if (urlParams.v) return parseV1ExtURL(urlParams)
-  else return parseV0ExtURL(urlParams)
+  if (urlParams.v) return parseV1ExtURL(urlParams, initialReq)
+  else return parseV0ExtURL(urlParams, initialReq)
 }
 
-function parseV0ExtURL(urlParams: Record<string, any>): HoppRESTRequest {
-  const resolvedReq = getDefaultRESTRequest()
+function parseV0ExtURL(
+  urlParams: Record<string, any>,
+  initialReq?: HoppRESTRequest
+): HoppRESTRequest {
+  const resolvedReq = initialReq ?? getDefaultRESTRequest()
 
   if (urlParams.method && typeof urlParams.method === "string") {
     resolvedReq.method = urlParams.method
@@ -89,8 +93,11 @@ function parseV0ExtURL(urlParams: Record<string, any>): HoppRESTRequest {
   return resolvedReq
 }
 
-function parseV1ExtURL(urlParams: Record<string, any>): HoppRESTRequest {
-  const resolvedReq = getDefaultRESTRequest()
+function parseV1ExtURL(
+  urlParams: Record<string, any>,
+  initialReq?: HoppRESTRequest
+): HoppRESTRequest {
+  const resolvedReq = initialReq ?? getDefaultRESTRequest()
 
   if (urlParams.headers && typeof urlParams.headers === "string") {
     resolvedReq.headers = JSON.parse(urlParams.headers)

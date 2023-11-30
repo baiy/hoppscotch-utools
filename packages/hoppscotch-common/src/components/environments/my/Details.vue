@@ -1,5 +1,5 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="t(`environment.${action}`)"
@@ -7,34 +7,27 @@
   >
     <template #body>
       <div class="flex flex-col">
-        <div class="relative flex">
-          <input
-            id="selectLabelEnvEdit"
-            v-model="name"
-            v-focus
-            class="input floating-input"
-            placeholder=" "
-            type="text"
-            autocomplete="off"
-            :disabled="editingEnvironmentIndex === 'Global'"
-            @keyup.enter="saveEnvironment"
-          />
-          <label for="selectLabelEnvEdit">
-            {{ t("action.label") }}
-          </label>
-        </div>
+        <HoppSmartInput
+          v-model="editingName"
+          placeholder=" "
+          :label="t('action.label')"
+          input-styles="floating-input"
+          :disabled="editingEnvironmentIndex === 'Global'"
+          @submit="saveEnvironment"
+        />
+
         <div class="flex items-center justify-between flex-1">
           <label for="variableList" class="p-4">
             {{ t("environment.variable_list") }}
           </label>
           <div class="flex">
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{ theme: 'tooltip' }"
               :title="t('action.clear_all')"
               :icon="clearIcon"
               @click="clearContent()"
             />
-            <ButtonSecondary
+            <HoppButtonSecondary
               v-tippy="{ theme: 'tooltip' }"
               :icon="IconPlus"
               :title="t('add.new')"
@@ -69,7 +62,7 @@
               :name="'value' + index"
             />
             <div class="flex">
-              <ButtonSecondary
+              <HoppButtonSecondary
                 id="variable"
                 v-tippy="{ theme: 'tooltip' }"
                 :title="t('action.remove')"
@@ -79,37 +72,29 @@
               />
             </div>
           </div>
-          <div
+          <HoppSmartPlaceholder
             v-if="vars.length === 0"
-            class="flex flex-col items-center justify-center p-4 text-secondaryLight"
+            :src="`/images/states/${colorMode.value}/blockchain.svg`"
+            :alt="`${t('empty.environments')}`"
+            :text="t('empty.environments')"
           >
-            <img
-              :src="`/images/states/${colorMode.value}/blockchain.svg`"
-              loading="lazy"
-              class="inline-flex flex-col object-contain object-center w-16 h-16 my-4"
-              :alt="`${t('empty.environments')}`"
-            />
-            <span class="pb-4 text-center">
-              {{ t("empty.environments") }}
-            </span>
-            <ButtonSecondary
+            <HoppButtonSecondary
               :label="`${t('add.new')}`"
               filled
-              class="mb-4"
               @click="addEnvironmentVariable"
             />
-          </div>
+          </HoppSmartPlaceholder>
         </div>
       </div>
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="`${t('action.save')}`"
           outline
           @click="saveEnvironment"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="`${t('action.cancel')}`"
           outline
           filled
@@ -117,7 +102,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script setup lang="ts">
@@ -147,6 +132,8 @@ import { useI18n } from "@composables/i18n"
 import { useToast } from "@composables/toast"
 import { useReadonlyStream } from "@composables/stream"
 import { useColorMode } from "@composables/theming"
+import { environmentsStore } from "~/newstore/environments"
+import { platform } from "~/platform"
 
 type EnvironmentVariable = {
   id: number
@@ -164,8 +151,8 @@ const props = withDefaults(
   defineProps<{
     show: boolean
     action: "edit" | "new"
-    editingEnvironmentIndex: number | "Global" | null
-    editingVariableName: string | null
+    editingEnvironmentIndex?: number | "Global" | null
+    editingVariableName?: string | null
     envVars?: () => Environment["variables"]
   }>(),
   {
@@ -183,7 +170,7 @@ const emit = defineEmits<{
 
 const idTicker = ref(0)
 
-const name = ref<string | null>(null)
+const editingName = ref<string | null>(null)
 const vars = ref<EnvironmentVariable[]>([
   { id: idTicker.value++, env: { key: "", value: "" } },
 ])
@@ -236,10 +223,12 @@ const liveEnvs = computed(() => {
   }
 
   if (props.editingEnvironmentIndex === "Global") {
-    return [...vars.value.map((x) => ({ ...x.env, source: name.value! }))]
+    return [
+      ...vars.value.map((x) => ({ ...x.env, source: editingName.value! })),
+    ]
   } else {
     return [
-      ...vars.value.map((x) => ({ ...x.env, source: name.value! })),
+      ...vars.value.map((x) => ({ ...x.env, source: editingName.value! })),
       ...globalVars.value.map((x) => ({ ...x, source: "Global" })),
     ]
   }
@@ -249,7 +238,7 @@ watch(
   () => props.show,
   (show) => {
     if (show) {
-      name.value = workingEnv.value?.name ?? null
+      editingName.value = workingEnv.value?.name ?? null
       vars.value = pipe(
         workingEnv.value?.variables ?? [],
         A.map((e) => ({
@@ -282,7 +271,7 @@ const removeEnvironmentVariable = (index: number) => {
 }
 
 const saveEnvironment = () => {
-  if (!name.value) {
+  if (!editingName.value) {
     toast.error(`${t("environment.invalid_name")}`)
     return
   }
@@ -298,26 +287,43 @@ const saveEnvironment = () => {
   )
 
   const environmentUpdated: Environment = {
-    name: name.value,
+    name: editingName.value,
     variables: filterdVariables,
   }
 
   if (props.action === "new") {
     // Creating a new environment
-    createEnvironment(name.value)
-    updateEnvironment(envList.value.length - 1, environmentUpdated)
+    createEnvironment(editingName.value, environmentUpdated.variables)
     setSelectedEnvironmentIndex({
       type: "MY_ENV",
       index: envList.value.length - 1,
     })
     toast.success(`${t("environment.created")}`)
+
+    platform.analytics?.logEvent({
+      type: "HOPP_CREATE_ENVIRONMENT",
+      workspaceType: "personal",
+    })
   } else if (props.editingEnvironmentIndex === "Global") {
     // Editing the Global environment
     setGlobalEnvVariables(environmentUpdated.variables)
     toast.success(`${t("environment.updated")}`)
   } else if (props.editingEnvironmentIndex !== null) {
+    const envID =
+      environmentsStore.value.environments[props.editingEnvironmentIndex].id
+
     // Editing an environment
-    updateEnvironment(props.editingEnvironmentIndex, environmentUpdated)
+    updateEnvironment(
+      props.editingEnvironmentIndex,
+      envID
+        ? {
+            ...environmentUpdated,
+            id: envID,
+          }
+        : {
+            ...environmentUpdated,
+          }
+    )
     toast.success(`${t("environment.updated")}`)
   }
 
@@ -325,7 +331,7 @@ const saveEnvironment = () => {
 }
 
 const hideModal = () => {
-  name.value = null
+  editingName.value = null
   emit("hide-modal")
 }
 </script>

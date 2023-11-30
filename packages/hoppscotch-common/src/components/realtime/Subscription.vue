@@ -1,5 +1,5 @@
 <template>
-  <SmartModal v-if="show" dialog :title="t('mqtt.new')" @close="hideModal">
+  <HoppSmartModal v-if="show" dialog :title="t('mqtt.new')" @close="hideModal">
     <template #body>
       <div class="flex justify-between mb-4">
         <div
@@ -10,11 +10,11 @@
           </label>
           <tippy interactive trigger="click" theme="popover">
             <span class="select-wrapper">
-              <ButtonSecondary class="pr-8" :label="`${QoS}`" />
+              <HoppButtonSecondary class="pr-8" :label="`${QoS}`" />
             </span>
             <template #content="{ hide }">
               <div class="flex flex-col" role="menu">
-                <SmartItem
+                <HoppSmartItem
                   v-for="item in QOS_VALUES"
                   :key="`qos-${item}`"
                   :label="`${item}`"
@@ -35,7 +35,7 @@
       <div class="relative flex flex-col">
         <input
           id="selectLabelAdd"
-          v-model="name"
+          v-model="editingName"
           v-focus
           class="input floating-input"
           placeholder=" "
@@ -68,13 +68,13 @@
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="t('mqtt.subscribe')"
           :loading="loadingState"
           outline
           @click="addNewSubscription"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="t('action.cancel')"
           outline
           filled
@@ -82,7 +82,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script lang="ts" setup>
@@ -113,13 +113,13 @@ const emit = defineEmits<{
 }>()
 
 const QoS = ref<(typeof QOS_VALUES)[number]>(2)
-const name = ref("")
+const editingName = ref("")
 const color = ref("#f58290")
 
 watch(
   () => props.show,
   () => {
-    name.value = ""
+    editingName.value = ""
     QoS.value = 2
     const randomColor = Math.floor(Math.random() * 16777215).toString(16)
     color.value = `#${randomColor}`
@@ -127,18 +127,18 @@ watch(
 )
 
 const addNewSubscription = () => {
-  if (!name.value) {
+  if (!editingName.value) {
     toastr.error(t("mqtt.invalid_topic").toString())
     return
   }
   emit("submit", {
-    name: name.value,
+    name: editingName.value,
     qos: QoS.value,
     color: color.value,
   })
 }
 const hideModal = () => {
-  name.value = ""
+  editingName.value = ""
   QoS.value = 2
   emit("hide-modal")
 }

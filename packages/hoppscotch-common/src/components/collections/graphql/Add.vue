@@ -1,35 +1,27 @@
 <template>
-  <SmartModal
+  <HoppSmartModal
     v-if="show"
     dialog
     :title="`${t('collection.new')}`"
     @close="hideModal"
   >
     <template #body>
-      <div class="flex flex-col">
-        <input
-          id="selectLabelGqlAdd"
-          v-model="name"
-          v-focus
-          class="input floating-input"
-          placeholder=" "
-          type="text"
-          autocomplete="off"
-          @keyup.enter="addNewCollection"
-        />
-        <label for="selectLabelGqlAdd">
-          {{ t("action.label") }}
-        </label>
-      </div>
+      <HoppSmartInput
+        v-model="name"
+        placeholder=" "
+        input-styles="floating-input"
+        :label="t('action.label')"
+        @submit="addNewCollection"
+      />
     </template>
     <template #footer>
       <span class="flex space-x-2">
-        <ButtonPrimary
+        <HoppButtonPrimary
           :label="`${t('action.save')}`"
           outline
           @click="addNewCollection"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           :label="`${t('action.cancel')}`"
           outline
           filled
@@ -37,7 +29,7 @@
         />
       </span>
     </template>
-  </SmartModal>
+  </HoppSmartModal>
 </template>
 
 <script lang="ts">
@@ -46,6 +38,7 @@ import { useToast } from "@composables/toast"
 import { useI18n } from "@composables/i18n"
 import { HoppGQLRequest, makeCollection } from "@hoppscotch/data"
 import { addGraphqlCollection } from "~/newstore/collections"
+import { platform } from "~/platform"
 
 export default defineComponent({
   props: {
@@ -79,6 +72,13 @@ export default defineComponent({
       )
 
       this.hideModal()
+
+      platform.analytics?.logEvent({
+        type: "HOPP_CREATE_COLLECTION",
+        isRootCollection: true,
+        platform: "gql",
+        workspaceType: "personal",
+      })
     },
     hideModal() {
       this.name = null

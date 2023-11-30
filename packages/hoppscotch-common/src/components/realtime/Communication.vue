@@ -1,5 +1,8 @@
 <template>
-  <div class="flex flex-col flex-1">
+  <div
+    class="flex flex-col flex-1"
+    :class="{ eventFeildShown: showEventField }"
+  >
     <div
       v-if="showEventField"
       class="sticky z-10 flex items-center justify-center flex-shrink-0 overflow-x-auto border-b bg-primary border-dividerLight"
@@ -31,7 +34,7 @@
           :on-shown="() => tippyActions.focus()"
         >
           <span class="select-wrapper">
-            <ButtonSecondary
+            <HoppButtonSecondary
               :label="contentType || t('state.none').toLowerCase()"
               class="pr-8 ml-2 rounded-none"
             />
@@ -43,7 +46,7 @@
               tabindex="0"
               @keyup.escape="hide()"
             >
-              <SmartItem
+              <HoppSmartItem
                 v-for="(contentTypeItem, index) in validContentTypes"
                 :key="`contentTypeItem-${index}`"
                 :label="contentTypeItem"
@@ -63,7 +66,7 @@
         </tippy>
       </span>
       <div class="flex">
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip', delay: [500, 20], allowHTML: true }"
           :title="`${t(
             'request.run'
@@ -74,7 +77,7 @@
           class="rounded-none !text-accent !hover:text-accentDark"
           @click="sendMessage()"
         />
-        <SmartCheckbox
+        <HoppSmartCheckbox
           v-tippy="{ theme: 'tooltip' }"
           :on="clearInputOnSend"
           class="px-2"
@@ -82,28 +85,28 @@
           @change="clearInputOnSend = !clearInputOnSend"
         >
           {{ t("mqtt.clear_input") }}
-        </SmartCheckbox>
-        <ButtonSecondary
+        </HoppSmartCheckbox>
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
-          to="https://docs.hoppscotch.io/realtime"
+          to="https://docs.hoppscotch.io/documentation/features/realtime-api-testing"
           blank
           :title="t('app.wiki')"
           :icon="IconHelpCircle"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.clear')"
           :icon="IconTrash2"
           @click="clearContent"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-tippy="{ theme: 'tooltip' }"
           :title="t('state.linewrap')"
           :class="{ '!text-accent': linewrapEnabled }"
           :icon="IconWrapText"
           @click.prevent="linewrapEnabled = !linewrapEnabled"
         />
-        <ButtonSecondary
+        <HoppButtonSecondary
           v-if="contentType && contentType == 'JSON'"
           v-tippy="{ theme: 'tooltip' }"
           :title="t('action.prettify')"
@@ -111,7 +114,7 @@
           @click="prettifyRequestBody"
         />
         <label for="payload">
-          <ButtonSecondary
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip' }"
             :title="t('import.title')"
             :icon="IconFilePlus"
@@ -271,3 +274,17 @@ const prettifyRequestBody = () => {
 
 defineActionHandler("request.send-cancel", sendMessage)
 </script>
+
+<style lang="scss" scoped>
+:deep(.cm-panels) {
+  @apply top-upperSecondaryStickyFold #{!important};
+}
+.eventFeildShown :deep(.cm-panels),
+.cmResponsePrimaryStickyFold :deep(.cm-panels) {
+  @apply top-upperTertiaryStickyFold #{!important};
+}
+
+.cmResponseSecondaryStickyFold :deep(.cm-panels) {
+  @apply top-upperFourthStickyFold #{!important};
+}
+</style>
